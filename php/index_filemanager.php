@@ -19,7 +19,7 @@
         <li><a href="./share">Share</a></li>
         <li><a href="./organize">Organize</a></li>
         <li><a href="./permissions">Permissions</a></li>
-        <li><a href="https://weblogin.umich.edu/cgi-bin/logout?http://afs.umich.edu/">Logout</a></li>
+        <li><a href="https://weblogin.umich.edu/cgi-bin/logout?http://mfile.umich.edu/">Logout</a></li>
     </ul>
 </div>
 <div id="welcome" class="serviceBox">
