@@ -1,0 +1,20 @@
+/* Amends and adds rules needed by IE6 to fileman.css */
+html {
+	overflow: hidden; 
+} 
+
+body {
+	overflow: auto; 
+}
+ 
+div.sidebar {
+	position: absolute;
+	padding: 0px;
+	height: 100%; 
+}
+
+div.masthead {
+	position: absolute;
+	padding: 0px;
+	padding-left: 0px;
+}
