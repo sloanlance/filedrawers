@@ -267,6 +267,7 @@ function createFileList()
     var docFragment = document.createDocumentFragment();
     var trElem, tdElem, txtNode;
     var i = 0;  // Only counts rows that are actually displayed
+    var className = '';
 
     for ( var j = 0; j < files.length; j++ ) {
 
@@ -276,7 +277,9 @@ function createFileList()
         }
 
         trElem = document.createElement( 'tr' );
-        trElem.className = 'row' + ( i % 2 );
+        className = 'row' + ( i % 2 );
+        trElem.className = className
+        files[j].className = className;
         i++;
 
         trElem.id = 'TR' + j;
@@ -369,11 +372,12 @@ function formatDate( rawDate )
 // File Object - All files and folders displayed are objects of this type
 function File( title, date, size, selected, type )
 {
-	this.title    = title;    // The title of the item
-	this.date     = date;     // The modify date of the item
-	this.size     = size;     // The size of the item
-	this.selected = selected; // Is the item selected?
-	this.type     = type;     // The file type of the item
+	this.title     = title;    // The title of the item
+	this.date      = date;     // The modify date of the item
+	this.size      = size;     // The size of the item
+	this.selected  = selected; // Is the item selected?
+	this.type      = type;     // The file type of the item
+    this.className = false;    // The original class style of the file's row
 }
 
 // Selected File Information Object - stores information about a file or files
@@ -804,7 +808,7 @@ function processCheckedItem( checkbox )
 {
 	if ( trElem = checkbox.parentNode.parentNode ) {
 		if ( files[checkbox.value].selected === true ) {
-            trElem.className = 'row' + ( checkbox.value % 2 );
+            trElem.className = files[checkbox.value].className;
             files[checkbox.value].selected = false;
 		} else {
             trElem.className = 'selectedrow';
