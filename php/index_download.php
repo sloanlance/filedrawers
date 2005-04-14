@@ -1,32 +1,17 @@
 <?php
 /*
- * Copyright (c) 2004 Regents of The University of Michigan.
+ * Copyright (c) 2005 Regents of The University of Michigan.
  * All Rights Reserved.  See COPYRIGHT.
  */
 
-require_once( '../lib/afs.php' );
+require_once( '../../objects/afs.php' );
 
-if ( !extension_loaded( 'fileinfo' )) {
-    dl( 'fileinfo.' . PHP_SHLIB_SUFFIX );
-}
+$download = new Afs( $_GET['path'] );
 
-if ( !extension_loaded( 'fileinfo' )) {
-    error_log( 'mFile: fileinfo extension is not avaliable, please compile it.' );
-    exit();
-}
-
-$download = new Afs();
-$download->setPath( $_GET['path'] );
-$res = finfo_open( FILEINFO_MIME );
-
-header( "Pragma: public" );
-header( "Expires: 0" );
-header( "Cache-Control: must-revalidate, post-check=0, pre-check=0" );
-
-header( "Content-Type: " . finfo_file( $res, $download->path ));
-header( "Content-Disposition: attachment; filename=" . basename( $download->path ));
-
-header( "Content-Description: File Transfer" );
-@readfile( $download->path );
-finfo_close( $res );
+header( 'Content-Description: File Transfer' ); 
+header( 'Content-Type: application/force-download' ); 
+header( 'Content-Length: ' . filesize( $download->path )); 
+header( 'Content-Disposition: attachment; filename=' . basename( $download->path )); 
+readfile( $download->path );
 ?>
+
