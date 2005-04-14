@@ -1,56 +1,92 @@
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
-<html xmlns="http://www.w3.org/1999/xhtml">
-<head>
-<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
-<link href="fileman.css" rel="stylesheet" type="text/css" />
-<title>Welcome to mFile (beta)</title>
-</head>
-<body>
-<div id="color-headbar-blue">
-    <?php include( 'display/includes/todaysdate.php' ); ?>
-    <h1>mFile: AFS File Management</h1>
-</div>
-<div id="itcs"><a href="http://www.itcs.umich.edu/"><b>information technology central
-            services </b>at the university of michigan</a> </div>
-<div id="menubar">
-    <ul>
-        <li><a href="./dropoff">Drop Off</a></li>
-        <li><a href="./publish">Publish</a></li>
-        <li><a href="./share">Share</a></li>
-        <li><a href="./organize">Organize</a></li>
-        <li><a href="./permissions">Permissions</a></li>
-        <li><a href="https://weblogin.umich.edu/cgi-bin/logout?http://mfile.umich.edu/">Logout</a></li>
-    </ul>
-</div>
-<div id="welcome" class="serviceBox">
-    <h2>Welcome to mFile</h2>
-    <p>mFile is a web-based interface to the AFS network storage system. Use mFile to
-        store, access, and share documents on any computer with a web browser. This is
-        a beta (test) version of mFile. If you encounter any problems or have suggestions
-        for improvement, please let us know!</p>
-</div>
-<div id="dropoff" class="serviceBox">
-    <h2>Dropoff</h2>
-    <p>- Create &quot;dropboxes&quot; that others can use to submit files (such as assignments).</p>
-    <p>- View dropboxes that others have created for you to use.</p>
-</div>
-<div id="publish" class="serviceBox">
-    <h2>Publish</h2>
-    <p>Publish html documents on the Internet. You can create public web sites that everyone
-        can view or private sites that only certain people can view.</p>
-</div>
-<div id="share" class="serviceBox">
-    <h2>Share</h2>
-    <p>Create special folders that contain documents you wish to share with other people.</p>
-</div>
-<div id="organize" class="serviceBox">
-    <h2>Organize</h2>
-    <p>Upload, download, move, delete, rename, and view the files in your AFS space.</p>
-</div>
-<div id="permissions" class="serviceBox">
-    <h2>Permissions</h2>
-    <p>Users familiar with AFS file permissions can set access controls for folders in
-        their AFS spaces.</p>
-</div>
-</body>
-</html>
+<?php
+/*
+ * Copyright (c) 2005 Regents of The University of Michigan.
+ * All Rights Reserved.  See COPYRIGHT.
+ */
+
+require_once( '../objects/afs.php' );
+require_once( '../smarty/smarty.custom.php' );
+
+$uploadError = false;
+$errorMsg    = '';
+
+if ( isset( $_GET['finishid'] )) {
+    $path = "/tmp/" . $_GET['finishid'];
+
+    if ( file_exists( $path )
+      && preg_match( "/[^a-f0-9]/", $_GET['finishid'] ) === 0
+      && !is_dir( $path )) {
+        $result = file( $path );
+        unlink( $path ); // Remove the session file
+
+        // Check for upload errors
+        if ( is_array( $result )) {
+            foreach( $result as $file ) {
+                $file = explode( ':', $file );
+                if ( isset( $file[2] ) && trim( $file[2] ) == 'File exists' ) {
+                    if ( $uploadError == false ) {
+                        $errorMsg = "The file '" . $file[0] . "' already exists."
+                          . " The upload cannot continue.";
+                        $uploadError = true;
+                    }
+                }
+
+                if ( isset( $file[2] ) && trim( $file[2] ) == 'not successful' ) {
+                    if ( $uploadError == false ) {
+                        $errorMsg = "One or more files did not upload sucessfully";
+                        $uploadError = true;
+                    }
+                }
+            }
+
+            if ( ! $uploadError ) {
+                $notifyMsg = "Successfully received file(s).";
+            }
+        }
+    }
+}
+
+$path = ( isset( $_GET['path'] )) ? $_GET['path'] : '';
+$afs  = new Afs( $path );
+$smarty = new Smarty_Template;
+
+// Set notification messages
+if ( ! empty( $notifyMsg )) {
+    $smarty->assign( 'notifyMsg', $notifyMsg );
+} else if ( ! empty( $afs->notifyMsg )) {
+    $smarty->assign( 'notifyMsg', $afs->notifyMsg );
+}
+
+// Set error messages
+if ( $uploadError ) {
+    $smarty->assign( 'warnUser', rawurlencode( $errorMsg ));
+} else if ( ! empty( $afs->errorMsg )) {
+    $smarty->assign( 'warnUser', rawurlencode( $afs->errorMsg ));
+} else if ( isset( $_GET['error'] )) {
+    $smarty->assign( 'warnUser', 'Unable to upload the selected file(s).' );
+}
+
+// Highlight the appropriate service button/tab
+if ( strpos( $path, $_SERVER['REMOTE_USER'] . '/Public/html' ) === false ) {
+    $webSelected = false;
+} else {
+    $webSelected = true;
+}
+
+$homeSelected = ( $webSelected ) ? false : true;
+
+$smarty->assign( 'returnToURI', 'https://' . $_SERVER['HTTP_HOST']
+  . $_SERVER['PHP_SELF'] . "?path=$afs->path&amp;finishid=$afs->sid" );
+$smarty->assign( 'path', htmlentities( $afs->path, ENT_QUOTES ));
+$smarty->assign( 'folderName', htmlentities( basename( $afs->path ), ENT_QUOTES ));
+$smarty->assign( 'folderContents', $afs->folderContents( true, true ));
+$smarty->assign( 'homePath', $afs->getBasePath());
+$smarty->assign( 'parentPath', $afs->parentPath());
+$smarty->assign( 'sid', $afs->sid );
+$smarty->assign( 'newWebSpaceUI', $afs->newWebSpaceUI );
+$smarty->assign( 'readonly', $afs->readonly );
+$smarty->assign( 'homeSelected', $homeSelected );
+$smarty->assign( 'webSelected', $webSelected );
+$smarty->assign( 'location', $afs->pathDisplay());
+$smarty->display( 'wwwroot/fileman.tpl' );
+?>
