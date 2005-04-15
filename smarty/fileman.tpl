@@ -28,7 +28,7 @@
             <div class="titlebar"> <a href="javascript:closeItem('favCtrl','favorites');">[X]</a>
                 <h2>My Favorite Locations</h2>
             </div>
-            <iframe name="favpanel" id="favpanel" scrolling="no" src="" frameborder="0"></iframe>
+            <iframe name="favpanel" id="favpanel" scrolling="no" src="blankpage.html" frameborder="0"></iframe>
         </div>
         <div id="permissions" class="expandItem" style="display: none;">
             <div class="titlebar"> <a href="javascript:closeItem('permsCtrl','permissions');">[X]</a>
@@ -76,7 +76,7 @@
             <div class="uploadctrl" id="uploadctrl">
                 <input type="button" name="upload" value="Upload File(s)" onclick="startUpload();" />
 &nbsp;&nbsp; </div>
-            <iframe class="progbar" src="" marginwidth="0" align="center" marginheight="0" scrolling="no" id="progbar" frameborder="0"></iframe>
+            <iframe class="progbar" src="blankpage.html" marginwidth="0" align="center" marginheight="0" scrolling="no" id="progbar" frameborder="0"></iframe>
         </form>
     </div>
     {/if}
