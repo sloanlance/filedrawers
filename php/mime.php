@@ -39,7 +39,7 @@ class Mime
 
         $ext = strtolower( pathinfo( $path, PATHINFO_EXTENSION ));
 
-        if ( file_exists( PATHTOIMGS . $mimeType . '.gif' )) {
+        if ( file_exists( PATHTOIMGS . $ext . '.gif' )) {
             return $ext;
         }
 
