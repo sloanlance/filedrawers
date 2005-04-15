@@ -433,7 +433,7 @@ class Afs
             $modTime = @filemtime( $fullpath );
             $mime    = Mime::mimeIcon( $fullpath );
 
-            $filename = rawurlencode( htmlentities( $filename, ENT_QUOTES ));
+            $filename = rawurlencode( $filename );
 
             if ( $showHidden ) {
                 $files .= "files[$id]=new File('$filename', '$modTime', $size, "
