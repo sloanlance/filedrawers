@@ -1,0 +1,25 @@
+CC= @CC@
+CFLAGS= -Wall -Wstrict-prototypes -g
+LIBS= -L./libcgi -lcgi
+OBJ= tpupload.o
+
+URL_ERROR_PAGE=@error_url@
+
+INSTALL=    @INSTALL@
+
+all:    tpupload
+
+tpupload.o: tpupload.c
+	    ${CC} \
+	    -D_URL_ERROR_PAGE=\"${URL_ERROR_PAGE}\" \
+	    -c tpupload.c
+
+tpupload:   ${OBJ}
+	    ${CC} ${CFLAGS} -o upload.cgi ${OBJ}  ${LIBS}
+
+libs:
+	    cd libcgi; $(MAKE)
+clean :
+	    cd libcgi; $(MAKE) clean
+	    rm -f *.o a.out core *.core
+	    rm -f upload.cgi
