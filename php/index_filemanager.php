@@ -79,7 +79,7 @@ $smarty->assign( 'returnToURI', 'https://' . $_SERVER['HTTP_HOST']
   . $_SERVER['PHP_SELF'] . "?path=$afs->path&amp;finishid=$afs->sid" );
 $smarty->assign( 'path', htmlentities( $afs->path, ENT_QUOTES ));
 $smarty->assign( 'folderName', htmlentities( basename( $afs->path ), ENT_QUOTES ));
-$smarty->assign( 'folderContents', $afs->folderContents( true, true ));
+$smarty->assign( 'folderContents', $afs->folderContents());
 $smarty->assign( 'homePath', $afs->getBasePath());
 $smarty->assign( 'parentPath', $afs->parentPath());
 $smarty->assign( 'sid', $afs->sid );
