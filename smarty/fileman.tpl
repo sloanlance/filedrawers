@@ -104,7 +104,7 @@
     <p>Before you can create a web site, you must first create a webspace to store all
         of the files in your site. This is a special folder that can be accessed by the
         web server.</p>
-    <p>In order to properly set up this folder, please use the <a href="https://dev.www.umich.edu/make-webspace/">Make
+    <p>In order to properly set up this folder, please use the <a href="./make-webspace/">Make
             Webspace utility</a>.</p>
 </div>
 {/if}
