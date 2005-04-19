@@ -93,8 +93,7 @@ class Afs
                 $this->selectedItems[$key] = $item;
             }
         } else if ( isset( $_POST['selectedItems'] )) {
-            $this->selectedItems = html_entity_decode( urldecode(
-              $_POST['selectedItems'] ), ENT_QUOTES );
+            $this->selectedItems = rawurldecode( $_POST['selectedItems'] );
         }
     }
 
@@ -185,7 +184,7 @@ class Afs
         $files = explode( "\n", trim( $this->selectedItems ));
 
         foreach ( $files as $file ) {
-		    $file = html_entity_decode( urldecode( $file ), ENT_QUOTES );
+		    $file = rawurldecode( $file );
 
             if ( !$file = $this->pathSecurity( $this->path . '/'
               . trim( $file ))) {
@@ -230,7 +229,7 @@ class Afs
         $files = explode( CLIPSEPARATOR, $this->selectedItems );
 
         foreach ( $files as $file ) {
-            $file = html_entity_decode( urldecode( $file ), ENT_QUOTES );
+            $file = rawurldecode( $file );
 
             if ( !@rename( $this->originPath . '/' . $file, $this->path . '/'
               . $file )) {
@@ -250,7 +249,7 @@ class Afs
         $files = explode( CLIPSEPARATOR, $this->selectedItems );
 
         foreach ( $files as $file ) {
-            $file = html_entity_decode( urldecode( $file ), ENT_QUOTES );
+            $file = rawurldecode( $file );
 
             if ( is_link( $this->originPath . '/' . $file )) {
                 $this->errorMsg = "$oldpath2 is a link to another location in AFS."
@@ -353,8 +352,7 @@ class Afs
     function readAcl( $path='' )
     {
         $path = ( $path ) ? $path : $this->path;
-        $cmd = "fs listacl " . escapeshellarg( html_entity_decode( urldecode( $path ),
-          ENT_QUOTES ));
+        $cmd = "fs listacl " . escapeshellarg( rawurldecode( $path ));
         $result = shell_exec( $cmd . " 2>&1" );
         $rights = array( 'l', 'r', 'w', 'i', 'd', 'k', 'a' );
 
@@ -408,7 +406,7 @@ class Afs
     }
 
     // List the contents of a folder
-    function folderContents( $showHidden=false )
+    function folderContents()
     {
         $id = 0;
         $files = '';
@@ -434,14 +432,8 @@ class Afs
             $mime    = Mime::mimeIcon( $fullpath );
 
             $filename = rawurlencode( $filename );
-
-            if ( $showHidden ) {
-                $files .= "files[$id]=new File('$filename', '$modTime', $size, "
-                  . "'', '$mime');\n";
-            } else if ( strpos( $filename, '.' ) !== 0 ) {
-                $files .= "files[$id]=new File('$filename', '$modTime', $size, "
-                  . "'', '$mime');\n";
-            }
+            $files .= "files[$id]=new File('$filename', '$modTime', $size, "
+              . "'', '$mime');\n";
 
             $id++;
         }
@@ -518,7 +510,7 @@ class Afs
     // Set the afs path used inside the class
     function setPath( $path='' )
     {
-        $path = html_entity_decode( urldecode( $path ), ENT_QUOTES );
+        $path = rawurldecode( $path );
 
         if ( $path ) {
             if ( ! file_exists( $path )) {
