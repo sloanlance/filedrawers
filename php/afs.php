@@ -156,7 +156,7 @@ class Afs
                 continue;
             }
 
-            if ( is_dir( "$dir/$item" )) {
+            if ( is_dir( "$dir/$item" ) && !is_link( "$dir/$item")) {
                 $this->removeFolder( '', "$dir/$item" ); // recursive
             } else {
                 unlink( "$dir/$item" );
@@ -252,7 +252,7 @@ class Afs
             $file = rawurldecode( $file );
 
             if ( is_link( $this->originPath . '/' . $file )) {
-                $this->errorMsg = "$oldpath2 is a link to another location in AFS."
+                $this->errorMsg = "$file is a link to another location in AFS."
                   . " Copying links is not currently supported.";
 				return false;
             }
