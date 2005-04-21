@@ -443,6 +443,7 @@ class Afs
     }
 
     // This will probably be replaced with a function that looks up a user's afs path
+    // It calculates the root of a user's afs space based on his/her uniqname
     function getBasePath( $user='' )
     {
         $user = ( $user ) ? $user : $_SERVER['REMOTE_USER'];
