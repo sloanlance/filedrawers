@@ -214,6 +214,8 @@ function selectColumn( sortFlag )
     setCookie( 'sortDecending', sortDecending );
 }
 
+// Refreshes the table containing the file list when a user changes
+// the sort order
 function reorderFileList( sortByCol )
 {
     var mythead = document.getElementById( 'fileListHead' );
@@ -232,7 +234,9 @@ function reorderFileList( sortByCol )
         selectColumn( sortBy );
     }
 
-    // Update the file list with the new sort order
+    // Update the file list with the new sort order. Desttroys the
+    // table containing the existing file list so that a table with
+    // the new sort order can be created in its place
     while ( mytbody.hasChildNodes && mytbody.lastChild != null ) {
         mytbody.removeChild( mytbody.lastChild );
     }
@@ -240,6 +244,8 @@ function reorderFileList( sortByCol )
     createFileList();
 }
 
+// Performs the initial display of the file list when the page loads
+// Checks to see what to sort by, sorts the files, and displays the results
 function displayFileList()
 {
     sortByCookie = readCookie( 'sortby' );
@@ -324,9 +330,12 @@ function createFileList()
         tdElem.appendChild( emElem );
         trElem.appendChild( tdElem );
 
+        // The docFragment is like a buffer of html code that can be
+        // appended to the document all in one chunk
         docFragment.appendChild( trElem );
     }
 
+    // Attaches all of the html generated above to the document
     myNewtbody.appendChild( docFragment );
     mytable.replaceChild( myNewtbody, mytbody );
 }
@@ -529,6 +538,8 @@ function startUpload()
 	document.getElementById( 'upload' ).submit();
 }
 
+// This function sets the target of the iframe that displays the permissions
+// for the selected folder. PM stands for permissions manager
 function setPMpath()
 {
     var itemInfo = new SelectedFileInfo();
@@ -536,6 +547,7 @@ function setPMpath()
       + path + '/' + files[ itemInfo.lastId ].title;
 }
 
+// Sets the path for the iframe that displays the user's list of favorite locations
 function setFavPath()
 {
     document.getElementById( 'favpanel' ).src = 'viewfavorites.php?target='
@@ -569,6 +581,9 @@ function setHiddenFilesCtrl()
     }
 }
 
+// This function creates an item in the list of controls that are displayed in
+// the sidebar on the left. Inspector refers to the sidebar on the left
+// This function greys out a link when it isn't appropriate
 function setInspControl( id, cmd, label )
 {
     var item = document.getElementById( id );
@@ -621,6 +636,8 @@ function getFolderIcon()
 }
 
 // Displays a dynamic inspector-type interface that changes based on user selections
+// This function displays inspector items as greyed out or clickable links as
+// apprpriate
 function fileInspector()
 {
 	var itemInfo  = new SelectedFileInfo();
@@ -633,6 +650,7 @@ function fileInspector()
         setInspControl( 'pasteCtrl', '', 'Paste to This Folder' );
     }
 
+    // This is the sidebar menu state for no items selected
 	if ( itemInfo.numSel == 0 ) {
         if ( readonly ) {
             setInspControl( 'uploadCtrl', '', 'Upload File(s)' );
@@ -654,6 +672,7 @@ function fileInspector()
         document.getElementById( 'selectedItem' ).innerHTML = foldername;
         document.getElementById( 'itemInfo' ).innerHTML = '';
 
+    // This is the sidebar menu state for 1 item selected
 	} else if ( itemInfo.numSel == 1 ) {
         setInspControl( 'uploadCtrl', '', 'Upload File(s)' );
         setInspControl( 'cutCtrl', 'setClipboard(\'cut\')',
@@ -679,6 +698,7 @@ function fileInspector()
         document.getElementById( 'selectedItem' ).innerHTML =
           unescape( files[itemInfo.lastId].title );
         document.getElementById( 'itemInfo' ).innerHTML = itemInfo.info;
+    // This is the sidebar menu state for many items selected
 	} else {
         setInspControl( 'uploadCtrl', '', 'Upload File(s)' );
         setInspControl( 'cutCtrl', 'setClipboard(\'cut\')',
@@ -700,14 +720,15 @@ function fileInspector()
     setHiddenFilesCtrl();
 }
 
-// Toggles the display of a hidden object
+// Toggles the display of a hidden object. I don't this this is still used
 function toggleDisplay( id )
 {
 	var obj = document.getElementById( id ).style;
     obj.display = ( obj.display == 'none' ) ? 'block' : 'none';
 }
 
-// Process the request to begin a file rename
+// Process the request to begin a file rename. Create the UI text field to
+// allow a rename
 function rename()
 {
     var ids = getSelectedItems();
