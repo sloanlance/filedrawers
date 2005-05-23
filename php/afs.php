@@ -433,17 +433,9 @@ class Afs
             $modTime = @filemtime( $fullpath );
             $mime    = Mime::mimeIcon( $fullpath );
 
-            /*
-	     * scam XXX "apostrophe" bug fixed.
-	     * the htmlentities() call isn't needed since
-	     * the text will be unescape() and then put into a
-	     * text node using createTextNode().
-	     * If this text is to be displayed as raw html,
-	     * it will need to have htmlentities() called on it
-	     * prior to being displayed.
-             */
-            $filename = rawurlencode( $filename );
-            // $filename = rawurlencode( htmlentities( $filename, ENT_QUOTES ));
+	    // $filename is no longer encoded.
+	    // The only character that needs to be escaped is '
+	    $filename = ereg_replace("'", "\\'", $filename);
 
             if ( $showHidden ) {
                 $files .= "files[$id]=new File('$filename', '$modTime', $size, "
@@ -529,7 +521,8 @@ class Afs
     // Set the afs path used inside the class
     function setPath( $path='' )
     {
-        $path = html_entity_decode( urldecode( $path ), ENT_QUOTES );
+	// paths pulled from the URL are not html escaped.
+        // $path = urldecode( $path );
 
         if ( $path ) {
             if ( ! file_exists( $path )) {

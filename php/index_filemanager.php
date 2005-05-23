@@ -77,8 +77,8 @@ $homeSelected = ( $webSelected ) ? false : true;
 
 $smarty->assign( 'returnToURI', 'https://' . $_SERVER['HTTP_HOST']
   . $_SERVER['PHP_SELF'] . "?path=$afs->path&amp;finishid=$afs->sid" );
-$smarty->assign( 'path', htmlentities( $afs->path, ENT_QUOTES ));
-$smarty->assign( 'folderName', htmlentities( basename( $afs->path ), ENT_QUOTES ));
+$smarty->assign( 'path', $afs->path);
+$smarty->assign( 'folderName', basename( $afs->path ));
 $smarty->assign( 'folderContents', $afs->folderContents( true, true ));
 $smarty->assign( 'homePath', $afs->getBasePath());
 $smarty->assign( 'parentPath', $afs->parentPath());

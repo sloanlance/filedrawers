@@ -7,11 +7,13 @@
 require_once( '../../objects/afs.php' );
 
 $download = new Afs( $_GET['path'] );
+// replace " with \" to escape quoted " in html header
+$basepath = '"' . preg_replace('/"/', '\"', basename($download->path)) . '"';
 
 header( 'Content-Description: File Transfer' ); 
 header( 'Content-Type: application/force-download' ); 
 header( 'Content-Length: ' . filesize( $download->path )); 
-header( 'Content-Disposition: attachment; filename=' . basename( $download->path )); 
-readfile( $download->path );
+header( "Content-Disposition: attachment; filename=$basepath;");
+@readfile( $download->path );
 ?>
 
