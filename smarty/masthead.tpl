@@ -41,22 +41,22 @@ files=new Array();
         <h1>mFile: afs file management</h1>
         <ul id="menubar">
             {if $homeSelected}
-            <li><a href="/trouser/" class="active">Home</a></li>
+            <li><a href="/" class="active">Home</a></li>
             {else}
-            <li><a href="/trouser/">Home</a></li>
+            <li><a href="/">Home</a></li>
             {/if}
             {if $webSelected}
-            <li><a href="/trouser/?path={$homePath}/Public/html" class="active">Web Sites</a></li>
+            <li><a href="/?path={$homePath}/Public/html" class="active">Web Sites</a></li>
             {else}
-            <li><a href="/trouser/?path={$homePath}/Public/html">Web Sites</a></li>
+            <li><a href="/?path={$homePath}/Public/html">Web Sites</a></li>
             {/if}
-            <li><a href="https://weblogin.umich.edu/cgi-bin/logout?http://mfile.umich.edu/">Logout</a></li>
+            <li><a href="https://mfile.umich.edu/cgi-bin/logout?http://mfile.umich.edu/">Logout</a></li>
         </ul>
     </div>
     <div id="infoBar">
         <ul id="infoMenu">
-            <li><a href="/trouser/?path={$parentPath}">Go Up &uarr;</a></li>
-            <li><a href="/trouser/?path={$path}">Refresh</a></li>
+            <li><a href="/?path={$parentPath}">Go Up &uarr;</a></li>
+            <li><a href="/?path={$path}">Refresh</a></li>
         </ul>
         <div id="notifyArea"> Location: <span id="location" style="width: 150px; overflow: hidden; white-space: nowrap;">
             {$location}

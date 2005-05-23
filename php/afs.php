@@ -93,7 +93,8 @@ class Afs
                 $this->selectedItems[$key] = $item;
             }
         } else if ( isset( $_POST['selectedItems'] )) {
-            $this->selectedItems = rawurldecode( $_POST['selectedItems'] );
+            $this->selectedItems = html_entity_decode( urldecode(
+              $_POST['selectedItems'] ), ENT_QUOTES );
         }
     }
 
@@ -184,7 +185,7 @@ class Afs
         $files = explode( "\n", trim( $this->selectedItems ));
 
         foreach ( $files as $file ) {
-		    $file = rawurldecode( $file );
+		    $file = html_entity_decode( urldecode( $file ), ENT_QUOTES );
 
             if ( !$file = $this->pathSecurity( $this->path . '/'
               . trim( $file ))) {
@@ -229,7 +230,7 @@ class Afs
         $files = explode( CLIPSEPARATOR, $this->selectedItems );
 
         foreach ( $files as $file ) {
-            $file = rawurldecode( $file );
+            $file = html_entity_decode( urldecode( $file ), ENT_QUOTES );
 
             if ( !@rename( $this->originPath . '/' . $file, $this->path . '/'
               . $file )) {
@@ -249,7 +250,7 @@ class Afs
         $files = explode( CLIPSEPARATOR, $this->selectedItems );
 
         foreach ( $files as $file ) {
-            $file = rawurldecode( $file );
+            $file = html_entity_decode( urldecode( $file ), ENT_QUOTES );
 
             if ( is_link( $this->originPath . '/' . $file )) {
                 $this->errorMsg = "$file is a link to another location in AFS."
@@ -352,7 +353,8 @@ class Afs
     function readAcl( $path='' )
     {
         $path = ( $path ) ? $path : $this->path;
-        $cmd = "fs listacl " . escapeshellarg( rawurldecode( $path ));
+        $cmd = "fs listacl " . escapeshellarg( html_entity_decode( urldecode( $path ),
+          ENT_QUOTES ));
         $result = shell_exec( $cmd . " 2>&1" );
         $rights = array( 'l', 'r', 'w', 'i', 'd', 'k', 'a' );
 
@@ -406,7 +408,7 @@ class Afs
     }
 
     // List the contents of a folder
-    function folderContents()
+    function folderContents( $showHidden=false )
     {
         $id = 0;
         $files = '';
@@ -431,9 +433,25 @@ class Afs
             $modTime = @filemtime( $fullpath );
             $mime    = Mime::mimeIcon( $fullpath );
 
+            /*
+	     * scam XXX "apostrophe" bug fixed.
+	     * the htmlentities() call isn't needed since
+	     * the text will be unescape() and then put into a
+	     * text node using createTextNode().
+	     * If this text is to be displayed as raw html,
+	     * it will need to have htmlentities() called on it
+	     * prior to being displayed.
+             */
             $filename = rawurlencode( $filename );
-            $files .= "files[$id]=new File('$filename', '$modTime', $size, "
-              . "'', '$mime');\n";
+            // $filename = rawurlencode( htmlentities( $filename, ENT_QUOTES ));
+
+            if ( $showHidden ) {
+                $files .= "files[$id]=new File('$filename', '$modTime', $size, "
+                  . "'', '$mime');\n";
+            } else if ( strpos( $filename, '.' ) !== 0 ) {
+                $files .= "files[$id]=new File('$filename', '$modTime', $size, "
+                  . "'', '$mime');\n";
+            }
 
             $id++;
         }
@@ -511,7 +529,7 @@ class Afs
     // Set the afs path used inside the class
     function setPath( $path='' )
     {
-        $path = rawurldecode( $path );
+        $path = html_entity_decode( urldecode( $path ), ENT_QUOTES );
 
         if ( $path ) {
             if ( ! file_exists( $path )) {
