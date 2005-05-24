@@ -1,0 +1,90 @@
+SHELL = /bin/sh
+
+srcdir =        .
+
+OPTOPTS=        -Wall -Wmissing-prototypes
+CC=             gcc
+INSTALL=        /usr/bin/install
+
+prefix=@prefix@
+
+ROOTDIR=@prefix@/webroot
+DOWNLOADDIR=${ROOTDIR}/download
+OBJECTS=@prefix@/objects
+IMAGES=${ROOTDIR}/images
+SMARTY=@prefix@/smarty
+TEMPLATES=${SMARTY}/templates
+WWWROOT=${TEMPLATES}/wwwroot
+PIECES=${TEMPLATES}/pieces
+TEMPLATES_C=${SMARTY}/templates_c
+
+CFLAGS=         ${OPTOPTS} -g -O2
+
+ROOTDIRTARGET=  css/fileman.css css/ie6specific.css css/ie5specific.css \
+		php/addfavorites.php php/deletefavorites.php \
+		php/perm_manager.php php/progress.php \
+		php/renamefavorites.php php/viewfavorites.php
+OBJECTSTARGET= php/afs.php php/favorites.php php/mime.php
+
+SMARTYTARGET= smarty/smarty.custom.php
+
+WWWROOTTARGET=  smarty/fileman.tpl
+
+PIECESTARGET=   smarty/addFavorites.tpl smarty/deleteFavorites.tpl \
+		smarty/footer.tpl smarty/masthead.tpl \
+		smarty/permissions.tpl smarty/renameFavorites.tpl \
+		smarty/viewFavorites.tpl
+
+all:
+	cd libcgi; make all
+	cd upload; make all
+
+FRC :
+
+libcgi/libcgi.a : FRC
+	cd libcgi; ${MAKE} ${MFLAGS} CC=${CC} 
+
+	upload/tpupload.o : FRC
+		cd upload; ${MAKE} ${MFLAGS} CC=${CC}
+
+
+install: all
+	-mkdir -p ${ROOTDIR}
+	for i in ${ROOTDIRTARGET}; do \
+		${INSTALL} -m 0755 -c $$i ${ROOTDIR}/; \
+	done
+	-cp -R images ${ROOTDIR}
+	-mkdir -p ${OBJECTS}
+	for i in ${OBJECTSTARGET}; do \
+		${INSTALL} -m 0755 -c $$i ${OBJECTS}/; \
+	done
+	-mkdir -p ${SMARTY}
+	for i in ${SMARTYTARGET}; do \
+		${INSTALL} -m 0755 -c $$i ${SMARTY}/; \
+	done
+	-mkdir -p ${TEMPLATES}
+	-mkdir -p ${WWWROOT}
+	for i in ${WWWROOTTARGET}; do \
+		${INSTALL} -m 0755 -c $$i ${WWWROOT}/; \
+	done
+	-mkdir -p ${PIECES}
+	for i in ${PIECESTARGET}; do \
+		${INSTALL} -m 0755 -c $$i ${PIECES}/; \
+	done
+
+	-mkdir -p ${TEMPLATES_C}
+	-chgrp -R www ${TEMPLATES_C}
+
+	-cp php/index_filemanager.php ${ROOTDIR}/index.php
+	-mkdir -p ${DOWNLOADDIR}
+	-cp php/index_download.php ${DOWNLOADDIR}/index.php
+	-cp upload/upload.cgi ${prefix}
+
+
+clean :
+	cd libcgi; ${MAKE} ${MFLAGS} clean
+	cd upload; ${MAKE} ${MFLAGS} clean
+	rm -rf ${ROOTDIR}
+	rm -rf ${OBJECTS}
+	rm -rf ${SMARTY}
+	rm -f ${prefix}/upload.cgi
