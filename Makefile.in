@@ -4,29 +4,31 @@ srcdir =        .
 
 OPTOPTS=        -Wall -Wmissing-prototypes
 CC=             gcc
-INSTALL=        /usr/bin/install
+INSTALL=        @INSTALL@
 
 prefix=@prefix@
 
-ROOTDIR=@prefix@/webroot
-DOWNLOADDIR=${ROOTDIR}/download
+ROOTDIR=@prefix@
+HTMLDIR=@prefix@/html-ssl
+DOWNLOADDIR=${HTMLDIR}/download
 OBJECTS=@prefix@/objects
-IMAGES=${ROOTDIR}/images
+IMAGES=${HTMLDIR}/images
 SMARTY=@prefix@/smarty
 TEMPLATES=${SMARTY}/templates
 WWWROOT=${TEMPLATES}/wwwroot
 PIECES=${TEMPLATES}/pieces
 TEMPLATES_C=${SMARTY}/templates_c
+CGIDIR=@prefix@/cgi-ssl
 
 CFLAGS=         ${OPTOPTS} -g -O2
 
-ROOTDIRTARGET=  css/fileman.css css/ie6specific.css css/ie5specific.css \
+HTMLDIRTARGET=  css/fileman.css css/ie6specific.css css/ie5specific.css \
 		php/addfavorites.php php/deletefavorites.php \
 		php/perm_manager.php php/progress.php \
 		php/renamefavorites.php php/viewfavorites.php
-OBJECTSTARGET= php/afs.php php/favorites.php php/mime.php
+OBJECTSTARGET=  php/afs.php php/favorites.php php/mime.php
 
-SMARTYTARGET= smarty/smarty.custom.php
+SMARTYTARGET=   smarty/smarty.custom.php
 
 WWWROOTTARGET=  smarty/fileman.tpl
 
@@ -44,47 +46,62 @@ FRC :
 libcgi/libcgi.a : FRC
 	cd libcgi; ${MAKE} ${MFLAGS} CC=${CC} 
 
-	upload/tpupload.o : FRC
-		cd upload; ${MAKE} ${MFLAGS} CC=${CC}
-
+upload/tpupload.o : FRC
+	cd upload; ${MAKE} ${MFLAGS} CC=${CC}
 
 install: all
-	-mkdir -p ${ROOTDIR}
-	for i in ${ROOTDIRTARGET}; do \
-		${INSTALL} -m 0755 -c $$i ${ROOTDIR}/; \
+	mkdir -p ${ROOTDIR}
+	chmod 755 ${ROOTDIR}
+
+	mkdir -p ${HTMLDIR}
+	chmod 755 ${HTMLDIR}
+	for i in ${HTMLDIRTARGET}; do \
+		$(INSTALL) -m 0755 -c $$i ${HTMLDIR}/; \
 	done
-	-cp -R images ${ROOTDIR}
-	-mkdir -p ${OBJECTS}
+	$(INSTALL) -m 0755 php/index_filemanager.php ${HTMLDIR}/index.php
+
+        # Install Images
+	cp -R images ${IMAGES}
+	chmod -R 755 ${IMAGES}
+
+	mkdir -p ${OBJECTS}
+	chmod 755 ${OBJECTS}
 	for i in ${OBJECTSTARGET}; do \
-		${INSTALL} -m 0755 -c $$i ${OBJECTS}/; \
+		$(INSTALL) -m 0755 -c $$i ${OBJECTS}/; \
 	done
-	-mkdir -p ${SMARTY}
+
+	mkdir -p ${SMARTY}
+	chmod 755 ${SMARTY}
 	for i in ${SMARTYTARGET}; do \
-		${INSTALL} -m 0755 -c $$i ${SMARTY}/; \
+		$(INSTALL) -m 0755 -c $$i ${SMARTY}/; \
 	done
-	-mkdir -p ${TEMPLATES}
-	-mkdir -p ${WWWROOT}
+
+	mkdir -p ${TEMPLATES}
+	chmod 755 ${TEMPLATES}
+
+	mkdir -p ${WWWROOT}
+	chmod 755 ${WWWROOT}
 	for i in ${WWWROOTTARGET}; do \
-		${INSTALL} -m 0755 -c $$i ${WWWROOT}/; \
+		$(INSTALL) -m 0755 -c $$i ${WWWROOT}/; \
 	done
-	-mkdir -p ${PIECES}
+
+	mkdir -p ${PIECES}
+	chmod 755 ${PIECES}
 	for i in ${PIECESTARGET}; do \
-		${INSTALL} -m 0755 -c $$i ${PIECES}/; \
+		$(INSTALL) -m 0755 -c $$i ${PIECES}/; \
 	done
 
-	-mkdir -p ${TEMPLATES_C}
-	-chgrp -R www ${TEMPLATES_C}
+	mkdir -p ${TEMPLATES_C}
+	chmod 755 ${TEMPLATES_C}
 
-	-cp php/index_filemanager.php ${ROOTDIR}/index.php
-	-mkdir -p ${DOWNLOADDIR}
-	-cp php/index_download.php ${DOWNLOADDIR}/index.php
-	-cp upload/upload.cgi ${prefix}
+	mkdir -p ${DOWNLOADDIR}
+	chmod 755 ${DOWNLOADDIR}
+	$(INSTALL) -m 0755 php/index_download.php ${DOWNLOADDIR}/index.php
 
+	mkdir -p ${CGIDIR}
+	chmod 755 ${CGIDIR}
+	$(INSTALL) -m 0755 upload/upload.cgi ${CGIDIR}/upload.cgi
 
 clean :
 	cd libcgi; ${MAKE} ${MFLAGS} clean
 	cd upload; ${MAKE} ${MFLAGS} clean
-	rm -rf ${ROOTDIR}
-	rm -rf ${OBJECTS}
-	rm -rf ${SMARTY}
-	rm -f ${prefix}/upload.cgi

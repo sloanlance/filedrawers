@@ -7,7 +7,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <sys/param.h>
-#include "libcgi/cgi.h"
+#include <cgi.h>
 
 #define SESSION_PATH	"/tmp/"		/* write progress here */
 #define VALID_PATH	"/afs/"		/* needs to begin with afs */
