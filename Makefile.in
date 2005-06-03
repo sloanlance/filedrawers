@@ -8,11 +8,15 @@ INSTALL=        @INSTALL@
 
 prefix=@prefix@
 
+# These directory names need to be defined with ./configure options.
+
 ROOTDIR=@prefix@
-HTMLDIR=@prefix@/html-ssl
-DOWNLOADDIR=${HTMLDIR}/download
-OBJECTS=@prefix@/objects
+SHTMLDIR=@prefix@/html-ssl
+SIMAGES=${SHTMLDIR}/images
+HTMLDIR=@prefix@/html
 IMAGES=${HTMLDIR}/images
+DOWNLOADDIR=${SHTMLDIR}/download
+OBJECTS=@prefix@/objects
 SMARTY=@prefix@/smarty
 TEMPLATES=${SMARTY}/templates
 WWWROOT=${TEMPLATES}/wwwroot
@@ -22,10 +26,13 @@ CGIDIR=@prefix@/cgi-ssl
 
 CFLAGS=         ${OPTOPTS} -g -O2
 
-HTMLDIRTARGET=  css/fileman.css css/ie6specific.css css/ie5specific.css \
+SHTMLDIRTARGET=  css/fileman.css css/ie6specific.css css/ie5specific.css \
 		php/addfavorites.php php/deletefavorites.php \
 		php/perm_manager.php php/progress.php \
 		php/renamefavorites.php php/viewfavorites.php
+
+HTMLDIRTARGET=  css/styles.css php/feedback.php
+
 OBJECTSTARGET=  php/afs.php php/favorites.php php/mime.php
 
 SMARTYTARGET=   smarty/smarty.custom.php
@@ -36,6 +43,19 @@ PIECESTARGET=   smarty/addFavorites.tpl smarty/deleteFavorites.tpl \
 		smarty/footer.tpl smarty/masthead.tpl \
 		smarty/permissions.tpl smarty/renameFavorites.tpl \
 		smarty/viewFavorites.tpl
+
+SIMAGETARGET=   images/checkbox.gif images/doc_lg.gif \
+                images/doc_sm.gif images/download.gif \
+		images/folder.gif images/folder_locked.gif \
+		images/sort_ascend.gif images/sort_decend.gif \
+		images/text.gif
+
+IMAGETARGET=    images/blue_tabcap_r.gif images/bulb_large.gif \
+                images/bulb_small.gif images/first_time.gif \
+		images/header_afs_cabinet.gif images/header_text_afs.gif \
+		images/link_arrow.gif images/login-anim.gif \
+		images/searchtab_l.gif images/searchtab_r.gif \
+		images/spacer.gif
 
 all:
 	cd libcgi; make all
@@ -51,56 +71,81 @@ upload/tpupload.o : FRC
 
 install: all
 	mkdir -p ${ROOTDIR}
-	chmod 755 ${ROOTDIR}
+	chmod 775 ${ROOTDIR}
+
+	mkdir -p ${SHTMLDIR}
+	chmod 775 ${SHTMLDIR}
+	for i in ${SHTMLDIRTARGET}; do \
+		$(INSTALL) -m 0775 -c $$i ${SHTMLDIR}/; \
+	done
+
+	# Copy filemanager index into shtml index.
+	$(INSTALL) -m 0775 php/index_filemanager.php ${SHTMLDIR}/index.php
+
+        # Install shtml Images
+	mkdir -p ${SIMAGES}
+	chmod 0775 ${SIMAGES}
+	for i in ${SIMAGETARGET}; do \
+		$(INSTALL) -m 0664 -c $$i ${SIMAGES}/; \
+	done
+
+        # Install mime images
+	cp -R images/mime ${SIMAGES}
+	chmod -R 0775 ${SIMAGES}/mime
 
 	mkdir -p ${HTMLDIR}
-	chmod 755 ${HTMLDIR}
+	chmod 775 ${HTMLDIR}
 	for i in ${HTMLDIRTARGET}; do \
-		$(INSTALL) -m 0755 -c $$i ${HTMLDIR}/; \
+		$(INSTALL) -m 0775 -c $$i ${HTMLDIR}/; \
 	done
-	$(INSTALL) -m 0755 php/index_filemanager.php ${HTMLDIR}/index.php
 
-        # Install Images
-	cp -R images ${IMAGES}
-	chmod -R 755 ${IMAGES}
+	# Copy html index into html index.
+	$(INSTALL) -m 0775 php/index_html.php ${HTMLDIR}/index.php
 
 	mkdir -p ${OBJECTS}
-	chmod 755 ${OBJECTS}
+	chmod 775 ${OBJECTS}
 	for i in ${OBJECTSTARGET}; do \
-		$(INSTALL) -m 0755 -c $$i ${OBJECTS}/; \
+		$(INSTALL) -m 0775 -c $$i ${OBJECTS}/; \
+	done
+
+        # Install html Images
+	mkdir -p ${IMAGES}
+	chmod 0775 ${IMAGES}
+	for i in ${IMAGETARGET}; do \
+		$(INSTALL) -m 0664 -c $$i ${IMAGES}/; \
 	done
 
 	mkdir -p ${SMARTY}
-	chmod 755 ${SMARTY}
+	chmod 775 ${SMARTY}
 	for i in ${SMARTYTARGET}; do \
-		$(INSTALL) -m 0755 -c $$i ${SMARTY}/; \
+		$(INSTALL) -m 0775 -c $$i ${SMARTY}/; \
 	done
 
 	mkdir -p ${TEMPLATES}
-	chmod 755 ${TEMPLATES}
+	chmod 775 ${TEMPLATES}
 
 	mkdir -p ${WWWROOT}
-	chmod 755 ${WWWROOT}
+	chmod 775 ${WWWROOT}
 	for i in ${WWWROOTTARGET}; do \
-		$(INSTALL) -m 0755 -c $$i ${WWWROOT}/; \
+		$(INSTALL) -m 0775 -c $$i ${WWWROOT}/; \
 	done
 
 	mkdir -p ${PIECES}
-	chmod 755 ${PIECES}
+	chmod 775 ${PIECES}
 	for i in ${PIECESTARGET}; do \
-		$(INSTALL) -m 0755 -c $$i ${PIECES}/; \
+		$(INSTALL) -m 0775 -c $$i ${PIECES}/; \
 	done
 
 	mkdir -p ${TEMPLATES_C}
-	chmod 755 ${TEMPLATES_C}
+	chmod 775 ${TEMPLATES_C}
 
 	mkdir -p ${DOWNLOADDIR}
-	chmod 755 ${DOWNLOADDIR}
-	$(INSTALL) -m 0755 php/index_download.php ${DOWNLOADDIR}/index.php
+	chmod 775 ${DOWNLOADDIR}
+	$(INSTALL) -m 0775 php/index_download.php ${DOWNLOADDIR}/index.php
 
 	mkdir -p ${CGIDIR}
 	chmod 755 ${CGIDIR}
-	$(INSTALL) -m 0755 upload/upload.cgi ${CGIDIR}/upload.cgi
+	$(INSTALL) -m 0775 upload/upload.cgi ${CGIDIR}/upload.cgi
 
 clean :
 	cd libcgi; ${MAKE} ${MFLAGS} clean
