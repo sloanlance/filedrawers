@@ -222,3 +222,7 @@ Suggested Features/bugfixes for trouser.
 
 - Fix Makefile.in so that it correctly configures php and javascript
     headers to use the configuration strings created in ./configure.
+
+- Fix Makefile.in so that ./configure and Make no longer have to recursively
+    go into the upload directory to make upload.cgi... everything should
+    be done from the root.
