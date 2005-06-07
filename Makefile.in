@@ -6,30 +6,31 @@ OPTOPTS=        -Wall -Wmissing-prototypes
 CC=             gcc
 INSTALL=        @INSTALL@
 
-prefix=@prefix@
+# Configured directory names
+ROOTDIR=@prefix@/@project_name@
+SHTMLDIR=${ROOTDIR}/@shtml_dir_name@
+HTMLDIR=${ROOTDIR}/@html_dir_name@
+OBJECTS=${ROOTDIR}/@object_dir_name@
+SMARTY=${ROOTDIR}/@smarty_dir_name@
+CGIDIR=${ROOTDIR}/@cgi_dir_name@
 
-# These directory names need to be defined with ./configure options.
-
-ROOTDIR=@prefix@
-SHTMLDIR=@prefix@/html-ssl
+# Derived directory names
 SIMAGES=${SHTMLDIR}/images
-HTMLDIR=@prefix@/html
+JSDIR=${SHTMLDIR}/js
 IMAGES=${HTMLDIR}/images
 DOWNLOADDIR=${SHTMLDIR}/download
-OBJECTS=@prefix@/objects
-SMARTY=@prefix@/smarty
 TEMPLATES=${SMARTY}/templates
 WWWROOT=${TEMPLATES}/wwwroot
 PIECES=${TEMPLATES}/pieces
 TEMPLATES_C=${SMARTY}/templates_c
-CGIDIR=@prefix@/cgi-ssl
 
 CFLAGS=         ${OPTOPTS} -g -O2
 
-SHTMLDIRTARGET=  css/fileman.css css/ie6specific.css css/ie5specific.css \
+SHTMLDIRTARGET= css/fileman.css css/ie6specific.css css/ie5specific.css \
 		php/addfavorites.php php/deletefavorites.php \
 		php/perm_manager.php php/progress.php \
-		php/renamefavorites.php php/viewfavorites.php
+		php/renamefavorites.php php/viewfavorites.php \
+		php/blankpage.html
 
 HTMLDIRTARGET=  css/styles.css php/feedback.php
 
@@ -57,6 +58,8 @@ IMAGETARGET=    images/blue_tabcap_r.gif images/bulb_large.gif \
 		images/searchtab_l.gif images/searchtab_r.gif \
 		images/spacer.gif
 
+JSDIRTARGET=    js/filemanage.js
+
 all:
 	cd libcgi; make all
 	cd upload; make all
@@ -72,80 +75,106 @@ upload/tpupload.o : FRC
 install: all
 	mkdir -p ${ROOTDIR}
 	chmod 775 ${ROOTDIR}
+	chgrp @install_group@ ${ROOTDIR}
 
 	mkdir -p ${SHTMLDIR}
 	chmod 775 ${SHTMLDIR}
+	chgrp @install_group@ ${SHTMLDIR}
 	for i in ${SHTMLDIRTARGET}; do \
-		$(INSTALL) -m 0775 -c $$i ${SHTMLDIR}/; \
+		$(INSTALL) -g @install_group@ -m 0775 -c $$i ${SHTMLDIR}/; \
 	done
 
 	# Copy filemanager index into shtml index.
-	$(INSTALL) -m 0775 php/index_filemanager.php ${SHTMLDIR}/index.php
+	$(INSTALL) -g @install_group@ -m 0775 php/index_filemanager.php \
+	           ${SHTMLDIR}/index.php
 
         # Install shtml Images
 	mkdir -p ${SIMAGES}
 	chmod 0775 ${SIMAGES}
+	chgrp @install_group@ ${SIMAGES}
 	for i in ${SIMAGETARGET}; do \
-		$(INSTALL) -m 0664 -c $$i ${SIMAGES}/; \
+		$(INSTALL) -g @install_group@ -m 0664 -c $$i ${SIMAGES}/; \
 	done
 
-        # Install mime images
+        # Install mime images.
 	cp -R images/mime ${SIMAGES}
 	chmod -R 0775 ${SIMAGES}/mime
+	chgrp -R @install_group@ ${SIMAGES}/mime
 
 	mkdir -p ${HTMLDIR}
 	chmod 775 ${HTMLDIR}
+	chgrp @install_group@ ${HTMLDIR}
 	for i in ${HTMLDIRTARGET}; do \
-		$(INSTALL) -m 0775 -c $$i ${HTMLDIR}/; \
+		$(INSTALL) -g @install_group@ -m 0775 -c $$i ${HTMLDIR}/; \
 	done
 
 	# Copy html index into html index.
-	$(INSTALL) -m 0775 php/index_html.php ${HTMLDIR}/index.php
+	$(INSTALL) -g @install_group@ -m 0775 php/index_html.php \
+	           ${HTMLDIR}/index.php
+
+	mkdir -p ${JSDIR}
+	chmod 775 ${JSDIR}
+	chgrp @install_group@ ${JSDIR}
+	for i in ${JSDIRTARGET}; do \
+		$(INSTALL) -g @install_group@ -m 0664 -c $$i ${JSDIR}/; \
+	done
 
 	mkdir -p ${OBJECTS}
 	chmod 775 ${OBJECTS}
+	chgrp @install_group@ ${OBJECTS}
 	for i in ${OBJECTSTARGET}; do \
-		$(INSTALL) -m 0775 -c $$i ${OBJECTS}/; \
+		$(INSTALL) -g @install_group@ -m 0775 -c $$i ${OBJECTS}/; \
 	done
 
         # Install html Images
 	mkdir -p ${IMAGES}
 	chmod 0775 ${IMAGES}
+	chgrp @install_group@ ${IMAGES}
 	for i in ${IMAGETARGET}; do \
-		$(INSTALL) -m 0664 -c $$i ${IMAGES}/; \
+		$(INSTALL) -g @install_group@ -m 0664 -c $$i ${IMAGES}/; \
 	done
 
 	mkdir -p ${SMARTY}
 	chmod 775 ${SMARTY}
+	chgrp @install_group@ ${SMARTY}
 	for i in ${SMARTYTARGET}; do \
-		$(INSTALL) -m 0775 -c $$i ${SMARTY}/; \
+		$(INSTALL) -g @install_group@ -m 0775 -c $$i ${SMARTY}/; \
 	done
 
+        # Create smarty templates directory
 	mkdir -p ${TEMPLATES}
-	chmod 775 ${TEMPLATES}
+	chgrp @install_group@ ${TEMPLATES}
+	chmod 777 ${TEMPLATES}
 
 	mkdir -p ${WWWROOT}
 	chmod 775 ${WWWROOT}
+	chgrp @install_group@ ${WWWROOT}
 	for i in ${WWWROOTTARGET}; do \
-		$(INSTALL) -m 0775 -c $$i ${WWWROOT}/; \
+		$(INSTALL) -g @install_group@ -m 0775 -c $$i ${WWWROOT}/; \
 	done
 
 	mkdir -p ${PIECES}
 	chmod 775 ${PIECES}
+	chgrp @install_group@ ${PIECES}
 	for i in ${PIECESTARGET}; do \
-		$(INSTALL) -m 0775 -c $$i ${PIECES}/; \
+		$(INSTALL) -g @install_group@ -m 0775 -c $$i ${PIECES}/; \
 	done
 
 	mkdir -p ${TEMPLATES_C}
-	chmod 775 ${TEMPLATES_C}
+	chgrp @install_group@ ${TEMPLATES_C}
+	chmod 777 ${TEMPLATES_C}
 
 	mkdir -p ${DOWNLOADDIR}
 	chmod 775 ${DOWNLOADDIR}
-	$(INSTALL) -m 0775 php/index_download.php ${DOWNLOADDIR}/index.php
+	chgrp @install_group@ ${DOWNLOADDIR}
+	$(INSTALL) -g @install_group@ -m 0775 php/index_download.php \
+	           ${DOWNLOADDIR}/index.php
 
 	mkdir -p ${CGIDIR}
 	chmod 755 ${CGIDIR}
-	$(INSTALL) -m 0775 upload/upload.cgi ${CGIDIR}/upload.cgi
+	chgrp @install_group@ ${CGIDIR}
+	$(INSTALL) -g @install_group@ -m 0775 upload/upload.cgi \
+	           ${CGIDIR}/upload.cgi
 
 clean :
 	cd libcgi; ${MAKE} ${MFLAGS} clean

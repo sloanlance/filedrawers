@@ -209,3 +209,16 @@ Suggested Features/bugfixes for trouser.
 
 - Fix incompatible browser detection needs to be added. Right now
     older browers (IE 5 on mac, for example) display garbled tables.
+
+- Add some sort of file (or full directory) synchronization. This could
+    be interactive, based on timestamp. Would it handle merges? Warn
+    between changes?
+
+    "you're about to replace an older version of ..."
+
+- There should be some way in the "web sites" view to get the web-url of
+    any given document. Possibly add a url link into the information bar
+    of a given file/directory?
+
+- Fix Makefile.in so that it correctly configures php and javascript
+    headers to use the configuration strings created in ./configure.

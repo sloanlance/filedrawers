@@ -1,0 +1,49 @@
+Copyright (c) 2005 Regents of The University of Michigan.
+All Rights Reserved.  See COPYRIGHT.
+
+------------------------------------------------
+Quick instructions for installing trouser
+------------------------------------------------
+
+% ./configure
+% make
+% make install
+
+--------------------------
+More detailed instructions
+--------------------------
+
+1: Getting the source
+
+Download the source from http://rsug.itd.umich.edu/software/trouser and
+uncompress it into a directory of your liking.  The current development
+source is also available through an anonymous CVS server.
+
+2: Configure the software
+
+Using configure in the top level directory, configure the software for
+your system:
+
+  % ./configure
+
+The configure scripts take several options.  To see them, run:
+
+  %s ./configure --help
+
+The following options were used to configure the build of trouser
+at http://mfile.umich.edu:
+
+    --prefix=/usr/local/projects
+    --with-project_name=mfile
+    --with-error_url="https://mfile-dev.www.umich.edu/?error=true"
+
+3: Build and install the software
+
+Now you are ready to build the software
+
+  % make
+
+Once that is done, you can install the service into the directory
+you configured with ./configure.
+
+  # make install
