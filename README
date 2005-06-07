@@ -28,7 +28,7 @@ your system:
 
 The configure scripts take several options.  To see them, run:
 
-  %s ./configure --help
+  % ./configure --help
 
 The following options were used to configure the build of trouser
 at http://mfile.umich.edu:
