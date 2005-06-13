@@ -311,8 +311,7 @@ ac_includes_default="\
 #endif"
 
 ac_subdirs_all="$ac_subdirs_all libcgi"
-ac_subdirs_all="$ac_subdirs_all upload"
-ac_subst_vars='SHELL PATH_SEPARATOR PACKAGE_NAME PACKAGE_TARNAME PACKAGE_VERSION PACKAGE_STRING PACKAGE_BUGREPORT exec_prefix prefix program_transform_name bindir sbindir libexecdir datadir sysconfdir sharedstatedir localstatedir libdir includedir oldincludedir infodir mandir build_alias host_alias target_alias DEFS ECHO_C ECHO_N ECHO_T LIBS project_name shtml_dir_name html_dir_name object_dir_name smarty_dir_name cgi_dir_name install_group CC CFLAGS LDFLAGS CPPFLAGS ac_ct_CC EXEEXT OBJEXT INSTALL_PROGRAM INSTALL_SCRIPT INSTALL_DATA SET_MAKE CPP EGREP LIBOBJS subdirs LTLIBOBJS'
+ac_subst_vars='SHELL PATH_SEPARATOR PACKAGE_NAME PACKAGE_TARNAME PACKAGE_VERSION PACKAGE_STRING PACKAGE_BUGREPORT exec_prefix prefix program_transform_name bindir sbindir libexecdir datadir sysconfdir sharedstatedir localstatedir libdir includedir oldincludedir infodir mandir build_alias host_alias target_alias DEFS ECHO_C ECHO_N ECHO_T LIBS project_name shtml_dir_name html_dir_name object_dir_name smarty_dir_name cgi_dir_name install_group error_url CC CFLAGS LDFLAGS CPPFLAGS ac_ct_CC EXEEXT OBJEXT INSTALL_PROGRAM INSTALL_SCRIPT INSTALL_DATA SET_MAKE CPP EGREP LIBOBJS subdirs LTLIBOBJS'
 ac_subst_files=''
 
 # Initialize some variables set by options.
@@ -859,6 +858,8 @@ Optional Packages:
                           name of sub-directory to contain cgi binaries
   --with-install_group=cgi_dir_name
                           name of group to have installed file ownership
+  --with-error_url=error_url
+                          default URL to redirect back to in case of error
 
 Some influential environment variables:
   CC          C compiler command
@@ -1355,6 +1356,16 @@ if test "${with_install_group+set}" = set; then
   install_group="$withval"
 else
   install_group="staff"
+fi;
+
+
+
+# Check whether --with-error_url or --without-error_url was given.
+if test "${with_error_url+set}" = set; then
+  withval="$with_error_url"
+  error_url="$withval"
+else
+  error_url="https://mfile.umich.edu/?error=true"
 fi;
 
 
@@ -3498,10 +3509,6 @@ done
 subdirs="$subdirs libcgi"
 
 
-
-subdirs="$subdirs upload"
-
-
           ac_config_files="$ac_config_files Makefile"
 
 
@@ -4146,6 +4153,7 @@ s,@object_dir_name@,$object_dir_name,;t t
 s,@smarty_dir_name@,$smarty_dir_name,;t t
 s,@cgi_dir_name@,$cgi_dir_name,;t t
 s,@install_group@,$install_group,;t t
+s,@error_url@,$error_url,;t t
 s,@CC@,$CC,;t t
 s,@CFLAGS@,$CFLAGS,;t t
 s,@LDFLAGS@,$LDFLAGS,;t t

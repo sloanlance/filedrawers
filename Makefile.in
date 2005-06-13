@@ -2,7 +2,7 @@ SHELL = /bin/sh
 
 srcdir =        .
 
-OPTOPTS=        -Wall -Wmissing-prototypes
+OPTOPTS=        -Wall -Wmissing-prototypes -Wstrict-prototypes
 CC=             gcc
 INSTALL=        @INSTALL@
 
@@ -60,17 +60,19 @@ IMAGETARGET=    images/blue_tabcap_r.gif images/bulb_large.gif \
 
 JSDIRTARGET=    js/filemanage.js
 
-all:
-	cd libcgi; make all
-	cd upload; make all
+all: upload/upload.cgi
 
-FRC :
+upload/upload.cgi: libcgi/libcgi.a upload/upload.o
+	${CC} ${CFLAGS} -o upload/upload.cgi upload/upload.o -Llibcgi -lcgi
 
-libcgi/libcgi.a : FRC
-	cd libcgi; ${MAKE} ${MFLAGS} CC=${CC} 
+upload/upload.o: upload/tpupload.c
+	${CC} ${CFLAGS} ${OPTOPTS} \
+	-Ilibcgi \
+	-D_URL_ERROR_PAGE=\"@error_url@\" \
+	-c upload/tpupload.c -o upload/upload.o
 
-upload/tpupload.o : FRC
-	cd upload; ${MAKE} ${MFLAGS} CC=${CC}
+libcgi/libcgi.a:
+	cd libcgi; ${MAKE} ${MFLAGS}
 
 install: all
 	mkdir -p ${ROOTDIR}
@@ -178,4 +180,4 @@ install: all
 
 clean :
 	cd libcgi; ${MAKE} ${MFLAGS} clean
-	cd upload; ${MAKE} ${MFLAGS} clean
+	rm -f upload/*.o upload/a.out upload/*.core upload/upload.cgi

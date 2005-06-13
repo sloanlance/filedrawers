@@ -51,6 +51,13 @@ AC_ARG_WITH(install_group,
             [install_group="staff"])
 AC_SUBST(install_group)
 
+AC_ARG_WITH(error_url,
+            AC_HELP_STRING([--with-error_url=error_url],
+                           [default URL to redirect back to in case of error]),
+            error_url="$withval",
+            [error_url="https://mfile.umich.edu/?error=true"])
+AC_SUBST(error_url)
+
 # Checks for programs.
 AC_PROG_CC
 AC_PROG_INSTALL
@@ -72,7 +79,6 @@ AC_FUNC_MEMCMP
 AC_CHECK_FUNCS([memchr memmove memset strcasecmp strdup strerror strncasecmp strstr strtol])
 
 AC_CONFIG_SUBDIRS(libcgi)
-AC_CONFIG_SUBDIRS(upload)
 
 AC_CONFIG_FILES(Makefile)
 
