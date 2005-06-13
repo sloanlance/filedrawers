@@ -16,13 +16,14 @@ More detailed instructions
 1: Getting the source
 
 Download the source from http://rsug.itd.umich.edu/software/trouser and
-uncompress it into a directory of your liking.  The current development
+uncompress it into a build directory of your liking. The build directory
+should be different from your install directory.  The current development
 source is also available through an anonymous CVS server.
 
 2: Configure the software
 
-Using configure in the top level directory, configure the software for
-your system:
+Using configure in the top level of your build directory, configure the
+software for your system:
 
   % ./configure
 
@@ -31,15 +32,18 @@ The configure scripts take several options.  To see them, run:
   % ./configure --help
 
 The following options were used to configure the build of trouser
-at http://mfile.umich.edu:
+at http://mfile.umich.edu, which installs trouser into
+/usr/local/projects/mfile on the webserver.
 
     --prefix=/usr/local/projects
     --with-project_name=mfile
     --with-error_url="https://mfile-dev.www.umich.edu/?error=true"
+    --with-install_group=staff
 
 3: Build and install the software
 
-Now you are ready to build the software
+Now you are ready to build the software. From the top level of your
+build directory:
 
   % make
 
