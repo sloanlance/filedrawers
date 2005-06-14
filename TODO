@@ -1,8 +1,8 @@
 Suggested Features/bugfixes for trouser.
 
-- Add a link to a "delegate afs permissions" url to the mfile menu.
+- Feature Add "allow support access" to file menu.
 
-- Create a "delegate afs permissions" page.
+- Feature Create a "allow support access" page.
 
     This will be a separate url.
 
@@ -10,49 +10,24 @@ Suggested Features/bugfixes for trouser.
 
     Upon loading, this url will make an ldap lookup of the user's affiliation.
 
-    The body of the page will consist of a list of AFS groups
-    that the user may delegate folder permissions to. At the top
-    of the list (highlighted?) will be the "suggested" group,
+    The body of the page will consist of a list of suggested AFS groups
+    that the user may delegate folder permissions to
     based on the user's affiliation.
 
-    Each listing will include a status icon, showing whether
+    Each listing will include a "permitted" status, showing whether
     the group currently has recursive permissions to access the
     user's folder.
 
-    Each listing will feature an "give permission" or "remove permission"
+    Each listing will feature a change support access "remove" or "give"
     button which will recursively add or remove group permissions
     from that user's AFS directories.
 
     Add a marking (icon) which shows groups that the user has delegated
     permissions to but is no longer affilliated with.
 
-    ftprints:lsa
-    dpugh:devosx
-    math:admins
-    itd.swdist:ssh.dist
-    math:gpcc
-    math
-    willrhee:example
-    chaimk:macsig
-    mathdept
-    intranet:itd.hr.supervisors
-    itd.swdist:arcviewunix.dist
-    itd.swdist:gqlupdate.dist
-    itd.swdist:notes4.dist
-    coun:meetingmakerjunkies
-    triciak:lsaprop
-    ws_load:readers
-    animania
-    itd.stat:subscribers_m
-    itd.login:subscribers_m
-    university.p.l:student.elgregpe.p.l
-    university.m.a:employee.m.a
-    itd.swdist:exceed.dist
-    lsa.lsait
-    lsa.pops:members
-    lsa.admin
+    Current mockup visible wwww.umich.edu/~scam/mfile_mockup.gif
 
-- Add "help" button to mfile header.
+- Feature Add "help" button to mfile header.
     Add "help" button and a corresponding documentation page.
 
     Documentation exists. "Online documentation" from mfile main page.
@@ -64,7 +39,7 @@ Suggested Features/bugfixes for trouser.
     Change mfile header so that it "lines up" exactly with
     the non-ssl mfile login page. Right now it's looking a bit odd.
 
-- Integrate archive file access into mfile
+- Feature Integrate archive file access into mfile
 
     There be an "open archive" file menu option that
     lights up when an archive is selected. Clicking
@@ -99,7 +74,7 @@ Suggested Features/bugfixes for trouser.
     settings", but remembering the settings would require some
     sort of ".mfile" file kept in the users AFS space.
 
-- Add handling for "current folder" operations.
+- Feature Add handling for "current folder" operations.
 
     We'll need cut, copy, rename, and set permissions for current folder.
 
@@ -120,7 +95,7 @@ Suggested Features/bugfixes for trouser.
     3. Add a "this folder" entry to the existing checklist. Ensure
        that it always remains on top when sorted.
 
-- Modify behavior of download filename and icon.
+- Fix behavior of download filename and icon.
 
     The filename link should simply be a "normal" download link.
 
@@ -132,12 +107,12 @@ Suggested Features/bugfixes for trouser.
     Other button should just be an a-link to the object in question.
     Open in new window? .mfile saved preferences?
 
-- Add an AFS quota display button?
+- Feature Add an AFS quota display button?
 
     Display quota at all times.
     Add a "buy more quota" link next to the displayed quota.
 
-- Re-work permissions tab for usability
+- Feature Re-work permissions tab for usability
     Permissions tab is currently very confusing unless you're
     familiar with AFS "wildkar" rights and how those work.
 
@@ -163,10 +138,10 @@ Suggested Features/bugfixes for trouser.
     Possibly make current permission tab features available in an
     "advanced" or "advanced AFS management" sub-tab.
 
-- Possibly allow the creation maintenance of a "friends" afs list?
+- Feature Possibly allow the creation maintenance of a "friends" afs list?
     and then allow the display of "My friends may:" etc?
 
-- Dropbox
+- Feature Dropbox
 
     Single button labeled sharing, or dropboxes.
 
@@ -196,29 +171,23 @@ Suggested Features/bugfixes for trouser.
 - Fix add secondary key (filename, alphabetical) to sort fields when
     sorting by something else other than filename.
 
-- We want to have a text-editing feature for MIME types that would be
-    editable in a web window.
+- Feature Create want to have a text-editing feature for MIME types
+    that would be editable in a web window.
 
-- Integration with mprint context sensitive "print this file"
+- Feature Integration with mprint context sensitive "print this file"
 
-- Integration with mail.umich.edu (imp)... context sensitive "mail this
-    file as an attachment"
+- Feature Integration with mail.umich.edu (imp)... context sensitive
+    "mail this file as an attachment"
 
-- Integrate mail.umich.edu (imp?) to be able to save read attachments as
-    uploaded files.
+- Feature Integrate mail.umich.edu (imp?) to be able to save read
+    attachments as uploaded files.
 
 - Fix incompatible browser detection needs to be added. Right now
     older browers (IE 5 on mac, for example) display garbled tables.
 
-- Add some sort of file (or full directory) synchronization. This could
-    be interactive, based on timestamp. Would it handle merges? Warn
-    between changes?
-
-    "you're about to replace an older version of ..."
-
-- There should be some way in the "web sites" view to get the web-url of
-    any given document. Possibly add a url link into the information bar
-    of a given file/directory?
+- Feature There should be some way in the "web sites" view to get
+    the web-url of any given document. Possibly add a url link into
+    the information bar of a given file/directory?
 
 - Fix Makefile.in so that it correctly configures php and javascript
     headers to use the configuration strings created in ./configure.
@@ -226,3 +195,16 @@ Suggested Features/bugfixes for trouser.
 - Fix Makefile.in so that ./configure and Make no longer have to recursively
     go into the upload directory to make upload.cgi... everything should
     be done from the root.
+
+- Fix "+" handling? Creating a file is possible with a + sign but
+    rename/removal is not. Same problem occurs with files with ` in
+    them.
+
+- Fix Files that mfile is unable to download (files with no read access)
+    these files should not have a download icon, and should not have
+    a clickable link for their filename.
+
+- Fix handling of filenames that look like unix options.
+
+- Fix remove any "system" commands that execute commands on the filename.
+   This will prevent `` exploits, option exploits, etc.
