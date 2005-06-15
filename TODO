@@ -1,12 +1,8 @@
-Suggested Features/bugfixes for trouser.
-
 - Feature Add "allow support access" to file menu.
 
 - Feature Create a "allow support access" page.
 
     This will be a separate url.
-
-    This url may be under the "help" section of the mfile page.
 
     Upon loading, this url will make an ldap lookup of the user's affiliation.
 
@@ -34,6 +30,12 @@ Suggested Features/bugfixes for trouser.
 
     Use the mfile look and feel to link to the various mfile
     documentation pages.
+
+    Link to our mailing list (mfile-help?).
+    List needs to get created.
+
+    documentation page:
+    http://www.itd.umich.edu/itcsdocs/s4311/
 
 - Fix mfile header
     Change mfile header so that it "lines up" exactly with
@@ -112,6 +114,10 @@ Suggested Features/bugfixes for trouser.
     Display quota at all times.
     Add a "buy more quota" link next to the displayed quota.
 
+    https://accounts.www.umich.edu/umce-bin/umce
+
+    (current IFS quota display)
+
 - Feature Re-work permissions tab for usability
     Permissions tab is currently very confusing unless you're
     familiar with AFS "wildkar" rights and how those work.
@@ -138,7 +144,7 @@ Suggested Features/bugfixes for trouser.
     Possibly make current permission tab features available in an
     "advanced" or "advanced AFS management" sub-tab.
 
-- Feature Possibly allow the creation maintenance of a "friends" afs list?
+- Feature Possibly allow the creation/maintenance of a "friends" afs list?
     and then allow the display of "My friends may:" etc?
 
 - Feature Dropbox
@@ -208,3 +214,28 @@ Suggested Features/bugfixes for trouser.
 
 - Fix remove any "system" commands that execute commands on the filename.
    This will prevent `` exploits, option exploits, etc.
+
+- Feature interact with ABS to display when an account has been disabled.
+   We don't want users who have AFS access disabled poking around on
+   mfile and not seeing their home directory.
+
+- Feature if you don't have a home directory, bring up a page/link
+   that says something like "you do not have an IFS home directory
+   either one was never created for you, or it's been disabled."
+   Then provide a link to where they can get help.
+
+- Fix user jport can't view the contents of his Private directory.
+   It's visible on mongolian, but not on japanese. What's wrong?
+
+- Feature find total # of users ever.
+    Look for how many new users we get every week.
+    (willn)
+
+- Feature Add makewebspace functionality.
+    (willn)
+
+- Fix folders which contain only hidden files should display a message
+    that "this folder contains only hidden files", in the same way
+    that empty folders display "this folder is empty".
+
+- Put mfile version number (subtle) in lower left corner.
