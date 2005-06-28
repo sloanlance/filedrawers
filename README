@@ -35,10 +35,11 @@ The following options were used to configure the build of trouser
 at http://mfile.umich.edu, which installs trouser into
 /usr/local/projects/mfile on the webserver.
 
-    --prefix=/usr/local/projects
-    --with-project_name=mfile
-    --with-error_url="https://mfile-dev.www.umich.edu/?error=true"
-    --with-install_group=staff
+./configure \
+--prefix=/usr/local/projects \
+--with-project_name=mfile \
+--with-error_url="https://mfile-dev.www.umich.edu/?error=true" \
+--with-install_group=staff
 
 3: Build and install the software
 

@@ -17,6 +17,7 @@ CGIDIR=${ROOTDIR}/@cgi_dir_name@
 # Derived directory names
 SIMAGES=${SHTMLDIR}/images
 JSDIR=${SHTMLDIR}/js
+MWSDIR=${SHTMLDIR}/make-webspace
 IMAGES=${HTMLDIR}/images
 DOWNLOADDIR=${SHTMLDIR}/download
 TEMPLATES=${SMARTY}/templates
@@ -177,6 +178,17 @@ install: all
 	chgrp @install_group@ ${CGIDIR}
 	$(INSTALL) -g @install_group@ -m 0775 upload/upload.cgi \
 	           ${CGIDIR}/upload.cgi
+
+        # Install make-webspace
+	mkdir -p ${MWSDIR}
+	chmod 755 ${MWSDIR}
+	chgrp @install_group@ ${MWSDIR}
+	$(INSTALL) -g @install_group@ -m 0775 php/index_makewebspace.php \
+	           ${MWSDIR}/index.php
+	$(INSTALL) -g @install_group@ -m 0775 php/make_makewebspace.php \
+	           ${MWSDIR}/make.php
+	$(INSTALL) -g @install_group@ -m 0775 php/lib_makewebspace.php \
+	           ${MWSDIR}/lib.php
 
 clean :
 	cd libcgi; ${MAKE} ${MFLAGS} clean
