@@ -35,7 +35,8 @@ SHTMLDIRTARGET= css/fileman.css css/ie6specific.css css/ie5specific.css \
 
 HTMLDIRTARGET=  css/styles.css php/feedback.php
 
-OBJECTSTARGET=  php/afs.php php/favorites.php php/mime.php
+OBJECTSTARGET=  php/afs.php php/favorites.php php/mime.php \
+                php/makewebspace.php
 
 SMARTYTARGET=   smarty/smarty.custom.php
 
@@ -185,10 +186,6 @@ install: all
 	chgrp @install_group@ ${MWSDIR}
 	$(INSTALL) -g @install_group@ -m 0775 php/index_makewebspace.php \
 	           ${MWSDIR}/index.php
-	$(INSTALL) -g @install_group@ -m 0775 php/make_makewebspace.php \
-	           ${MWSDIR}/make.php
-	$(INSTALL) -g @install_group@ -m 0775 php/lib_makewebspace.php \
-	           ${MWSDIR}/lib.php
 
 clean :
 	cd libcgi; ${MAKE} ${MFLAGS} clean
