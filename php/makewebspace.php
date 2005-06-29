@@ -95,7 +95,7 @@ function SetPerms( $directory, $recursive, $perms )
     return 1;
 }
 
-function RenderMakewebspaceDiv( $uniqname )
+function RenderMakewebspaceDiv( $uniqname, $webspaces )
 {
     $dir = '';
     $help = 'http://www.umich.edu/how-to-homepage.html';
@@ -103,7 +103,7 @@ function RenderMakewebspaceDiv( $uniqname )
     $Matches = array( );
     $rc = 1;
 
-    echo '<div id="notice">\n';
+    echo '<div id="notice">' . "\n";
 
     if ( !count( $_POST )) {
 	echo '<h3>No directories were chosen to set up.</h3>';
@@ -120,7 +120,7 @@ function RenderMakewebspaceDiv( $uniqname )
 	    $dir = $Matches[2];
 
 	    # if they're trying to inject a name they shouldn't
-	    if ( !isset( $Spaces[$homedir] )) {
+	    if ( !isset( $webspaces[$homedir] )) {
 		PassTheBuck( );
 		$rc = 1;
 		break;

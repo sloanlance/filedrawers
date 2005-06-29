@@ -47,7 +47,7 @@ if ( $_SERVER['REMOTE_REALM'] != 'friend' ) {
 if ( isset( $_POST['make-ws-posted'] )) {
     unset( $_POST['make-ws-posted'] );
 
-    RenderMakewebspaceDiv($_SERVER['REMOTE_USER']);
+    RenderMakewebspaceDiv($_SERVER['REMOTE_USER'], $Spaces);
 }
 
 #---- finish html for form above ---
