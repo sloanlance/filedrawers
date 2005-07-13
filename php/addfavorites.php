@@ -21,5 +21,5 @@ $smarty->assign( 'usedFavs', sizeof( $favorites ));
 $smarty->assign( 'target', $fav->favoriteTarget );
 $smarty->assign( 'maxFavs', 5 ); // The maximum number of favorite locations
 $smarty->assign( 'cmd', ( isset( $_POST['cmd'] )) ? $_POST['cmd'] : '' );
-$smarty->display( 'pieces/addFavorites.tpl' );
+$smarty->display( 'addFavorites.tpl' );
 ?>

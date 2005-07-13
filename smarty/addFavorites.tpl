@@ -3,7 +3,7 @@
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
 <title>Favorites Panel</title>
-<link href="favorites.css" rel="stylesheet" type="text/css" />
+<link href="/favorites.css" rel="stylesheet" type="text/css" />
 <style type="text/css">
 <!--
 {literal}
@@ -15,16 +15,16 @@ body {
 </style>
 </head>
 <body onload="{$loadCmds}">
-<div id="menu"><a href="viewfavorites.php?target={$target}">View</a> | <a href="addfavorites.php?target={$target}" class="sel">Add</a> | <a href="renamefavorites.php?target={$target}">Rename</a> | <a href="deletefavorites.php?target={$target}">Delete</a></div>
+<div id="menu"><a href="/viewfavorites.php?target={$target}">View</a> | <a href="/addfavorites.php?target={$target}" class="sel">Add</a> | <a href="/renamefavorites.php?target={$target}">Rename</a> | <a href="/deletefavorites.php?target={$target}">Delete</a></div>
 {if $usedFavs < $maxFavs}
-<form method="post" name="fav_editor" action="viewfavorites.php?target={$target}">
+<form method="post" name="fav_editor" action="/viewfavorites.php?target={$target}">
     <p>Enter a name and click 'Add' to add the current location to your favorites.</p>
     <input type="text" name="selectedItems" size="18" />
 	<input type="submit" name="command" value="Add" />
 </form>
 {else}
 <p>You have stored the maximum number of favorite locations.</p>
-<p align="center"><a href="viewfavorites.php?target={$target}">OK</a></p>
+<p align="center"><a href="/viewfavorites.php?target={$target}">OK</a></p>
 {/if}
 </body>
 </html>

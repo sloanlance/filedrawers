@@ -3,7 +3,7 @@
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
 <title>Favorites Panel</title>
-<link href="favorites.css" rel="stylesheet" type="text/css" />
+<link href="/favorites.css" rel="stylesheet" type="text/css" />
 <style type="text/css">
 <!--
 {literal}
@@ -15,8 +15,8 @@ body {
 </style>
 </head>
 <body>
-<form method="post" name="fav_editor" action="viewfavorites.php?target={$target}">
-    <div id="menu"><a href="viewfavorites.php?target={$target}">View</a> | <a href="addfavorites.php?target={$target}">Add</a> | <a href="renamefavorites.php?target={$target}" class="sel">Rename</a> | <a href="deletefavorites.php?target={$target}">Delete</a></div>
+<form method="post" name="fav_editor" action="/viewfavorites.php?target={$target}">
+    <div id="menu"><a href="/viewfavorites.php?target={$target}">View</a> | <a href="/addfavorites.php?target={$target}">Add</a> | <a href="/renamefavorites.php?target={$target}" class="sel">Rename</a> | <a href="/deletefavorites.php?target={$target}">Delete</a></div>
     {foreach key=name item=link from=$favorites}
     <input type="text" name="selectedItems[{$name}]" value="{$name}" size="18" maxlength="25" />
     <br />

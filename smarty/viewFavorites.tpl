@@ -3,7 +3,7 @@
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
 <title>Favorites Panel</title>
-<link href="favorites.css" rel="stylesheet" type="text/css" />
+<link href="/favorites.css" rel="stylesheet" type="text/css" />
 <style type="text/css">
 <!--
 {literal}
@@ -15,7 +15,7 @@ body {
 </style>
 </head>
 <body>
-<div id="menu"><a href="viewfavorites.php?target={$target}" class="sel">View</a> | <a href="addfavorites.php?target={$target}">Add</a> | <a href="renamefavorites.php?target={$target}">Rename</a> | <a href="deletefavorites.php?target={$target}">Delete</a></div>
+<div id="menu"><a href="/viewfavorites.php?target={$target}" class="sel">View</a> | <a href="/addfavorites.php?target={$target}">Add</a> | <a href="/renamefavorites.php?target={$target}">Rename</a> | <a href="/deletefavorites.php?target={$target}">Delete</a></div>
 <br />
 Go to a favorite location:<br />
 {foreach key=name item=link from=$favorites}

@@ -1,16 +1,18 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
-<title>mFile: afs file management</title>
+<title>mfile: {$trouser_title}</title>
 <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
-<link href="fileman.css" rel="stylesheet" type="text/css" />
+{foreach from="$stylesheets" item="stylesheet"}
+<link href="{$stylesheet}" rel="stylesheet" type="text/css" />
+{/foreach}
 <!--[if IE 5]> 
- <link href="ie5specific.css" rel="stylesheet" type="text/css"> 
+ <link href="/ie5specific.css" rel="stylesheet" type="text/css"> 
  <![endif]-->
 <!--[if IE 6]> 
- <link href="ie6specific.css" rel="stylesheet" type="text/css"> 
+ <link href="/ie6specific.css" rel="stylesheet" type="text/css"> 
  <![endif]-->
-<script language="JavaScript" type="text/javascript" src="js/filemanage.js"></script>
+<script language="JavaScript" type="text/javascript" src="/js/filemanage.js"></script>
 <script language="JavaScript" type="text/JavaScript">
 var path       = "{$path}";
 var foldername = "{$folderName}";
@@ -38,18 +40,14 @@ files=new Array();
                     of Michigan</a></div>
     </div>
     <div id="banner">
-        <h1>mFile: afs file management</h1>
+        <h1>mFile: {$trouser_title}</h1>
         <ul id="menubar">
             {if $homeSelected}
             <li><a href="/" class="active">Home</a></li>
             {else}
             <li><a href="/">Home</a></li>
             {/if}
-            {if $webSelected}
-            <li><a href="/?path={$homePath}/Public/html" class="active">Web Sites</a></li>
-            {else}
-            <li><a href="/?path={$homePath}/Public/html">Web Sites</a></li>
-            {/if}
+            <li><a href="/make-webspace/">Web Sites</a></li>
             <li><a href="https://mfile.umich.edu/cgi-bin/logout?http://mfile.umich.edu/">Logout</a></li>
         </ul>
     </div>

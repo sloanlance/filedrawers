@@ -4,8 +4,8 @@
  * All Rights Reserved.  See COPYRIGHT.
  */
 
-var imgStore         = 'images';       // General UI icons
-var mimeStore        = 'images/mime';  // Mime type icons
+var imgStore         = '/images';       // General UI icons
+var mimeStore        = '/images/mime';  // Mime type icons
 var uploadLocation   = 'progress.php'; // Where the upload form posts
 var downloadURI      = 'download'      // Location of download script
 var folderMime       = '0000000dir';   // Fake mime type used for folders
@@ -37,15 +37,15 @@ Array.prototype.inArray = function ( value )
 // From: embimedia.com
 function sortFunc( file1, file2 )
 {
-	if ( file1[sortBy] < file2[sortBy] ) {
-		retVal = ( sortDecending == 1 ) ? 1 : -1;
-	} else if ( file1[sortBy] > file2[sortBy] ) {
-		retVal = ( sortDecending == 1 ) ? -1 : 1;
-	} else {
-		retVal = 0;
-	}
+    if ( file1[sortBy] < file2[sortBy] ) {
+        retVal = ( sortDecending == 1 ) ? 1 : -1;
+    } else if ( file1[sortBy] > file2[sortBy] ) {
+        retVal = ( sortDecending == 1 ) ? -1 : 1;
+    } else {
+        retVal = 0;
+    }
 
-	return retVal;
+    return retVal;
 }
 
 // Perform all of the intial tasks when the page first loads
@@ -58,7 +58,7 @@ function startPage( notifyMsg, warnMsg )
     }
 
     displayFileList();
-	fileInspector();
+    fileInspector();
 
     if ( notifyMsg ) {
         notifyUser( notifyMsg );
@@ -76,9 +76,9 @@ function startPage( notifyMsg, warnMsg )
 // Returns a form checkbox or something else if approriate
 function createItemSelect( id, cuts )
 {
-	if ( readonly ) {
-		return document.createTextNode( '' );
-	} else if ( cuts && cuts.inArray( files[id].title ) ) {
+    if ( readonly ) {
+            return document.createTextNode( '' );
+    } else if ( cuts && cuts.inArray( files[id].title ) ) {
         return document.createTextNode( 'cut' );
     } else {
         // Create a checkbox and add it to the file list
@@ -121,15 +121,15 @@ function createFileName( id )
     if ( files[id].type == folderMime ) {
         var l = document.createElement( 'a' );
         l.setAttribute( 'href', './?path=' + path + '/' + files[id].title );
-        l.appendChild( document.createTextNode( unescape( files[id].title )));
+        l.appendChild( document.createTextNode( files[id].title));
         return l;
     } else if ( readonly ) {
-        return document.createTextNode( unescape( files[id].title ));
+        return document.createTextNode( files[id].title);
     } else {
         var l = document.createElement( 'a' );
         l.setAttribute( 'href', downloadURI + '/?path=' + path + '/' +
           files[id].title );
-        l.appendChild( document.createTextNode( unescape( files[id].title )));
+        l.appendChild( document.createTextNode(files[id].title));
         return l;
     }
 }
@@ -157,25 +157,26 @@ function createDlIcon( id )
 function unselectColumn()
 {
     switch( readCookie( 'sortby' )) {
-        case 'type':
-            var typeCol = document.getElementById( 'typesel' );
-            typeCol.className = '';
-            typeCol.removeChild( typeCol.lastChild );
-            break;
-        case 'date':
-            var dateCol = document.getElementById( 'datesel' );
-            dateCol.className = '';
-            dateCol.removeChild( dateCol.lastChild );
-            break;
-        case 'size':
-            var sizeCol = document.getElementById( 'sizesel' );
-            sizeCol.className = '';
-            sizeCol.removeChild( sizeCol.lastChild );
-            break;
-        default:
-            var titleCol = document.getElementById( 'titlesel' );
-            titleCol.className = '';
-            titleCol.removeChild( titleCol.lastChild );
+    case 'type':
+        var typeCol = document.getElementById( 'typesel' );
+        typeCol.className = '';
+        typeCol.removeChild( typeCol.lastChild );
+        break;
+    case 'date':
+        var dateCol = document.getElementById( 'datesel' );
+        dateCol.className = '';
+        dateCol.removeChild( dateCol.lastChild );
+        break;
+    case 'size':
+        var sizeCol = document.getElementById( 'sizesel' );
+        sizeCol.className = '';
+        sizeCol.removeChild( sizeCol.lastChild );
+        break;
+    default:
+        var titleCol = document.getElementById( 'titlesel' );
+        titleCol.className = '';
+        titleCol.removeChild( titleCol.lastChild );
+        break;
     }
 }
 
@@ -186,17 +187,18 @@ function selectColumn( sortFlag )
     var l = document.createElement( 'a' );
 
     switch( sortFlag ) {
-        case 'type':
-            var parentElem = document.getElementById( 'typesel' );
-            break;
-        case 'date':
-            var parentElem = document.getElementById( 'datesel' );
-            break;
-        case 'size':
-            var parentElem = document.getElementById( 'sizesel' );
-            break;
-        default:
-            var parentElem = document.getElementById( 'titlesel' );
+    case 'type':
+        var parentElem = document.getElementById( 'typesel' );
+        break;
+    case 'date':
+        var parentElem = document.getElementById( 'datesel' );
+        break;
+    case 'size':
+        var parentElem = document.getElementById( 'sizesel' );
+        break;
+    default:
+        var parentElem = document.getElementById( 'titlesel' );
+        break;
     }
 
     parentElem.className = 'selectedCol';
@@ -255,7 +257,7 @@ function displayFileList()
     }
 
     sortDecending = readCookie( 'sortDecending' );
-	files.sort( sortFunc );
+        files.sort( sortFunc );
 
     // Display the file list
     createFileList();
@@ -345,25 +347,25 @@ function createFileList()
 function roundNum( num )
 {
     return Math.round( num * Math.pow( 10, sigFigures )) / Math.pow( 10,
-      sigFigures );
+    sigFigures );
 }
 
 // Returns a user friendly file size
 function formatBytes( bytes )
 {
- 	if ( bytes >= 1073741824 ) {
-		return ( bytes / 1073741824 ) + ' GB';
-	} else if ( bytes >= 1048576 ) {
-		return roundNum( bytes / 1048576 ) + ' MB';
-	} else if ( bytes >= 1024 ) {
-		return roundNum( bytes / 1024 ) + ' KB';
-	} else if ( bytes > 768 && bytes < 1024 ) {
-		return bytes + '1 KB';
+    if ( bytes >= 1073741824 ) {
+        return ( bytes / 1073741824 ) + ' GB';
+    } else if ( bytes >= 1048576 ) {
+        return roundNum( bytes / 1048576 ) + ' MB';
+    } else if ( bytes >= 1024 ) {
+        return roundNum( bytes / 1024 ) + ' KB';
+    } else if ( bytes > 768 && bytes < 1024 ) {
+        return bytes + '1 KB';
     } else if ( bytes > 0 && bytes < 768 ) {
-		return '< 1 KB';
-	} else {
-		return "--";
-	}
+        return '< 1 KB';
+    } else {
+        return "--";
+    }
 }
 
 function formatDate( rawDate )
@@ -381,114 +383,119 @@ function formatDate( rawDate )
 // File Object - All files and folders displayed are objects of this type
 function File( title, date, size, selected, type )
 {
-	this.title     = title;    // The title of the item
-	this.date      = date;     // The modify date of the item
-	this.size      = size;     // The size of the item
-	this.selected  = selected; // Is the item selected?
-	this.type      = type;     // The file type of the item
+    this.title     = title;    // The title of the item
+    this.date      = date;     // The modify date of the item
+    this.size      = size;     // The size of the item
+    this.selected  = selected; // Is the item selected?
+    this.type      = type;     // The file type of the item
     this.className = false;    // The original class style of the file's row
 }
 
 // Selected File Information Object - stores information about a file or files
 function SelectedFileInfo()
 {
-	this.filelist  = '';
-	this.numSel    = 0;
-	this.totalSize = 0;
-	this.lastId    = 0;
-	var ids        = getSelectedItems();
+    this.filelist  = '';
+    this.numSel    = 0;
+    this.totalSize = 0;
+    this.lastId    = 0;
+    var ids        = getSelectedItems();
 
-	for ( var j=0; j < ids.length; j++ ) {
-		this.filelist += unescape( files[ids[j]].title ) + "<br />";
-		this.totalSize += files[ids[j]].size;
-		this.numSel++;
-		this.lastId = ids[j];
-	}
+    for ( var j=0; j < ids.length; j++ ) {
+        this.filelist += files[ids[j]].title + "<br />";
+        this.totalSize += files[ids[j]].size;
+        this.numSel++;
+        this.lastId = ids[j];
+    }
 
-	this.info = '<h4>Information</h4><ul><li><strong>'
-		+ this.numSel + ' items selected</strong><br />'
-		+ formatBytes( this.totalSize ) + '</li></ul>';
+    this.info = '<h4>Information</h4><ul><li><strong>'
+            + this.numSel + ' items selected</strong><br />'
+            + formatBytes( this.totalSize ) + '</li></ul>';
 
-	this.info += ( this.numSel < maxInspFileList ) ? '<ul><li>'
-		+ this.filelist + '</li></ul>' : '';
+    this.info += ( this.numSel < maxInspFileList ) ? '<ul><li>'
+            + this.filelist + '</li></ul>' : '';
 }
 
 // Notify user of status changes (e.g. upload complete, file deleted, etc.)
 function notifyUser( msg )
 {
     originalNotify = document.getElementById( 'notifyArea' ).innerHTML;
-	document.getElementById( 'notifyArea' ).innerHTML = '<span class="notify">'
-      + msg + '</span>';
-	setTimeout( "document.getElementById('notifyArea').innerHTML = originalNotify",
-      notifyHoldTime );
+    document.getElementById('notifyArea' ).innerHTML = '<span class="notify">'
+            + msg + '</span>';
+    setTimeout(document.getElementById('notifyArea').innerHTML =
+               originalNotify, notifyHoldTime );
 }
 
 // Get the contents of the clipboard from the browser cookie file
 function getClipboard()
 {
-	var clipboard  = readCookie( 'clipboard' );
-	var clipPath   = readCookie( 'filepath' );
-	var clipAction = readCookie( 'clipaction' );
-	
-	if ( clipboard && clipAction == 'cut' && path == clipPath) {
-		return clipboard.split( clipboardSeparat );
-	} else {
-		return null;
-	}
+    var clipboard  = readCookie( 'clipboard' );
+    var clipPath   = readCookie( 'filepath' );
+    var clipAction = readCookie( 'clipaction' );
+    
+    if ( clipboard && clipAction == 'cut' && path == clipPath) {
+        return clipboard.split( clipboardSeparat );
+    } else {
+        return null;
+    }
 }
 
 // Submit a paste command with the contents of the clipboard and reset the clipboard.
 function paste()
 {
-	document.cmd.selectedItems.value = readCookie( 'clipboard' );
+    document.cmd.selectedItems.value = readCookie( 'clipboard' );
     document.cmd.command.value = readCookie( 'clipaction' );
     document.cmd.originPath.value = readCookie( 'filepath' );
-	setCookie( 'clipboard', '' );
-	document.cmd.submit();
+    setCookie( 'clipboard', '' );
+    document.cmd.submit();
 }
 
-// Read the items marked as selected in the files array and put them in the clipboard
+/*
+ * Read the items marked as selected in the files array and put
+ * them in the clipboard
+ */
 function setClipboard( action )
 {
-	var ids           = getSelectedItems();
-	var clipArray     = new Array();    // Forget previous contents of clipboard
-	var selectedItems = 0;
+    var ids           = getSelectedItems();
 
-	for ( var j = 0; j < ids.length; j++ ) {
-		files[ids[j]].selected = false;
-		clipArray.push( files[ids[j]].title );
-		selectedItems++;
-	}
+    // Forget previous contents of clipboard
+    var clipArray     = new Array();
+    var selectedItems = 0;
 
-	var clipboard = clipArray.join( clipboardSeparat );
+    for ( var j = 0; j < ids.length; j++ ) {
+            files[ids[j]].selected = false;
+            clipArray.push( files[ids[j]].title );
+            selectedItems++;
+    }
 
-	// Add selected items to clipboard cookie
-	setCookie( 'filepath', path );
-	setCookie( 'clipaction', action );
-	setCookie( 'clipboard', clipboard );
+    var clipboard = clipArray.join( clipboardSeparat );
 
-	// Reset display so that item(s) are marked as 'cut'
-	reorderFileList();
+    // Add selected items to clipboard cookie
+    setCookie( 'filepath', path );
+    setCookie( 'clipaction', action );
+    setCookie( 'clipboard', clipboard );
+
+    // Reset display so that item(s) are marked as 'cut'
+    reorderFileList();
 
     // Refresh the inspector display
     fileInspector();
 
-	// Display clipboard action notification to user
-	notifyUser( 'Added ' + selectedItems + ' item(s) to the clipboard.' );
+    // Display clipboard action notification to user
+    notifyUser( 'Added ' + selectedItems + ' item(s) to the clipboard.' );
 }
 
 // Generic function to set a specific field in the cookie file
 function setCookie( field, value )
 {
-	var theCookie = field + '=' +  escape( value );
-	document.cookie = theCookie + "; path=/; secure;";
+    var theCookie = field + '=' +  escape( value );
+    document.cookie = theCookie + "; path=/; secure;";
 }
 
 // Origninally from www.quirksmode.org
 function readCookie( name )
 {
     var nameEQ    = name + '=';
-	var theCookie = document.cookie;
+    var theCookie = document.cookie;
     var ca        = theCookie.split( ';' );
 
     for ( var i = 0; i < ca.length; i++ ) {
@@ -523,19 +530,19 @@ function closeItem( itemCtrl, overlay )
 // Reveals the file upload progress UI element
 function showProgress()
 {
-	document.getElementById( 'uploadctrl' ).style.display = 'none';
-	document.getElementById( 'progbar' ).style.display    = 'block';
+    document.getElementById( 'uploadctrl' ).style.display = 'none';
+    document.getElementById( 'progbar' ).style.display    = 'block';
 }
 
 // Begins the upload process by submitting the upload form and revealing
 // the upload progress bar
 function startUpload()
 {
-	var baseUrl = uploadLocation;
-	baseUrl += '?sessionid=' + sid;
-	document.getElementById( 'progbar' ).src = baseUrl;
-	showProgress();
-	document.getElementById( 'upload' ).submit();
+    var baseUrl = uploadLocation;
+    baseUrl += '?sessionid=' + sid;
+    document.getElementById( 'progbar' ).src = baseUrl;
+    showProgress();
+    document.getElementById( 'upload' ).submit();
 }
 
 // This function sets the target of the iframe that displays the permissions
@@ -543,27 +550,27 @@ function startUpload()
 function setPMpath()
 {
     var itemInfo = new SelectedFileInfo();
-    document.getElementById( 'permpanel' ).src = 'perm_manager.php?target='
-      + path + '/' + files[ itemInfo.lastId ].title;
+    document.getElementById( 'permpanel' ).src = '/perm_manager.php?target='
+            + path + '/' + files[ itemInfo.lastId ].title;
 }
 
 // Sets the path for the iframe that displays the user's list of favorite locations
 function setFavPath()
 {
-    document.getElementById( 'favpanel' ).src = 'viewfavorites.php?target='
-      + path;
+    document.getElementById( 'favpanel' ).src = '/viewfavorites.php?target='
+            + path;
 }
 
 // Toggles the show hidden files variable
 function setShowHidden()
 {
-	showHiddenFiles = ( showHiddenFiles == 1 ) ? 0 : 1;
+    showHiddenFiles = ( showHiddenFiles == 1 ) ? 0 : 1;
     setCookie( 'showHiddenFiles', showHiddenFiles );
 
     // Update UI toggle control
     setHiddenFilesCtrl();
 
-	// Refresh display
+    // Refresh display
     reorderFileList();
 }
 
@@ -572,7 +579,7 @@ function setHiddenFilesCtrl()
 {
     var l = document.getElementById( 'hidnFilesCtrl' );
 
-	if ( showHiddenFiles == 1 ) {
+        if ( showHiddenFiles == 1 ) {
         var t = document.createTextNode( 'Hide Hidden Files' );
         l.replaceChild( t, l.firstChild );
     } else {
@@ -626,13 +633,13 @@ function activateLocationCtrl( active )
 // Display a locked folder icon if this directory is read only
 function getFolderIcon()
 {
-	if ( readonly ) {
+    if ( readonly ) {
         document.getElementById('selectedItem').background = imgStore
-          + '/folder_locked.gif';
-	} else {
-		document.getElementById('selectedItem').background = imgStore
-          + '/folder.gif';
-	}
+                + '/folder_locked.gif';
+    } else {
+            document.getElementById('selectedItem').background = imgStore
+                    + '/folder.gif';
+    }
 }
 
 // Displays a dynamic inspector-type interface that changes based on user selections
@@ -640,24 +647,25 @@ function getFolderIcon()
 // apprpriate
 function fileInspector()
 {
-	var itemInfo  = new SelectedFileInfo();
-	var content = '';
+    var itemInfo  = new SelectedFileInfo();
+    var content = '';
 
     // Only show the paste option if there is something in the clipboard
-	if ( readCookie( "clipboard" )) {
+        if ( readCookie( "clipboard" )) {
         setInspControl( 'pasteCtrl', 'paste()', 'Paste to This Folder' );
     } else {
         setInspControl( 'pasteCtrl', '', 'Paste to This Folder' );
     }
 
     // This is the sidebar menu state for no items selected
-	if ( itemInfo.numSel == 0 ) {
+    if ( itemInfo.numSel == 0 ) {
         if ( readonly ) {
             setInspControl( 'uploadCtrl', '', 'Upload File(s)' );
             setInspControl( 'newFolderCtrl', '', 'Create a New Folder' );
         } else {
-            setInspControl( 'uploadCtrl', 'expandItem(\'uploadCtrl\',\'upload\')',
-              'Upload File(s)' );
+            setInspControl('uploadCtrl',
+                           'expandItem(\'uploadCtrl\',\'upload\')',
+           'Upload File(s)' );
             setInspControl( 'newFolderCtrl',
               'expandItem(\'newFolderCtrl\',\'newFolder\')',
               'Create a New Folder' );
@@ -673,7 +681,7 @@ function fileInspector()
         document.getElementById( 'itemInfo' ).innerHTML = '';
 
     // This is the sidebar menu state for 1 item selected
-	} else if ( itemInfo.numSel == 1 ) {
+    } else if ( itemInfo.numSel == 1 ) {
         setInspControl( 'uploadCtrl', '', 'Upload File(s)' );
         setInspControl( 'cutCtrl', 'setClipboard(\'cut\')',
           'Cut Selected Item(s)' );
@@ -694,12 +702,12 @@ function fileInspector()
 
         setInspControl( 'pasteCtrl', '', 'Paste to This Folder' );
         document.getElementById( 'inspTitle' ).innerHTML =
-          'Selected Item Properties';
+                'Selected Item Properties';
         document.getElementById( 'selectedItem' ).innerHTML =
-          unescape( files[itemInfo.lastId].title );
+                files[itemInfo.lastId].title;
         document.getElementById( 'itemInfo' ).innerHTML = itemInfo.info;
     // This is the sidebar menu state for many items selected
-	} else {
+    } else {
         setInspControl( 'uploadCtrl', '', 'Upload File(s)' );
         setInspControl( 'cutCtrl', 'setClipboard(\'cut\')',
           'Cut Selected Item(s)' );
@@ -713,9 +721,10 @@ function fileInspector()
         setInspControl( 'pasteCtrl', '', 'Paste to This Folder' );
         document.getElementById( 'inspTitle' ).innerHTML =
           'Selected Items Properties';
-		document.getElementById( 'selectedItem' ).innerHTML = 'Multiple Items';
+        document.getElementById( 'selectedItem' ).innerHTML =
+            'Multiple Items';
         document.getElementById( 'itemInfo' ).innerHTML = itemInfo.info;
-	}
+    }
 
     setHiddenFilesCtrl();
 }
@@ -723,7 +732,7 @@ function fileInspector()
 // Toggles the display of a hidden object. I don't this this is still used
 function toggleDisplay( id )
 {
-	var obj = document.getElementById( id ).style;
+    var obj = document.getElementById( id ).style;
     obj.display = ( obj.display == 'none' ) ? 'block' : 'none';
 }
 
@@ -737,7 +746,7 @@ function rename()
     tBox.setAttribute( 'name', '' );
     tBox.setAttribute( 'size', '15' );
     tBox.setAttribute( 'maxlength', '50' );
-    tBox.setAttribute( 'value' , unescape( files[id].title ));
+    tBox.setAttribute( 'value' , files[id].title );
     var rButton = document.createElement( 'a' );
     rButton.setAttribute( 'href', '#' );
     rButton.appendChild( document.createTextNode( 'Rename' ));
@@ -753,7 +762,8 @@ function rename()
     cell.appendChild( spacer );
     cell.appendChild( cButton );
     cButton.onclick = function() { cancelRename( oldContent, cell ); }
-    rButton.onclick = function(id) { finishRename( tBox.value, oldContent, cell ); }
+    rButton.onclick = function(id)
+            { finishRename( tBox.value, oldContent, cell ); }
     tBox.focus();
 
     // Safari does .select() automatically. Will crash if called manually
@@ -792,50 +802,50 @@ function finishRename( newName, oldContent, cell )
 // Gets the ids of all items marked as selected in the files array
 function getSelectedItems()
 {
-	var ids = new Array();
+    var ids = new Array();
 
-	for ( var j = 0; j < files.length; j++ ) {
-		if ( files[j].selected === true ) {
-			ids.push(j);
-		}
-	}
+    for ( var j = 0; j < files.length; j++ ) {
+            if ( files[j].selected === true ) {
+                    ids.push(j);
+            }
+    }
 
-	return ids;
+    return ids;
 }
 
 // Processs the request to delete files
 function delFiles()
 {
-	var ids     = getSelectedItems();
-	var delMsg  = "Are you sure you want to delete:\n";
-	var delList = '';
+    var ids     = getSelectedItems();
+    var delMsg  = "Are you sure you want to delete:\n";
+    var delList = '';
 
-	// Print the list of items to be deleted
-	for ( var j = 0; j < ids.length; j++ ) {
-		delList += unescape( files[ids[j]].title ) + "\n";
-	}
+    // Print the list of items to be deleted
+    for ( var j = 0; j < ids.length; j++ ) {
+            delList += files[ids[j]].title + "\n";
+    }
 
-	if ( confirm( delMsg + delList )) {
-		document.cmd.selectedItems.value = delList;
-        document.cmd.command.value = 'delete';
-		document.cmd.submit();
-	}
+    if ( confirm( delMsg + delList )) {
+            document.cmd.selectedItems.value = delList;
+    document.cmd.command.value = 'delete';
+            document.cmd.submit();
+    }
 
-	ids.length = 0;	
+    ids.length = 0;        
 }
 
 // Changes the background color of a list item when it is selected
 function processCheckedItem( checkbox )
 {
-	if ( trElem = checkbox.parentNode.parentNode ) {
-		if ( files[checkbox.value].selected === true ) {
-            trElem.className = files[checkbox.value].className;
-            files[checkbox.value].selected = false;
-		} else {
-            trElem.className = 'selectedrow';
-			files[checkbox.value].selected = true;
-		}
-	}
+    if ( trElem = checkbox.parentNode.parentNode ) {
+            if ( files[checkbox.value].selected === true ) {
+        trElem.className = files[checkbox.value].className;
+        files[checkbox.value].selected = false;
+            } else {
+        trElem.className = 'selectedrow';
+                    files[checkbox.value].selected = true;
+            }
+    }
 
     fileInspector();
 }

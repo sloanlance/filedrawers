@@ -12,29 +12,29 @@ $afs = new Afs( $_GET['target'] );
 $perms = array( 'l', 'r', 'w', 'i', 'd', 'k', 'a' );
 
 if ( isset( $_POST['nrm'] )) {
-	foreach ( $_POST['nrm'] as $group => $rights ) {
-		$rights = implode( $rights );
-		$rights = ( $rights == ' ' ) ? 'none' : $rights;
+    foreach ( $_POST['nrm'] as $group => $rights ) {
+        $rights = implode( $rights );
+        $rights = ( $rights == ' ' ) ? 'none' : $rights;
 
-		if ( $group == 'nrm_add' ) {
-			$afs->changeAcl( $_POST['nrm_add_name'], $rights );
-		} else if ( $rights !== 1 ) {
-			$afs->changeAcl( $group, $rights );
-		}
-	}
+        if ( $group == 'nrm_add' ) {
+            $afs->changeAcl( $_POST['nrm_add_name'], $rights );
+        } else if ( $rights !== 1 ) {
+            $afs->changeAcl( $group, $rights );
+        }
+    }
 }
 
 if ( isset( $_POST['neg'] )) {
-	foreach ( $_POST['neg'] as $group => $rights ) {
-		$rights = implode( $rights );
-		$rights = ( $rights == ' ' ) ? 'none' : $rights;
+    foreach ( $_POST['neg'] as $group => $rights ) {
+        $rights = implode( $rights );
+        $rights = ( $rights == ' ' ) ? 'none' : $rights;
 
-		if ( $group == 'neg_add' ) {
-			$afs->changeAcl( $_POST['neg_add_name'], $rights, '', false, true );
-		} else if ( $rights !== 1 ) {
-			$afs->changeAcl( $group, $rights, '', false, true );
-		}
-	}
+        if ( $group == 'neg_add' ) {
+            $afs->changeAcl( $_POST['neg_add_name'], $rights, '', false, true );
+        } else if ( $rights !== 1 ) {
+            $afs->changeAcl( $group, $rights, '', false, true );
+        }
+    }
 }
 
 $rights    = $afs->readAcl();
@@ -52,6 +52,6 @@ if ( isset( $rights['negative'] )) {
     $smarty->assign( 'negative', $rights['negative'] );
 }
 
-$smarty->display( 'pieces/permissions.tpl' );
+$smarty->display( 'permissions.tpl' );
 ?>
 

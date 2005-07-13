@@ -7,6 +7,8 @@
 require_once( '../objects/afs.php' );
 require_once( '../smarty/smarty.custom.php' );
 
+// Take care of file uploads.
+
 $uploadError = false;
 $errorMsg    = '';
 
@@ -25,15 +27,18 @@ if ( isset( $_GET['finishid'] )) {
                 $file = explode( ':', $file );
                 if ( isset( $file[2] ) && trim( $file[2] ) == 'File exists' ) {
                     if ( $uploadError == false ) {
-                        $errorMsg = "The file '" . $file[0] . "' already exists."
-                          . " The upload cannot continue.";
+                        $errorMsg = "The file '" . $file[0] .
+                                "' already exists."
+                                . " The upload cannot continue.";
                         $uploadError = true;
                     }
                 }
 
-                if ( isset( $file[2] ) && trim( $file[2] ) == 'not successful' ) {
+                if ( isset( $file[2] ) &&
+                        trim( $file[2] ) == 'not successful' ) {
                     if ( $uploadError == false ) {
-                        $errorMsg = "One or more files did not upload sucessfully";
+                        $errorMsg =
+                                "One or more files did not upload sucessfully";
                         $uploadError = true;
                     }
                 }
@@ -66,27 +71,23 @@ if ( $uploadError ) {
     $smarty->assign( 'warnUser', 'Unable to upload the selected file(s).' );
 }
 
-// Highlight the appropriate service button/tab
-if ( strpos( $path, $_SERVER['REMOTE_USER'] . '/Public/html' ) === false ) {
-    $webSelected = false;
-} else {
-    $webSelected = true;
-}
+$webSelected = false;
+$homeSelected = true;
 
-$homeSelected = ( $webSelected ) ? false : true;
-
-$smarty->assign( 'returnToURI', 'https://' . $_SERVER['HTTP_HOST']
-  . $_SERVER['PHP_SELF'] . "?path=$afs->path&amp;finishid=$afs->sid" );
+$smarty->assign( 'returnToURI', 'https://' . $_SERVER['HTTP_HOST'] .
+                 $_SERVER['PHP_SELF'] .
+                 "?path=$afs->path&amp;finishid=$afs->sid" );
 $smarty->assign( 'path', $afs->path);
 $smarty->assign( 'folderName', basename( $afs->path ));
 $smarty->assign( 'folderContents', $afs->folderContents( true, true ));
 $smarty->assign( 'homePath', $afs->getBasePath());
 $smarty->assign( 'parentPath', $afs->parentPath());
 $smarty->assign( 'sid', $afs->sid );
-$smarty->assign( 'newWebSpaceUI', $afs->newWebSpaceUI );
 $smarty->assign( 'readonly', $afs->readonly );
 $smarty->assign( 'homeSelected', $homeSelected );
 $smarty->assign( 'webSelected', $webSelected );
 $smarty->assign( 'location', $afs->pathDisplay());
-$smarty->display( 'wwwroot/fileman.tpl' );
+$smarty->assign( 'trouser_title', 'afs file management');
+$smarty->assign( 'stylesheets', array("/fileman.css"));
+$smarty->display( 'fileman.tpl' );
 ?>

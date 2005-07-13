@@ -21,44 +21,43 @@ MWSDIR=${SHTMLDIR}/make-webspace
 IMAGES=${HTMLDIR}/images
 DOWNLOADDIR=${SHTMLDIR}/download
 TEMPLATES=${SMARTY}/templates
-WWWROOT=${TEMPLATES}/wwwroot
-PIECES=${TEMPLATES}/pieces
 TEMPLATES_C=${SMARTY}/templates_c
 
 CFLAGS=         ${OPTOPTS} -g -O2
 
 SHTMLDIRTARGET= css/fileman.css css/ie6specific.css css/ie5specific.css \
-		php/addfavorites.php php/deletefavorites.php \
-		php/perm_manager.php php/progress.php \
-		php/renamefavorites.php php/viewfavorites.php \
-		php/blankpage.html
+                css/favorites.css css/makewebspace.css \
+                php/addfavorites.php php/deletefavorites.php \
+                php/perm_manager.php php/progress.php \
+                php/renamefavorites.php php/viewfavorites.php \
+                php/blankpage.html
 
 HTMLDIRTARGET=  css/styles.css php/feedback.php
 
 OBJECTSTARGET=  php/afs.php php/favorites.php php/mime.php \
-                php/makewebspace.php
+                php/webspaces.php
 
 SMARTYTARGET=   smarty/smarty.custom.php
 
-WWWROOTTARGET=  smarty/fileman.tpl
-
-PIECESTARGET=   smarty/addFavorites.tpl smarty/deleteFavorites.tpl \
-		smarty/footer.tpl smarty/masthead.tpl \
-		smarty/permissions.tpl smarty/renameFavorites.tpl \
-		smarty/viewFavorites.tpl
+TEMPLATETARGET= smarty/fileman.tpl smarty/makewebspace.tpl \
+                smarty/addFavorites.tpl smarty/deleteFavorites.tpl \
+                smarty/footer.tpl smarty/masthead.tpl \
+                smarty/permissions.tpl smarty/renameFavorites.tpl \
+                smarty/viewFavorites.tpl smarty/sidebar.tpl \
+                smarty/filelist.tpl smarty/fileman.tpl \
 
 SIMAGETARGET=   images/checkbox.gif images/doc_lg.gif \
                 images/doc_sm.gif images/download.gif \
-		images/folder.gif images/folder_locked.gif \
-		images/sort_ascend.gif images/sort_decend.gif \
-		images/text.gif
+                images/folder.gif images/folder_locked.gif \
+                images/sort_ascend.gif images/sort_decend.gif \
+                images/text.gif
 
 IMAGETARGET=    images/blue_tabcap_r.gif images/bulb_large.gif \
                 images/bulb_small.gif images/first_time.gif \
-		images/header_afs_cabinet.gif images/header_text_afs.gif \
-		images/link_arrow.gif images/login-anim.gif \
-		images/searchtab_l.gif images/searchtab_r.gif \
-		images/spacer.gif
+                images/header_afs_cabinet.gif images/header_text_afs.gif \
+                images/link_arrow.gif images/login-anim.gif \
+                images/searchtab_l.gif images/searchtab_r.gif \
+                images/spacer.gif
 
 JSDIRTARGET=    js/filemanage.js
 
@@ -150,18 +149,8 @@ install: all
 	chgrp @install_group@ ${TEMPLATES}
 	chmod 777 ${TEMPLATES}
 
-	mkdir -p ${WWWROOT}
-	chmod 775 ${WWWROOT}
-	chgrp @install_group@ ${WWWROOT}
-	for i in ${WWWROOTTARGET}; do \
-		$(INSTALL) -g @install_group@ -m 0775 -c $$i ${WWWROOT}/; \
-	done
-
-	mkdir -p ${PIECES}
-	chmod 775 ${PIECES}
-	chgrp @install_group@ ${PIECES}
-	for i in ${PIECESTARGET}; do \
-		$(INSTALL) -g @install_group@ -m 0775 -c $$i ${PIECES}/; \
+	for i in ${TEMPLATETARGET}; do \
+		$(INSTALL) -g @install_group@ -m 0775 -c $$i ${TEMPLATES}/; \
 	done
 
 	mkdir -p ${TEMPLATES_C}

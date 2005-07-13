@@ -30,7 +30,6 @@ class Afs
     public    $readonly      = 0; // Are we limited to read only permission?
     public    $path          = '';
     public    $sid;
-    public    $newWebSpaceUI = false;
     protected $newName       = '';
 
     public function __construct( $path="" )
@@ -81,8 +80,11 @@ class Afs
     }
 
 
-    // This function sets the "target" of an operation (what file(s) or folder(s)
-    // to perform the selected action on
+    /*
+     * This function sets the "target" of an operation
+     * (what file(s) or folder(s)
+     * to perform the selected action on.
+     */
     protected function setSelectedItems()
     {
         if ( isset( $_POST['selectedItems'] )
@@ -94,7 +96,7 @@ class Afs
             }
         } else if ( isset( $_POST['selectedItems'] )) {
             $this->selectedItems = html_entity_decode( urldecode(
-              $_POST['selectedItems'] ), ENT_QUOTES );
+		  $_POST['selectedItems'] ), ENT_QUOTES );
         }
     }
 
@@ -119,14 +121,17 @@ class Afs
 
     function createFolder()
     {
-        if ( $this->selectedItems != 'Please enter a name for your new folder.' ) {
+        if ( $this->selectedItems !=
+		'Please enter a name for your new folder.' ) {
             if ( file_exists( $this->path . '/' . $this->selectedItems )) {
-                $this->errorMsg = "The folder \'$this->selectedItems\' already exists."
-                  . " Please select a different name.";
+                $this->errorMsg =
+			"The folder \'$this->selectedItems\' already exists." .
+                        " Please select a different name.";
                   return false;
             }
 
-            if ( ! mkdir( $this->path . '/' . $this->selectedItems, 0644, true )) {
+            if ( ! mkdir($this->path . '/' .
+			$this->selectedItems, 0644, true )) {
                 $this->errorMsg = "Unable to create folder.";
                 return false;
             }
@@ -147,7 +152,8 @@ class Afs
 			return false;
         }
         if ( !$handle = @opendir( $dir )) {
-            $this->errorMsg = "Unable to remove the folder because it no longer exists.";
+            $this->errorMsg = "Unable to remove the folder because " .
+		    "it no longer exists.";
             return false;
         }
 
@@ -185,19 +191,19 @@ class Afs
         $files = explode( "\n", trim( $this->selectedItems ));
 
         foreach ( $files as $file ) {
-		    $file = html_entity_decode( urldecode( $file ), ENT_QUOTES );
+	    $file = html_entity_decode( urldecode( $file ), ENT_QUOTES );
 
             if ( !$file = $this->pathSecurity( $this->path . '/'
-              . trim( $file ))) {
-                $this->errorMsg = "Unable to delete $file";
-				return false;
+		  . trim( $file ))) {
+	      $this->errorMsg = "Unable to delete $file";
+	      return false;
             }
 
             if ( is_dir( $file ) && !is_link( $file )) { 
                 $this->removeFolder( '', $file );
             } else if ( ! unlink( $file )) {
                 $this->errorMsg = "Unable to delete $file.";
-				return false;
+		return false;
             } else {
                 $this->notifyMsg = "Successfully deleted file(s).";
             }
@@ -211,20 +217,22 @@ class Afs
         }
 
         if ( file_exists( $this->path . '/' . $this->newName )) {
-            $this->errorMsg = "The file or folder '" . $this->newName
-              . "' already exists. Please select a different name.";
+            $this->errorMsg = "The file or folder '" . $this->newName .
+		    "' already exists. Please select a different name.";
             return false;
         }
 
-        if ( !@rename( $this->path . '/' . $this->selectedItems, $this->path
-          . '/' . $this->newName )) {
+        if ( !@rename( $this->path . '/' . $this->selectedItems, $this->path .
+		'/' . $this->newName )) {
             $this->errorMsg = "Unable to rename this file or folder.";
             return false;
         }
     }
 
-    // Move files from one directory to another
-	// This will clobber an existing file with the same name
+    /*
+     * Move files from one directory to another
+     * This will clobber an existing file with the same name
+     */
     function moveFiles()
     {
         $files = explode( CLIPSEPARATOR, $this->selectedItems );
@@ -259,13 +267,13 @@ class Afs
             }
 
             if ( is_dir( $this->originPath . '/' . $file )) {
-                if ( !$this->copy_dirs( $this->originPath . '/' . $file, $this->path
-                  . '/' . $file )) {
+                if ( !$this->copy_dirs( $this->originPath . '/' .
+			$file, $this->path . '/' . $file )) {
                     $this->errorMsg = "Unable to copy $file.";
                     return false;
                 }
-            } else if ( !@copy( $this->originPath . '/' . $file, $this->path
-              . '/' . $file )) {
+            } else if ( !@copy( $this->originPath . '/' . $file, $this->path .
+		    '/' . $file )) {
                 $this->errorMsg = "Unable to copy $file.";
                 return false;
             }
@@ -325,16 +333,20 @@ class Afs
     }
 
     // Change the ACL for a given path
-    function changeAcl( $entity, $rights, $path='', $recursive=false, $negative=false )
+    function changeAcl($entity,
+                       $rights,
+                       $path='',
+                       $recursive=false,
+                       $negative=false )
     {
         $entity   = escapeshellarg( $entity );
         $rights   = escapeshellarg( trim( $rights ));
         $path     = ( $path ) ? $path : $this->path;
         $neg      = ( $negative ) ? ' -negative' : '';
-        $cmd      = "$this->afsUtils/fs sa $neg " . escapeshellarg( $path )
-          . " $entity $rights";
-        $cmdRecur = "find " . escapeshellarg( $path ) . " -type d -exec "
-          . "$this->afsUtils/fs sa $neg {} $entity $rights \\;";
+        $cmd      = "$this->afsUtils/fs sa $neg " . escapeshellarg( $path ) .
+		" $entity $rights";
+        $cmdRecur = "find " . escapeshellarg( $path ) . " -type d -exec " .
+	        "$this->afsUtils/fs sa $neg {} $entity $rights \\;";
         $cmd      = ( $recursive ) ? $cmdRecur : $cmd;
 
         if ( !$path ) {
@@ -342,7 +354,8 @@ class Afs
         }
 
         if ( strpos( shell_exec( $cmd . " 2>&1" ), 'fs:' ) !== false ) {
-            $this->errorMsg = "Warning: Unable to modify the access control list.";
+            $this->errorMsg =
+		    "Warning: Unable to modify the access control list.";
             return false;
         }
 
@@ -353,8 +366,9 @@ class Afs
     function readAcl( $path='' )
     {
         $path = ( $path ) ? $path : $this->path;
-        $cmd = "fs listacl " . escapeshellarg( html_entity_decode( urldecode( $path ),
-          ENT_QUOTES ));
+        $cmd = "fs listacl " .
+		escapeshellarg(html_entity_decode( urldecode( $path ),
+                               ENT_QUOTES ));
         $result = shell_exec( $cmd . " 2>&1" );
         $rights = array( 'l', 'r', 'w', 'i', 'd', 'k', 'a' );
 
@@ -362,8 +376,9 @@ class Afs
             return false;
         }
 
-		if ( strstr( $result, "fs:" )) {
-            $this->errorMsg = "Warning: Unable to read the access control list.";
+	if ( strstr( $result, "fs:" )) {
+	    $this->errorMsg =
+		    "Warning: Unable to read the access control list.";
             return false;
         }
 
@@ -452,8 +467,11 @@ class Afs
         return $files;
     }
 
-    // This will probably be replaced with a function that looks up a user's afs path
-    // It calculates the root of a user's afs space based on his/her uniqname
+    /*
+     * This will probably be replaced with a function
+     * that looks up a user's afs path
+     * It calculates the root of a user's afs space based on his/her uniqname.
+     */
     function getBasePath( $user='' )
     {
         $user = ( $user ) ? $user : $_SERVER['REMOTE_USER'];
@@ -526,11 +544,7 @@ class Afs
 
         if ( $path ) {
             if ( ! file_exists( $path )) {
-                if ( strpos( $path, $_SERVER['REMOTE_USER'] . '/Public/html' )) {
-                    $this->newWebSpaceUI = true;
-                } else {
-                    $this->errorMsg = "The specified path does not exist. ($path)";
-                }
+		$this->errorMsg = "The specified path does not exist. ($path)";
             } else {
                 $this->path = $this->pathSecurity( $path );
             }
@@ -559,7 +573,7 @@ class Afs
             if ( $piece == 'afs' ) {
                 $pathDisp .= '/' . htmlentities( $piece );
             } else {
-                $pathDisp .= "/<a href=\"./?path="
+                $pathDisp .= "/<a href=\"/?path="
                   . rawurlencode( htmlentities( $pathURI )) . "\">"
                   . htmlentities( $piece ) . "</a>";
             }

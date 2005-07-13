@@ -1,0 +1,47 @@
+/* CSS Document */
+/*
+ * Copyright (c) 2005 Regents of The University of Michigan.
+ * All Rights Reserved.  See COPYRIGHT.
+ */
+
+div#content {
+        visibility: hidden;
+}
+
+div#makewebspace {
+    position: absolute;
+    top: 95px;
+    left: 220px;
+    width: 530px;
+    padding: 0px;
+    z-index: 2;
+}
+
+table.prep-results {
+    width: 530px;
+    margin: 0px;
+    padding: 0px;
+    margin-bottom: 8px;
+    border: 0px;
+    border-collapse: collapse;
+}
+
+table.prep-results tr {
+    border: 0px;
+}
+
+table.prep-results td {
+    border: 0px;
+    font-weight: normal;
+    color: #fa7909;
+    padding: 4px 4px 4px 4px;
+    padding-left: 0px;
+    margin: 0;
+    overflow: hidden;
+    height: 20px;
+}
+
+p.prep-results {
+    font-weight: normal;
+    color: #fa7909;
+}

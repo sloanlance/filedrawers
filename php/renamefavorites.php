@@ -12,5 +12,5 @@ $fav    = new Favorites( $_GET['target'] );
 $smarty = new Smarty_Template;
 $smarty->assign( 'favorites', $fav->getFavorites());
 $smarty->assign( 'target', $fav->favoriteTarget );
-$smarty->display( 'pieces/renameFavorites.tpl' );
+$smarty->display( 'renameFavorites.tpl' );
 ?>
