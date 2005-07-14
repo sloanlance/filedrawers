@@ -66,7 +66,7 @@ class Webspaces {
 	}
 
         // Add Private and Public webspaces
-	$this->init_webspace($uniqname, $dir);
+	$this->init_webspace($this->uniqname, $dir);
 
 	/*
 	 * Check each PTS group to see if it has an associated
