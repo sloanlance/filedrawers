@@ -448,9 +448,7 @@ class Afs
             $modTime = @filemtime( $fullpath );
             $mime    = Mime::mimeIcon( $fullpath );
 
-	    // $filename is no longer encoded.
-	    // The only character that needs to be escaped is '
-	    $filename = ereg_replace("'", "\\'", $filename);
+	    $filename = $this->escape_js($filename);
 
             if ( $showHidden ) {
                 $files .= "files[$id]=new File('$filename', '$modTime', $size, "
@@ -465,6 +463,40 @@ class Afs
 
         closedir( $dh );
         return $files;
+    }
+
+    /*
+     * Return a string escaped for a javascript string literal.
+     */
+    function escape_js( $string )
+    {
+	$o="";
+
+	$l=strlen($string);
+	for($i=0;$i<$l;$i++)
+	{
+	    $c=$string[$i];
+	    switch($c)
+	    {
+	    case '\'':
+		$o.='\\\'';
+		break;
+	    case '\\':
+		$o.='\\\\';
+		break;
+	    case "\n":
+		$o.='\\n';
+		break;
+	    case "\r":
+		$o.='\\r';
+		break;
+	    default:
+		$o.=$c;
+		break;
+	    }
+	}
+
+	return $o;
     }
 
     /*
