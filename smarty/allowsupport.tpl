@@ -93,13 +93,6 @@ NO
 </form>
 {/if}
 
-{* scam XXX remove once location bar status starts working *}
-{if $notifyMsg ne null}
-<p class=allow-results>
-{$notifyMsg}
-</p>
-{/if}
-
 </div>
 
 {include file="footer.tpl"}

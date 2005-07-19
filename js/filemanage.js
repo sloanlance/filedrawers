@@ -15,7 +15,7 @@ var showHiddenFiles  = 0;
 var agent            = navigator.userAgent.toLowerCase();
 var browserSafari    = ( agent.indexOf( "safari" ) != -1 );
 var sigFigures       = 0;              // Number of significant figures for fractions
-var notifyHoldTime   = 2200;           // Time to display notification messages
+var notifyHoldTime   = 5000;           // Time to display notification messages
 var previousHTML     = '';
 var sortDecending    = 0;
 var sortBy           = 'title';        // Default category to sort by
@@ -419,10 +419,15 @@ function SelectedFileInfo()
 function notifyUser( msg )
 {
     originalNotify = document.getElementById( 'notifyArea' ).innerHTML;
-    document.getElementById('notifyArea' ).innerHTML = '<span class="notify">'
-            + msg + '</span>';
-    setTimeout(document.getElementById('notifyArea').innerHTML =
-               originalNotify, notifyHoldTime );
+    document.getElementById('notifyArea' ).innerHTML =
+            '<span class="notify" ' +
+            'id="location" >' + msg + '</span>';
+    setTimeout("resetnotifyArea(originalNotify)", notifyHoldTime );
+}
+
+function resetnotifyArea( original )
+{
+    document.getElementById('notifyArea').innerHTML = original;
 }
 
 // Get the contents of the clipboard from the browser cookie file

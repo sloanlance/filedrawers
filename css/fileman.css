@@ -179,13 +179,13 @@ div.sidebar a:hover {
 
 #infoBar {
     clear: both;
-        margin: 0px;
-        padding: 3px;
-        font-family: "Trebuchet MS", verdana, sans-serif;
-        font-size: 15px;
-        color: #666666;
-        background-color: #ffffee;
-        border-bottom: 1px solid #336699;
+    margin: 0px;
+    padding: 3px;
+    font-family: "Trebuchet MS", verdana, sans-serif;
+    font-size: 15px;
+    color: #666666;
+    background-color: #ffffee;
+    border-bottom: 1px solid #336699;
 }
 
 #notifyArea {
