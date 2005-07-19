@@ -51,6 +51,27 @@ AC_ARG_WITH(install_group,
             [install_group="staff"])
 AC_SUBST(install_group)
 
+AC_ARG_WITH(service_name,
+            AC_HELP_STRING([--with-service_name=service_name],
+                           [name of the service]),
+            service_name="$withval",
+            [service_name="mfile.umich.edu"])
+AC_SUBST(service_name)
+
+AC_ARG_WITH(service_url,
+            AC_HELP_STRING([--with-service_url=service_url],
+                           [url for the trouser service]),
+            service_url="$withval",
+            [service_url="http://mfile.umich.edu"])
+AC_SUBST(service_url)
+
+AC_ARG_WITH(secure_service_url,
+            AC_HELP_STRING([--with-secure_service_url=secure_service_url],
+                           [secure url for the trouser service]),
+            secure_service_url="$withval",
+            [secure_service_url="https://mfile.umich.edu"])
+AC_SUBST(secure_service_url)
+
 AC_ARG_WITH(error_url,
             AC_HELP_STRING([--with-error_url=error_url],
                            [default URL to redirect back to in case of error]),

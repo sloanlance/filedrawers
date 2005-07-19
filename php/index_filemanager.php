@@ -4,6 +4,7 @@
  * All Rights Reserved.  See COPYRIGHT.
  */
 
+require_once( '../objects/config.php' );
 require_once( '../objects/afs.php' );
 require_once( '../smarty/smarty.custom.php' );
 
@@ -74,6 +75,9 @@ if ( $uploadError ) {
 $webSelected = false;
 $homeSelected = true;
 
+$smarty->assign( 'service_name', $service_name);
+$smarty->assign( 'service_url', $service_url);
+$smarty->assign( 'secure_service_url', $secure_service_url);
 $smarty->assign( 'returnToURI', 'https://' . $_SERVER['HTTP_HOST'] .
                  $_SERVER['PHP_SELF'] .
                  "?path=$afs->path&amp;finishid=$afs->sid" );
@@ -88,6 +92,7 @@ $smarty->assign( 'homeSelected', $homeSelected );
 $smarty->assign( 'webSelected', $webSelected );
 $smarty->assign( 'location', $afs->pathDisplay());
 $smarty->assign( 'trouser_title', 'afs file management');
+$smarty->assign( 'javascripts', array("/js/filemanage.js"));
 $smarty->assign( 'stylesheets', array("/fileman.css"));
 $smarty->display( 'fileman.tpl' );
 ?>

@@ -27,6 +27,12 @@
 - Fix when a single item is selected, display the large mime icon for that item
     under "selected item properties"
 
+- Fix "Icon^M" error ... this crashes the javascript when the return
+    appears within the string literal.
+
+- Fix the AFS status bar. This was working on test but no longer
+    seems to be.
+
 (0.2) --- Help
 
 - Feature Add "help" button to mfile header.

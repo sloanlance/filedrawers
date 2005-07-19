@@ -311,7 +311,7 @@ ac_includes_default="\
 #endif"
 
 ac_subdirs_all="$ac_subdirs_all libcgi"
-ac_subst_vars='SHELL PATH_SEPARATOR PACKAGE_NAME PACKAGE_TARNAME PACKAGE_VERSION PACKAGE_STRING PACKAGE_BUGREPORT exec_prefix prefix program_transform_name bindir sbindir libexecdir datadir sysconfdir sharedstatedir localstatedir libdir includedir oldincludedir infodir mandir build_alias host_alias target_alias DEFS ECHO_C ECHO_N ECHO_T LIBS project_name shtml_dir_name html_dir_name object_dir_name smarty_dir_name cgi_dir_name install_group error_url CC CFLAGS LDFLAGS CPPFLAGS ac_ct_CC EXEEXT OBJEXT INSTALL_PROGRAM INSTALL_SCRIPT INSTALL_DATA SET_MAKE CPP EGREP LIBOBJS subdirs LTLIBOBJS'
+ac_subst_vars='SHELL PATH_SEPARATOR PACKAGE_NAME PACKAGE_TARNAME PACKAGE_VERSION PACKAGE_STRING PACKAGE_BUGREPORT exec_prefix prefix program_transform_name bindir sbindir libexecdir datadir sysconfdir sharedstatedir localstatedir libdir includedir oldincludedir infodir mandir build_alias host_alias target_alias DEFS ECHO_C ECHO_N ECHO_T LIBS project_name shtml_dir_name html_dir_name object_dir_name smarty_dir_name cgi_dir_name install_group service_name service_url secure_service_url error_url CC CFLAGS LDFLAGS CPPFLAGS ac_ct_CC EXEEXT OBJEXT INSTALL_PROGRAM INSTALL_SCRIPT INSTALL_DATA SET_MAKE CPP EGREP LIBOBJS subdirs LTLIBOBJS'
 ac_subst_files=''
 
 # Initialize some variables set by options.
@@ -858,6 +858,12 @@ Optional Packages:
                           name of sub-directory to contain cgi binaries
   --with-install_group=cgi_dir_name
                           name of group to have installed file ownership
+  --with-service_name=service_name
+                          name of the service
+  --with-service_url=service_url
+                          url for the trouser service
+  --with-secure_service_url=secure_service_url
+                          secure url for the trouser service
   --with-error_url=error_url
                           default URL to redirect back to in case of error
 
@@ -1356,6 +1362,36 @@ if test "${with_install_group+set}" = set; then
   install_group="$withval"
 else
   install_group="staff"
+fi;
+
+
+
+# Check whether --with-service_name or --without-service_name was given.
+if test "${with_service_name+set}" = set; then
+  withval="$with_service_name"
+  service_name="$withval"
+else
+  service_name="mfile.umich.edu"
+fi;
+
+
+
+# Check whether --with-service_url or --without-service_url was given.
+if test "${with_service_url+set}" = set; then
+  withval="$with_service_url"
+  service_url="$withval"
+else
+  service_url="http://mfile.umich.edu"
+fi;
+
+
+
+# Check whether --with-secure_service_url or --without-secure_service_url was given.
+if test "${with_secure_service_url+set}" = set; then
+  withval="$with_secure_service_url"
+  secure_service_url="$withval"
+else
+  secure_service_url="https://mfile.umich.edu"
 fi;
 
 
@@ -4153,6 +4189,9 @@ s,@object_dir_name@,$object_dir_name,;t t
 s,@smarty_dir_name@,$smarty_dir_name,;t t
 s,@cgi_dir_name@,$cgi_dir_name,;t t
 s,@install_group@,$install_group,;t t
+s,@service_name@,$service_name,;t t
+s,@service_url@,$service_url,;t t
+s,@secure_service_url@,$secure_service_url,;t t
 s,@error_url@,$error_url,;t t
 s,@CC@,$CC,;t t
 s,@CFLAGS@,$CFLAGS,;t t

@@ -1,7 +1,10 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
 <html>
 <head>
-<title>mfile.umich.edu : Web File Access</title>
+<title>
+<?php require_once('../objects/config.php'); ?>
+<?php echo "$service_name"; ?>
+: Web File Access</title>
 <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
 <link href="styles.css" rel="stylesheet" type="text/css">
 </head>
@@ -26,7 +29,9 @@
   <tr>
     <td class="color-headbar-blue"><table width="100%" border="0" cellspacing="0" cellpadding="0">
       <tr>
-        <td align="left"><img src="images/header_afs_cabinet.gif" width="98" height="120" hspace="6"><img src="images/header_text_afs.gif" alt="mfile.umich.edu - AFS file management" width="258" height="120"></td>
+        <td align="left"><img src="images/header_afs_cabinet.gif" width="98" height="120" hspace="6"><img src="images/header_text_afs.gif" alt="
+<?php echo "$service_name "; ?>
+ - AFS file management" width="258" height="120"></td>
         <td align="right" valign="middle"><a href="http://www.itd.umich.edu/help/"><img src="images/first_time.gif" alt="Do you require assistance?" width="232" height="30" border="0"></a><img src="images/spacer.gif" width="25" height="1"></td>
       </tr>
     </table>
@@ -54,7 +59,9 @@
                     <td class="tab-cap"><img src="images/blue_tabcap_r.gif" width="8" height="24"></td>
                   </tr>
                 </table>
-                  <p class="content-text"><strong>mfile.umich.edu</strong> gives you secure access to your U of M IFS space from any computer with an Internet connection. Our <a href="http://www.itd.umich.edu/itcsdocs/s4311/">online documentation</a> should help get you started.<br>
+                  <p class="content-text"><strong>
+<?php echo "$service_name"; ?>
+</strong> gives you secure access to your U of M IFS space from any computer with an Internet connection. Our <a href="http://www.itd.umich.edu/itcsdocs/s4311/">online documentation</a> should help get you started.<br>
                       <br>
       Need help? Call (734)-764-HELP for assistance.<br>
                   </p>
@@ -110,7 +117,8 @@
 	  <td valign="top" class="tipbox-img-white">
 	      <img src="images/bulb_small.gif" width="14" height="20">
 	  </td>
-            <td class="tipbox-text-white"><p>JavaScript must be active in your browser for most mfile.umich.edu features.</p>
+            <td class="tipbox-text-white"><p>JavaScript must be active in your browser for most
+<?php echo "$service_name"; ?> features.</p>
                 </td>
           </tr>
         </table>

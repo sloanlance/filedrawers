@@ -12,7 +12,9 @@
 <!--[if IE 6]> 
  <link href="/ie6specific.css" rel="stylesheet" type="text/css"> 
  <![endif]-->
-<script language="JavaScript" type="text/javascript" src="/js/filemanage.js"></script>
+{foreach from="$javascripts" item="script"}
+<script language="JavaScript" type="text/javascript" src="{$script}"></script>
+{/foreach}
 <script language="JavaScript" type="text/JavaScript">
 var path       = "{$path}";
 var foldername = "{$folderName}";
@@ -48,7 +50,7 @@ files=new Array();
             <li><a href="/">Home</a></li>
             {/if}
             <li><a href="/make-webspace/">Web Sites</a></li>
-            <li><a href="https://mfile.umich.edu/cgi-bin/logout?http://mfile.umich.edu/">Logout</a></li>
+            <li><a href="{$secure_service_url}/cgi-bin/logout?{$service_url}/">Logout</a></li>
         </ul>
     </div>
     <div id="infoBar">

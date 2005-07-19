@@ -38,6 +38,21 @@ at http://mfile.umich.edu, which installs trouser into
 ./configure \
 --prefix=/usr/local/projects \
 --with-project_name=mfile \
+--with-service_name="mfile.umich.edu" \
+--with-service_url="http://mfile.umich.edu" \
+--with-secure_service_url="https://mfile.umich.edu" \
+--with-error_url="https://mfile.umich.edu/?error=true" \
+--with-install_group=staff
+
+The following options were use to configure the build of trouser
+at http://mfile-dev.www.umich.edu:
+
+./configure \
+--prefix=/usr/local/projects \
+--with-project_name=mfile-dev \
+--with-service_name="mfile-dev.umich.edu" \
+--with-service_url="http://mfile-dev.www.umich.edu" \
+--with-secure_service_url="https://mfile-dev.www.umich.edu" \
 --with-error_url="https://mfile-dev.www.umich.edu/?error=true" \
 --with-install_group=staff
 
