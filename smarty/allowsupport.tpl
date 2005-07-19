@@ -33,6 +33,10 @@ Your U-M Affiliations:
 </tr>
 {/foreach}
 </table>
+{else}
+<p class=content-text >
+You have no U-M affiliations.
+</p>
 {/if}
 
 {if $supportgroups ne null}
@@ -91,6 +95,11 @@ NO
 {/foreach}
 </table>
 </form>
+{else}
+<p class=content-text >
+Based on your U-M affliations, there are no departmental support groups
+that we can suggest at this time.
+</p>
 {/if}
 
 </div>

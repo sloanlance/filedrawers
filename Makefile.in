@@ -19,6 +19,7 @@ SIMAGES=${SHTMLDIR}/images
 JSDIR=${SHTMLDIR}/js
 MWSDIR=${SHTMLDIR}/make-webspace
 ASDIR=${SHTMLDIR}/allow-support
+ADMINDIR=${SHTMLDIR}/admin-support
 IMAGES=${HTMLDIR}/images
 DOWNLOADDIR=${SHTMLDIR}/download
 TEMPLATES=${SMARTY}/templates
@@ -28,7 +29,7 @@ CFLAGS=         ${OPTOPTS} -g -O2
 
 SHTMLDIRTARGET= css/fileman.css css/ie6specific.css css/ie5specific.css \
                 css/favorites.css css/makewebspace.css \
-		css/allowsupport.css \
+		css/allowsupport.css css/adminsupport.css \
                 php/addfavorites.php php/deletefavorites.php \
                 php/perm_manager.php php/progress.php \
                 php/renamefavorites.php php/viewfavorites.php \
@@ -43,7 +44,8 @@ OBJECTSTARGET=  php/afs.php php/favorites.php php/mime.php \
 SMARTYTARGET=   smarty/smarty.custom.php
 
 TEMPLATETARGET= smarty/fileman.tpl smarty/makewebspace.tpl \
-                smarty/allowsupport.tpl \
+                smarty/allowsupport.tpl smarty/adminsupport.tpl \
+		smarty/adminsupport_noauth.tpl \
                 smarty/addFavorites.tpl smarty/deleteFavorites.tpl \
                 smarty/footer.tpl smarty/masthead.tpl \
                 smarty/permissions.tpl smarty/renameFavorites.tpl \
@@ -197,6 +199,13 @@ install: all
 	chgrp @install_group@ ${ASDIR}
 	$(INSTALL) -g @install_group@ -m 0775 php/index_allowsupport.php \
 	           ${ASDIR}/index.php
+
+        # Install admin-support
+	mkdir -p ${ADMINDIR}
+	chmod 755 ${ADMINDIR}
+	chgrp @install_group@ ${ADMINDIR}
+	$(INSTALL) -g @install_group@ -m 0775 php/index_adminsupport.php \
+	           ${ADMINDIR}/index.php
 
 clean :
 	cd libcgi; ${MAKE} ${MFLAGS} clean

@@ -1,0 +1,66 @@
+/* CSS Document */
+/*
+ * Copyright (c) 2005 Regents of The University of Michigan.
+ * All Rights Reserved.  See COPYRIGHT.
+ */
+
+div#content {
+    visibility: hidden;
+}
+
+div#adminsupport {
+    position: absolute;
+    top: 95px;
+    left: 220px;
+    width: 640px;
+    padding: 0px;
+    z-index: 2;
+}
+
+#adminsupport a:hover {
+    text-decoration: none;
+    border: none;
+}
+
+#adminsupport .textin {
+    width: 270px;
+}
+
+table.supportmap {
+    width: 700px;
+    margin: 0px;
+    padding: 0px;
+    margin-bottom: 20px;
+    border: 1px solid #6699cc;
+    border-collapse: collapse;
+}
+
+table.supportmap th {
+    padding: 4px 4px 4px 4px;
+    color: #336699;
+    background-color: #bbcbff;
+    text-align: left;
+    margin: 0;
+    overflow: hidden;
+    height: 26px;
+}
+
+table.supportmap td {
+    font-weight: normal;
+    color: #336699;
+    padding: 4px 4px 4px 4px;
+    border: 1px solid #6699cc;
+    overflow: hidden;
+    height: 26px;
+}
+
+.supportgroups_warn {
+    font-weight: bold;
+    color: #fa7909;
+}
+
+p.allow-results {
+    font-weight: normal;
+    color: #fa7909;
+}
+

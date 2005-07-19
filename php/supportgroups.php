@@ -20,9 +20,11 @@ class Supportgroups {
     private $conn = null;
 
     private $affiliations = null;
+    private $authorized = null;
 
     const AFS_BASEDIR = '/afs/umich.edu/user/';
     const FS_BINARY = "/usr/bin/fs";
+    const PTS_BINARY = "/usr/bin/pts";
 
     /*
      * Creates a new set of support groups.
@@ -35,28 +37,48 @@ class Supportgroups {
         $this->uniqname = $_SERVER['REMOTE_USER'];
         $this->homedir = $this->get_homedir();
 
-	$this->supportgroups = array();
 	$this->affiliations  = new Affiliations();
 
+        // Connect to database
         $this->db_connect_ro();
 
-	$query = "select * from affiliations;";
+        $this->update_authorized();
+	$this->update_supportgroups();
+	$this->update_permitted();
 
+	return;
+    }
+
+    private function update_authorized()
+    {
+        // Create an array of authorized uniqnames.
+	$this->authorized = array();
+	$query = "select * from authorized;";
 	$result = $this->db_query($query);
 
+	while ($row = mysql_fetch_array($result)) {
+	    $this->authorized[$row["uniqname"]] = $row["uniqname"];
+	}
+    }
+
+    private function update_supportgroups()
+    {
+	$this->supportgroups = array();
+
         // Create an array of all known support groups.
+	$query = "select * from affiliations;";
+	$result = $this->db_query($query);
+
 	while ($row = mysql_fetch_array($result)) {
             $temp_group = array();
+            $temp_group["id"] = $row["id"];
             $temp_group["name"] = $row["supportgroup_name"];
             $temp_group["affiliation_name"] = $row["name"];
+            $temp_group["submitter"] = $row["submitter"];
 	    $temp_group["affiliated"] =
                     $this->is_affiliated($temp_group["affiliation_name"]);
 	    $this->supportgroups[] = $temp_group;
 	}
-
-	$this->update_permitted();
-
-	return;
     }
 
     /*
@@ -175,11 +197,6 @@ class Supportgroups {
          * read and return true.
          */
 	if (!($dir_handle = @opendir ($dir))) {
-	    // $fs_command = self::FS_BINARY . " la " .
-            //              $dir;
-	    // $fs_output = shell_exec( $fs_command );
-            // echo $fs_output;
-
             return true;
         }
 
@@ -189,14 +206,13 @@ class Supportgroups {
 		continue;
             }
 
-            // Special case. Should check for mount points that
-	    // aren't the users.
-	    if ($entry == ".oldfiles") {
+            // Special case. Should check for negative rights.
+	    // on the user's directory before attempting to open it.
+	    if ($entry == "dropbox") {
 		continue;
 	    }
 
-            // Special case. Should check for negative rights.
-	    if ($entry == "dropbox") {
+	    if ($entry == "Dropbox") {
 		continue;
 	    }
 
@@ -205,6 +221,19 @@ class Supportgroups {
             if (!is_dir($entry_path)) {
                 continue;
             }
+
+            // Special case. Check for mount points that
+	    // aren't the users.
+	    $fs_command = self::FS_BINARY . " ls " .
+                          $entry_path;
+	    $fs_output = shell_exec( $fs_command );
+
+	    $regex = "/is a mount point for volume '(.*)'/";
+	    if(preg_match( $regex, $fs_output, $matches )) {
+		if ($matches[1] != "#user.$this->uniqname") {
+		    continue;
+		}
+	    }
 
             if (is_link($entry_path)) {
                 continue;
@@ -295,16 +324,95 @@ class Supportgroups {
 	return false;
     }
 
-    // Return the array of support groups
+    // Return the array of unique support groups.
+    // Note that is a subset of "supportgroups" which
+    // actually contains all affiliation->supportgroup mappings.
     public function get()
     {
-	$sg = $this->supportgroups;
+	$sg = array();
+	foreach($this->supportgroups as $supportgroup) {
+	    if ($supportgroup["affiliated"] &&
+	        !$this->group_in_array($supportgroup["name"], $sg)) {
+		$sg[] = $supportgroup;
+	    }
+	}
+
 	return $sg;
+    }
+
+    // Returns true if groupname is in a.
+    private function group_in_array($groupname, $a)
+    {
+	foreach($a as $member) {
+	    if ($member["name"] == $groupname) {
+		return true;
+	    }
+	}
+
+	return false;
     }
 
     public function get_affiliations()
     {
 	return $this->affiliations->get();
+    }
+
+    // Return the full array of mappings.
+    public function get_mappings()
+    {
+	return $this->supportgroups;
+    }
+
+    public function delete_mapping($id)
+    {
+	if (!$this->is_admin()) {
+	    return false;
+	}
+
+	$query = "delete from affiliations where id = $id;";
+
+	$result = $this->db_query($query);
+
+        $this->update_authorized();
+	$this->update_supportgroups();
+	$this->update_permitted();
+
+	return true;
+    }
+
+    public function add_mapping($affiliation, $supportgroup)
+    {
+	if (!$this->is_admin()) {
+	    return false;
+	}
+
+	// Verify that supportgroup is a legitimate pts group.
+
+	$pts_command = self::PTS_BINARY . " examine " .
+		      $supportgroup;
+	$pts_output = shell_exec( $pts_command );
+
+	$regex = "/id: (-?\d+)/";
+	if(!preg_match( $regex, $pts_output, $matches )) {
+	    return false;
+	}
+	$id = $matches[1];
+
+	$query = "insert into affiliations " .
+		 '(name, supportgroup_name, submitter) ' .
+		 'values (' .
+		 "'" . addslashes($affiliation) . "', " .
+		 "'" . addslashes($supportgroup) . "', " .
+		 "'" . $this->uniqname . "'" .
+		 ");";
+
+	$result = $this->db_query($query);
+
+        $this->update_authorized();
+	$this->update_supportgroups();
+	$this->update_permitted();
+
+	return true;
     }
 
     private function db_connect_ro()
@@ -344,6 +452,12 @@ class Supportgroups {
 			 "<li>query=".$query
 		  );
 	return $result;
+    }
+
+    // Returns true if uniqname is on the support administration list.
+    public function is_admin()
+    {
+	return isset($this->authorized[$this->uniqname]);
     }
 
 }

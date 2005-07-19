@@ -21,25 +21,9 @@ $smarty = new Smarty_Template;
 $webSelected = true;
 $homeSelected = false;
 
-$give_support = ( isset( $_POST['give_support'] )) ?
-                $_POST['give_support'] : '';
-$remove_support = ( isset( $_POST['remove_support'] )) ?
-                $_POST['remove_support'] : '';
-
-$supportgroups->give_permissions($give_support);
-$supportgroups->remove_permissions($remove_support);
-
 // Set notification messages
 if ( ! empty( $notifyMsg )) {
     $smarty->assign( 'notifyMsg', $notifyMsg );
-} else if ( ! empty( $give_support )) {
-    $smarty->assign( 'notifyMsg',
-	    "Gave support permissions to departmental support group " .
-	    $give_support );
-} else if ( ! empty( $remove_support )) {
-    $smarty->assign( 'notifyMsg',
-	    "Removed support permissions from departmental support group " .
-	    $remove_support );
 } else if ( ! empty( $afs->notifyMsg )) {
     $smarty->assign( 'notifyMsg', $afs->notifyMsg );
 }
@@ -51,6 +35,20 @@ if ( $uploadError ) {
     $smarty->assign( 'warnUser', rawurlencode( $afs->errorMsg ));
 } else if ( isset( $_GET['error'] )) {
     $smarty->assign( 'warnUser', 'Unable to upload the selected file(s).' );
+}
+
+if (isset($_POST["add_mapping"])) {
+    $supportgroups->add_mapping($_POST["new_map_aff"],
+                                $_POST["new_map_group"]);
+}
+
+if (isset($_POST["delete_mapping"])) {
+    foreach($_POST as $key => $garbage) {
+	$regex = "/^delete_(\d+)$/";
+	if(preg_match( $regex, $key, $matches )) {
+	    $supportgroups->delete_mapping($matches[1]);
+	}
+    }
 }
 
 # File manager assignments
@@ -72,13 +70,17 @@ $smarty->assign( 'webSelected', $webSelected );
 $smarty->assign( 'location', $afs->pathDisplay());
 $smarty->assign( 'javascripts', array("/js/filemanage.js",
                                       "/js/allowsupport.js"));
-$smarty->assign( 'stylesheets', array("/fileman.css", "/allowsupport.css"));
-$smarty->assign( 'trouser_title', 'allow-support');
+$smarty->assign( 'stylesheets', array("/fileman.css", "/adminsupport.css"));
+$smarty->assign( 'trouser_title', 'admin-support');
+
+$smarty->assign( 'uniqname', $supportgroups->uniqname);
 
 $smarty->assign( 'affiliations', $supportgroups->get_affiliations());
-$smarty->assign( 'supportgroups', $supportgroups->get());
-$smarty->assign( 'give_support', $give_support);
-$smarty->assign( 'remove_support', $remove_support);
+$smarty->assign( 'mappings', $supportgroups->get_mappings());
 
-$smarty->display( 'allowsupport.tpl' );
+if ($supportgroups->is_admin()) {
+    $smarty->display( 'adminsupport.tpl' );
+} else {
+    $smarty->display( 'adminsupport_noauth.tpl' );
+}
 ?>
