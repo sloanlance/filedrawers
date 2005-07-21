@@ -95,8 +95,7 @@ class Afs
                 $this->selectedItems[$key] = $item;
             }
         } else if ( isset( $_POST['selectedItems'] )) {
-            $this->selectedItems = html_entity_decode( urldecode(
-		  $_POST['selectedItems'] ), ENT_QUOTES );
+            $this->selectedItems = $_POST['selectedItems'];
         }
     }
 
@@ -191,7 +190,6 @@ class Afs
         $files = explode( "\n", trim( $this->selectedItems ));
 
         foreach ( $files as $file ) {
-	    $file = html_entity_decode( urldecode( $file ), ENT_QUOTES );
 
             if ( !$file = $this->pathSecurity( $this->path . '/'
 		  . trim( $file ))) {
@@ -212,6 +210,7 @@ class Afs
 
     function afsRename()
     {
+
         if ( $this->selectedItems == $this->newName ) {
             return false;
         }
@@ -238,7 +237,6 @@ class Afs
         $files = explode( CLIPSEPARATOR, $this->selectedItems );
 
         foreach ( $files as $file ) {
-            $file = html_entity_decode( urldecode( $file ), ENT_QUOTES );
 
             if ( !@rename( $this->originPath . '/' . $file, $this->path . '/'
               . $file )) {
@@ -258,7 +256,6 @@ class Afs
         $files = explode( CLIPSEPARATOR, $this->selectedItems );
 
         foreach ( $files as $file ) {
-            $file = html_entity_decode( urldecode( $file ), ENT_QUOTES );
 
             if ( is_link( $this->originPath . '/' . $file )) {
                 $this->errorMsg = "$file is a link to another location in AFS."
@@ -366,9 +363,7 @@ class Afs
     function readAcl( $path='' )
     {
         $path = ( $path ) ? $path : $this->path;
-        $cmd = "fs listacl " .
-		escapeshellarg(html_entity_decode( urldecode( $path ),
-                               ENT_QUOTES ));
+        $cmd = "fs listacl " . $path;
         $result = shell_exec( $cmd . " 2>&1" );
         $rights = array( 'l', 'r', 'w', 'i', 'd', 'k', 'a' );
 
@@ -571,9 +566,6 @@ class Afs
     // Set the afs path used inside the class
     function setPath( $path='' )
     {
-	// paths pulled from the URL are not html escaped.
-        // $path = urldecode( $path );
-
         if ( $path ) {
             if ( ! file_exists( $path )) {
 		$this->errorMsg = "The specified path does not exist. ($path)";
@@ -606,7 +598,7 @@ class Afs
                 $pathDisp .= '/' . htmlentities( $piece );
             } else {
                 $pathDisp .= "/<a href=\"/?path="
-                  . rawurlencode( htmlentities( $pathURI )) . "\">"
+                  . rawurlencode( $pathURI ) . "\">"
                   . htmlentities( $piece ) . "</a>";
             }
         }

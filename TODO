@@ -3,15 +3,6 @@
 - Fix user jport can't view the contents of his Private directory.
    It's visible on mongolian, but not on japanese. What's wrong?
 
-- Fix remove any "system" commands that execute commands on the filename.
-   This will prevent `` exploits, option exploits, etc.
-
-- Fix handling of filenames that look like unix options.
-
-- Fix "+" handling? Creating a file is possible with a + sign but
-    rename/removal is not. Same problem occurs with files with ` in
-    them.
-
 - Fix the "rename" function
     In file rename, fix it so that hitting the return key completes
     the rename instead of having to hit the "rename" button.
@@ -26,12 +17,6 @@
 
 - Fix when a single item is selected, display the large mime icon for that item
     under "selected item properties"
-
-- Fix "Icon^M" error ... this crashes the javascript when the return
-    appears within the string literal.
-
-- Fix the AFS status bar. This was working on test but no longer
-    seems to be.
 
 (0.2) --- Help
 
@@ -97,29 +82,6 @@
 
     Possibly make current permission tab features available in an
     "advanced" or "advanced AFS management" sub-tab.
-
-- Feature Create a "allow support access" page.
-
-    This will be a separate url.
-
-    Upon loading, this url will make an ldap lookup of the user's affiliation.
-
-    The body of the page will consist of a list of suggested AFS groups
-    that the user may delegate folder permissions to
-    based on the user's affiliation.
-
-    Each listing will include a "permitted" status, showing whether
-    the group currently has recursive permissions to access the
-    user's folder.
-
-    Each listing will feature a change support access "remove" or "give"
-    button which will recursively add or remove group permissions
-    from that user's AFS directories.
-
-    Add a marking (icon) which shows groups that the user has delegated
-    permissions to but is no longer affilliated with.
-
-    Current mockup visible www.umich.edu/~scam/mfile_mockup.gif
 
 --- Non-critical Fixes
 
@@ -256,13 +218,9 @@
 
 --- Release
 
-- Fix Makefile.in so that it correctly configures php and javascript
-    headers to use the configuration strings created in ./configure.
-
 - Feature find total # of users ever.
     Look for how many new users we get every week.
     (willn)
-
 
 - Feature: Put mfile version number (subtle) in lower left corner.
 

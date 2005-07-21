@@ -107,7 +107,7 @@ function createListIcon( id )
 
     if ( files[id].type == folderMime ) {
         var l = document.createElement( 'a' );
-        l.setAttribute( 'href', './?path=' + path + '/' + files[id].title );
+        l.setAttribute( 'href', './?path=' + getFilenameUrl(id));
         l.appendChild(i);
         return l;
     } else {
@@ -120,15 +120,15 @@ function createFileName( id )
 {
     if ( files[id].type == folderMime ) {
         var l = document.createElement( 'a' );
-        l.setAttribute( 'href', './?path=' + path + '/' + files[id].title );
+        l.setAttribute( 'href', './?path=' + getFilenameUrl(id));
         l.appendChild( document.createTextNode( files[id].title));
         return l;
     } else if ( readonly ) {
         return document.createTextNode( files[id].title);
     } else {
         var l = document.createElement( 'a' );
-        l.setAttribute( 'href', downloadURI + '/?path=' + path + '/' +
-          files[id].title );
+        l.setAttribute( 'href', downloadURI + '/?path=' +
+			 getFilenameUrl(id));
         l.appendChild( document.createTextNode(files[id].title));
         return l;
     }
@@ -144,8 +144,8 @@ function createDlIcon( id )
         i.setAttribute( 'height', '16' );
 
         var l = document.createElement( 'a' );
-        l.setAttribute( 'href', downloadURI + '/?path=' + path + '/'
-          + files[id].title );
+        l.setAttribute( 'href', downloadURI + '/?path=' +
+			 getFilenameUrl(id));
         l.appendChild(i);
         return l;
     } else {
@@ -556,7 +556,7 @@ function setPMpath()
 {
     var itemInfo = new SelectedFileInfo();
     document.getElementById( 'permpanel' ).src = '/perm_manager.php?target='
-            + path + '/' + files[ itemInfo.lastId ].title;
+	    getFilenameUrl(itemInfo.lastID);
 }
 
 // Sets the path for the iframe that displays the user's list of favorite locations
@@ -853,4 +853,21 @@ function processCheckedItem( checkbox )
     }
 
     fileInspector();
+}
+
+/*
+ * Returns the filename of the file with id "id" and returns
+ * a properly url-encoded path to it.
+ */
+function getFilenameUrl( id )
+{
+    return urlescape(path + '/' + files[id].title );
+}
+
+// escape() doesn't handle the "+" character? odd.
+function urlescape( str )
+{
+    str = escape(str);
+    str = str.replace(/\+/g, "%2B");
+    return str;
 }
