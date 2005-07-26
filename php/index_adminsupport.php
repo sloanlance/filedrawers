@@ -5,11 +5,14 @@
  * All Rights Reserved.  See COPYRIGHT.
  */
 
-require_once( '../../objects/config.php' );
+require_once( '../../lib/config.php' );
+require_once( '../../lib/libdrawers.php' );
 require_once( '../../objects/afs.php' );
 require_once( '../../objects/affiliations.php' );
 require_once( '../../objects/supportgroups.php' );
 require_once( '../../smarty/smarty.custom.php' );
+
+$uploadError = process_upload($notifyMsg, $errorMsg);
 
 $path = ( isset( $_GET['path'] )) ? $_GET['path'] : '';
 $afs  = new Afs( $path );
@@ -17,9 +20,6 @@ $afs  = new Afs( $path );
 $supportgroups = new Supportgroups;
 
 $smarty = new Smarty_Template;
-
-$webSelected = true;
-$homeSelected = false;
 
 // Set notification messages
 if ( ! empty( $notifyMsg )) {
@@ -44,37 +44,30 @@ if (isset($_POST["add_mapping"])) {
 
 if (isset($_POST["delete_mapping"])) {
     foreach($_POST as $key => $garbage) {
-	$regex = "/^delete_(\d+)$/";
-	if(preg_match( $regex, $key, $matches )) {
-	    $supportgroups->delete_mapping($matches[1]);
-	}
+        $regex = "/^delete_(\d+)$/";
+        if(preg_match( $regex, $key, $matches )) {
+            $supportgroups->delete_mapping($matches[1]);
+        }
     }
 }
 
-# File manager assignments
+$webSelected = false;
+$homeSelected = true;
+
 $smarty->assign( 'service_name', $service_name);
-$smarty->assign( 'secure_service_url', $secure_service_url); 
-$smarty->assign( 'returnToURI',
-                 'https://' . $_SERVER['HTTP_HOST'] .
-                 $_SERVER['PHP_SELF'] .
-                 "?path=$afs->path&amp;finishid=$afs->sid" );
-$smarty->assign( 'path', $afs->path);
-$smarty->assign( 'folderName', basename( $afs->path ));
-$smarty->assign( 'folderContents', $afs->folderContents( true, true ));
-$smarty->assign( 'homePath', $afs->getBasePath());
-$smarty->assign( 'parentPath', $afs->parentPath());
-$smarty->assign( 'sid', $afs->sid );
-$smarty->assign( 'readonly', $afs->readonly );
+$smarty->assign( 'service_url', $service_url);
+$smarty->assign( 'secure_service_url', $secure_service_url);
+
 $smarty->assign( 'homeSelected', $homeSelected );
 $smarty->assign( 'webSelected', $webSelected );
-$smarty->assign( 'location', $afs->pathDisplay());
-$smarty->assign( 'javascripts', array("/js/filemanage.js",
-                                      "/js/allowsupport.js"));
-$smarty->assign( 'stylesheets', array("/fileman.css", "/adminsupport.css"));
+
 $smarty->assign( 'trouser_title', 'admin-support');
+$smarty->assign( 'javascripts', array("/js/filemanage.js"));
+$smarty->assign( 'stylesheets', array("/fileman.css", "/adminsupport.css"));
+
+$afs->make_smarty_assignments($smarty);
 
 $smarty->assign( 'uniqname', $supportgroups->uniqname);
-
 $smarty->assign( 'affiliations', $supportgroups->get_affiliations());
 $smarty->assign( 'mappings', $supportgroups->get_mappings());
 

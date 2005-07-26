@@ -5,10 +5,13 @@
  * All Rights Reserved.  See COPYRIGHT.
  */
 
-require_once( '../../objects/config.php' );
+require_once( '../../lib/config.php' );
+require_once( '../../lib/libdrawers.php' );
 require_once( '../../objects/webspaces.php' );
 require_once( '../../objects/afs.php' );
 require_once( '../../smarty/smarty.custom.php' );
+
+$uploadError = process_upload($notifyMsg, $errorMsg);
 
 $path = ( isset( $_GET['path'] )) ? $_GET['path'] : '';
 $afs  = new Afs( $path );
@@ -35,27 +38,18 @@ if ( $uploadError ) {
     $smarty->assign( 'warnUser', 'Unable to upload the selected file(s).' );
 }
 
-# File manager assignments
 $smarty->assign( 'service_name', $service_name);
 $smarty->assign( 'service_url', $service_url);
-$smarty->assign( 'secure_service_url', $secure_service_url); 
-$smarty->assign( 'returnToURI',
-                 'https://' . $_SERVER['HTTP_HOST'] .
-                 $_SERVER['PHP_SELF'] .
-                 "?path=$afs->path&amp;finishid=$afs->sid" );
-$smarty->assign( 'path', $afs->path);
-$smarty->assign( 'folderName', basename( $afs->path ));
-$smarty->assign( 'folderContents', $afs->folderContents( true, true ));
-$smarty->assign( 'homePath', $afs->getBasePath());
-$smarty->assign( 'parentPath', $afs->parentPath());
-$smarty->assign( 'sid', $afs->sid );
-$smarty->assign( 'readonly', $afs->readonly );
+$smarty->assign( 'secure_service_url', $secure_service_url);
+
 $smarty->assign( 'homeSelected', $homeSelected );
 $smarty->assign( 'webSelected', $webSelected );
-$smarty->assign( 'location', $afs->pathDisplay());
+
+$smarty->assign( 'trouser_title', 'make-webspace');
 $smarty->assign( 'javascripts', array("/js/filemanage.js"));
 $smarty->assign( 'stylesheets', array("/fileman.css", "/makewebspace.css"));
-$smarty->assign( 'trouser_title', 'make-webspace');
+
+$afs->make_smarty_assignments($smarty);
 
 # Makewebspace specific assignments
 

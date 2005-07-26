@@ -5,11 +5,14 @@
  * All Rights Reserved.  See COPYRIGHT.
  */
 
-require_once( '../../objects/config.php' );
+require_once( '../../lib/config.php' );
+require_once( '../../lib/libdrawers.php' );
 require_once( '../../objects/afs.php' );
 require_once( '../../objects/affiliations.php' );
 require_once( '../../objects/supportgroups.php' );
 require_once( '../../smarty/smarty.custom.php' );
+
+$uploadError = process_upload($notifyMsg, $errorMsg);
 
 $path = ( isset( $_GET['path'] )) ? $_GET['path'] : '';
 $afs  = new Afs( $path );
@@ -34,12 +37,12 @@ if ( ! empty( $notifyMsg )) {
     $smarty->assign( 'notifyMsg', $notifyMsg );
 } else if ( ! empty( $give_support )) {
     $smarty->assign( 'notifyMsg',
-	    "Gave support permissions to departmental support group " .
-	    $give_support );
+            "Gave support permissions to departmental support group " .
+            $give_support );
 } else if ( ! empty( $remove_support )) {
     $smarty->assign( 'notifyMsg',
-	    "Removed support permissions from departmental support group " .
-	    $remove_support );
+            "Removed support permissions from departmental support group " .
+            $remove_support );
 } else if ( ! empty( $afs->notifyMsg )) {
     $smarty->assign( 'notifyMsg', $afs->notifyMsg );
 }
@@ -53,27 +56,19 @@ if ( $uploadError ) {
     $smarty->assign( 'warnUser', 'Unable to upload the selected file(s).' );
 }
 
-# File manager assignments
 $smarty->assign( 'service_name', $service_name);
-$smarty->assign( 'secure_service_url', $secure_service_url); 
-$smarty->assign( 'returnToURI',
-                 'https://' . $_SERVER['HTTP_HOST'] .
-                 $_SERVER['PHP_SELF'] .
-                 "?path=$afs->path&amp;finishid=$afs->sid" );
-$smarty->assign( 'path', $afs->path);
-$smarty->assign( 'folderName', basename( $afs->path ));
-$smarty->assign( 'folderContents', $afs->folderContents( true, true ));
-$smarty->assign( 'homePath', $afs->getBasePath());
-$smarty->assign( 'parentPath', $afs->parentPath());
-$smarty->assign( 'sid', $afs->sid );
-$smarty->assign( 'readonly', $afs->readonly );
+$smarty->assign( 'service_url', $service_url);
+$smarty->assign( 'secure_service_url', $secure_service_url);
+
 $smarty->assign( 'homeSelected', $homeSelected );
 $smarty->assign( 'webSelected', $webSelected );
-$smarty->assign( 'location', $afs->pathDisplay());
+
+$smarty->assign( 'trouser_title', 'allow-support');
 $smarty->assign( 'javascripts', array("/js/filemanage.js",
                                       "/js/allowsupport.js"));
 $smarty->assign( 'stylesheets', array("/fileman.css", "/allowsupport.css"));
-$smarty->assign( 'trouser_title', 'allow-support');
+
+$afs->make_smarty_assignments($smarty);
 
 $smarty->assign( 'affiliations', $supportgroups->get_affiliations());
 $smarty->assign( 'supportgroups', $supportgroups->get());

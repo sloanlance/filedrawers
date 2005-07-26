@@ -311,7 +311,7 @@ ac_includes_default="\
 #endif"
 
 ac_subdirs_all="$ac_subdirs_all libcgi"
-ac_subst_vars='SHELL PATH_SEPARATOR PACKAGE_NAME PACKAGE_TARNAME PACKAGE_VERSION PACKAGE_STRING PACKAGE_BUGREPORT exec_prefix prefix program_transform_name bindir sbindir libexecdir datadir sysconfdir sharedstatedir localstatedir libdir includedir oldincludedir infodir mandir build_alias host_alias target_alias DEFS ECHO_C ECHO_N ECHO_T LIBS project_name shtml_dir_name html_dir_name object_dir_name smarty_dir_name cgi_dir_name install_group service_name service_url secure_service_url error_url CC CFLAGS LDFLAGS CPPFLAGS ac_ct_CC EXEEXT OBJEXT INSTALL_PROGRAM INSTALL_SCRIPT INSTALL_DATA SET_MAKE CPP EGREP LIBOBJS subdirs LTLIBOBJS'
+ac_subst_vars='SHELL PATH_SEPARATOR PACKAGE_NAME PACKAGE_TARNAME PACKAGE_VERSION PACKAGE_STRING PACKAGE_BUGREPORT exec_prefix prefix program_transform_name bindir sbindir libexecdir datadir sysconfdir sharedstatedir localstatedir libdir includedir oldincludedir infodir mandir build_alias host_alias target_alias DEFS ECHO_C ECHO_N ECHO_T LIBS project_name shtml_dir_name html_dir_name object_dir_name smarty_dir_name cgi_dir_name lib_dir_name install_group service_name service_url secure_service_url error_url CC CFLAGS LDFLAGS CPPFLAGS ac_ct_CC EXEEXT OBJEXT INSTALL_PROGRAM INSTALL_SCRIPT INSTALL_DATA SET_MAKE CPP EGREP LIBOBJS subdirs LTLIBOBJS'
 ac_subst_files=''
 
 # Initialize some variables set by options.
@@ -856,6 +856,8 @@ Optional Packages:
                           name of sub-directory to contain smarty files
   --with-cgi_dir_name=cgi_dir_name
                           name of sub-directory to contain cgi binaries
+  --with-lib_dir_name=lib_dir_name
+                          name of sub-directory to contain php libraries
   --with-install_group=cgi_dir_name
                           name of group to have installed file ownership
   --with-service_name=service_name
@@ -1352,6 +1354,16 @@ if test "${with_cgi_dir_name+set}" = set; then
   cgi_dir_name="$withval"
 else
   cgi_dir_name="cgi-ssl"
+fi;
+
+
+
+# Check whether --with-lib_dir_name or --without-lib_dir_name was given.
+if test "${with_lib_dir_name+set}" = set; then
+  withval="$with_lib_dir_name"
+  lib_dir_name="$withval"
+else
+  lib_dir_name="lib"
 fi;
 
 
@@ -4188,6 +4200,7 @@ s,@html_dir_name@,$html_dir_name,;t t
 s,@object_dir_name@,$object_dir_name,;t t
 s,@smarty_dir_name@,$smarty_dir_name,;t t
 s,@cgi_dir_name@,$cgi_dir_name,;t t
+s,@lib_dir_name@,$lib_dir_name,;t t
 s,@install_group@,$install_group,;t t
 s,@service_name@,$service_name,;t t
 s,@service_url@,$service_url,;t t

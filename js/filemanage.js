@@ -57,6 +57,7 @@ function startPage( notifyMsg, warnMsg )
         showHiddenFiles = 0;
     }
 
+    init_formvals();
     displayFileList();
     fileInspector();
 
@@ -71,6 +72,15 @@ function startPage( notifyMsg, warnMsg )
             window.location.href = window.location.href.replace( regex, '' );
         }
     }
+}
+
+// Initialize form input values that can't be done with html.
+function init_formvals()
+{
+    document.getElementById( 'sessionid' ).value = sid;
+    document.getElementById( 'path' ).value = path;
+    document.getElementById( 'returnToURI' ).value = returnToURI;
+    document.getElementById( 'newLoc' ).value = path;
 }
 
 // Returns a form checkbox or something else if approriate
@@ -204,9 +214,9 @@ function selectColumn( sortFlag )
     parentElem.className = 'selectedCol';
 
     if ( sortDecending == 1 ) {
-        i.setAttribute( 'src',  'images/sort_decend.gif' );
+        i.setAttribute( 'src', imgStore + '/' + 'sort_decend.gif' );
     } else {
-        i.setAttribute( 'src',  'images/sort_ascend.gif' );
+        i.setAttribute( 'src', imgStore + '/' + 'sort_ascend.gif' );
     }
 
     l.setAttribute( 'href', "javascript:reorderFileList('" + sortFlag + "');" );
@@ -555,8 +565,9 @@ function startUpload()
 function setPMpath()
 {
     var itemInfo = new SelectedFileInfo();
-    document.getElementById( 'permpanel' ).src = '/perm_manager.php?target='
-	    getFilenameUrl(itemInfo.lastID);
+
+    document.getElementById( 'permpanel' ).src = '/perm_manager.php?target=' +
+	    getFilenameUrl(itemInfo.lastId);
 }
 
 // Sets the path for the iframe that displays the user's list of favorite locations
@@ -699,8 +710,8 @@ function fileInspector()
         
         if ( files[ itemInfo.lastId ].type == folderMime ) {
             setInspControl( 'permsCtrl',
-              'setPMpath();expandItem(\'permsCtrl\',\'permissions\')',
-              'Set Permissions for Folder' );
+                            'permsCtrl_cmd()',
+                            'Set Permissions for Folder' );
         } else {
             setInspControl( 'permsCtrl', '', 'Set Permissions for Folder' );
         }
@@ -714,13 +725,16 @@ function fileInspector()
     // This is the sidebar menu state for many items selected
     } else {
         setInspControl( 'uploadCtrl', '', 'Upload File(s)' );
-        setInspControl( 'cutCtrl', 'setClipboard(\'cut\')',
-          'Cut Selected Item(s)' );
-        setInspControl( 'copyCtrl', 'setClipboard(\'copy\')',
-          'Copy Selected Item(s)' );
+        setInspControl( 'cutCtrl',
+                        'setClipboard(\'cut\')',
+                        'Cut Selected Item(s)' );
+        setInspControl( 'copyCtrl',
+                        'setClipboard(\'copy\')',
+                        'Copy Selected Item(s)' );
         setInspControl( 'renameCtrl', '', 'Rename Selected Item' );
-        setInspControl( 'deleteCtrl', 'delFiles(files)',
-          'Delete Selected Item(s)' );
+        setInspControl( 'deleteCtrl',
+                        'delFiles(files)',
+                        'Delete Selected Item(s)' );
         setInspControl( 'newFolderCtrl', '', 'Create a New Folder' );
         setInspControl( 'permsCtrl', '', 'Set Permissions for Folder' );
         setInspControl( 'pasteCtrl', '', 'Paste to This Folder' );
@@ -732,6 +746,13 @@ function fileInspector()
     }
 
     setHiddenFilesCtrl();
+}
+
+// Helper function for permsCtrl
+function permsCtrl_cmd()
+{
+    setPMpath();
+    expandItem('permsCtrl','permissions');
 }
 
 // Toggles the display of a hidden object. I don't this this is still used

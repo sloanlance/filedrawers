@@ -44,6 +44,13 @@ AC_ARG_WITH(cgi_dir_name,
             [cgi_dir_name="cgi-ssl"])
 AC_SUBST(cgi_dir_name)
 
+AC_ARG_WITH(lib_dir_name,
+            AC_HELP_STRING([--with-lib_dir_name=lib_dir_name],
+                           [name of sub-directory to contain php libraries]),
+            lib_dir_name="$withval",
+            [lib_dir_name="lib"])
+AC_SUBST(lib_dir_name)
+
 AC_ARG_WITH(install_group,
             AC_HELP_STRING([--with-install_group=cgi_dir_name],
                            [name of group to have installed file ownership]),

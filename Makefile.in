@@ -10,9 +10,10 @@ INSTALL=        @INSTALL@
 ROOTDIR=@prefix@/@project_name@
 SHTMLDIR=${ROOTDIR}/@shtml_dir_name@
 HTMLDIR=${ROOTDIR}/@html_dir_name@
-OBJECTS=${ROOTDIR}/@object_dir_name@
+OBJDIR=${ROOTDIR}/@object_dir_name@
 SMARTY=${ROOTDIR}/@smarty_dir_name@
 CGIDIR=${ROOTDIR}/@cgi_dir_name@
+LIBDIR=${ROOTDIR}/@lib_dir_name@
 
 # Derived directory names
 SIMAGES=${SHTMLDIR}/images
@@ -29,7 +30,7 @@ CFLAGS=         ${OPTOPTS} -g -O2
 
 SHTMLDIRTARGET= css/fileman.css css/ie6specific.css css/ie5specific.css \
                 css/favorites.css css/makewebspace.css \
-		css/allowsupport.css css/adminsupport.css \
+                css/allowsupport.css css/adminsupport.css \
                 php/addfavorites.php php/deletefavorites.php \
                 php/perm_manager.php php/progress.php \
                 php/renamefavorites.php php/viewfavorites.php \
@@ -37,20 +38,23 @@ SHTMLDIRTARGET= css/fileman.css css/ie6specific.css css/ie5specific.css \
 
 HTMLDIRTARGET=  css/styles.css php/feedback.php
 
-OBJECTSTARGET=  php/afs.php php/favorites.php php/mime.php \
+OBJDIRTARGET=   php/afs.php php/favorites.php php/mime.php \
                 php/webspaces.php php/affiliations.php \
-		php/supportgroups.php php/config.php
+                php/supportgroups.php php/config.php
+
+LIBDIRTARGET=   php/config.php php/libdrawers.php
 
 SMARTYTARGET=   smarty/smarty.custom.php
 
 TEMPLATETARGET= smarty/fileman.tpl smarty/makewebspace.tpl \
                 smarty/allowsupport.tpl smarty/adminsupport.tpl \
-		smarty/adminsupport_noauth.tpl \
+                smarty/adminsupport_noauth.tpl \
                 smarty/addFavorites.tpl smarty/deleteFavorites.tpl \
                 smarty/footer.tpl smarty/masthead.tpl \
                 smarty/permissions.tpl smarty/renameFavorites.tpl \
                 smarty/viewFavorites.tpl smarty/sidebar.tpl \
                 smarty/filelist.tpl smarty/fileman.tpl \
+                smarty/banner.tpl smarty/infobar.tpl
 
 SIMAGETARGET=   images/checkbox.gif images/doc_lg.gif \
                 images/doc_sm.gif images/download.gif \
@@ -139,11 +143,18 @@ install: all
 		$(INSTALL) -g @install_group@ -m 0664 -c $$i ${JSDIR}/; \
 	done
 
-	mkdir -p ${OBJECTS}
-	chmod 775 ${OBJECTS}
-	chgrp @install_group@ ${OBJECTS}
-	for i in ${OBJECTSTARGET}; do \
-		$(INSTALL) -g @install_group@ -m 0775 -c $$i ${OBJECTS}/; \
+	mkdir -p ${OBJDIR}
+	chmod 775 ${OBJDIR}
+	chgrp @install_group@ ${OBJDIR}
+	for i in ${OBJDIRTARGET}; do \
+		$(INSTALL) -g @install_group@ -m 0775 -c $$i ${OBJDIR}/; \
+	done
+
+	mkdir -p ${LIBDIR}
+	chmod 775 ${LIBDIR}
+	chgrp @install_group@ ${LIBDIR}
+	for i in ${LIBDIRTARGET}; do \
+		$(INSTALL) -g @install_group@ -m 0775 -c $$i ${LIBDIR}/; \
 	done
 
         # Install html Images

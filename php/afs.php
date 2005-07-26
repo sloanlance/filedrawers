@@ -363,7 +363,7 @@ class Afs
     function readAcl( $path='' )
     {
         $path = ( $path ) ? $path : $this->path;
-        $cmd = "fs listacl " . $path;
+        $cmd = "fs listacl " . escapeshellarg($path);
         $result = shell_exec( $cmd . " 2>&1" );
         $rights = array( 'l', 'r', 'w', 'i', 'd', 'k', 'a' );
 
@@ -417,8 +417,12 @@ class Afs
         return $result;
     }
 
-    // List the contents of a folder
-    function folderContents( $showHidden=false )
+    /*
+     * List the contents of a folder as a set of javascript
+     * variable declarations.
+     *
+     */
+    public function folderContents_js( $showHidden=false )
     {
         $id = 0;
         $files = '';
@@ -458,6 +462,53 @@ class Afs
 
         closedir( $dh );
         return $files;
+    }
+
+    /*
+     * List the path variable
+     * as a javascript string.
+     *
+     */
+    function path_js()
+    {
+	return $this->escape_js($this->path);
+    }
+
+    /*
+     * List the folder name
+     * as a javascript string.
+     *
+     */
+    function foldername_js()
+    {
+	return $this->escape_js(basename( $this->path ));
+    }
+
+    /*
+     * List the path variable variable
+     * as a javascript string.
+     *
+     */
+    function homepath_js()
+    {
+	return $this->escape_js($this->getBasePath());
+    }
+
+    function returnToURI_js()
+    {
+        return $this->escape_js( 'https://' .
+                                 $_SERVER['HTTP_HOST'] .
+	                         $_SERVER['PHP_SELF'] .
+	                         "?path=" .
+	                         urlencode($this->path) .
+	                         "&" .
+	                         "finishid=" .
+                                 $this->sid );
+    }
+
+    function sid_js()
+    {
+	return $this->escape_js($this->sid);
     }
 
     /*
@@ -604,6 +655,21 @@ class Afs
         }
 
         return $pathDisp;
+    }
+
+    // Make smarty template variable assignments
+    function make_smarty_assignments(&$smart)
+    {
+	$smart->assign( 'returnToURI_js', $this->returnToURI_js());
+	$smart->assign( 'path_url', urlencode($this->path));
+	$smart->assign( 'path_js', $this->path_js());
+	$smart->assign( 'folderName_js', $this->foldername_js());
+	$smart->assign( 'folderContents_js', $this->folderContents_js( true ));
+	$smart->assign( 'homePath_js', $this->homepath_js());
+	$smart->assign( 'parentPath', urlencode($this->parentPath()));
+	$smart->assign( 'sid_js', $this->sid_js());
+	$smart->assign( 'readonly_js', $this->readonly );
+	$smart->assign( 'location', $this->pathDisplay());
     }
 }
 ?>

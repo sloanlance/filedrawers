@@ -25,13 +25,13 @@
 	<div class="titlebar"> <a href="javascript:closeItem('favCtrl','favorites');">[X]</a>
 	    <h2>My Favorite Locations</h2>
 	</div>
-	<iframe name="favpanel" id="favpanel" scrolling="no" src="blankpage.html" frameborder="0"></iframe>
+	<iframe name="favpanel" id="favpanel" scrolling="no" src="/blankpage.html" frameborder="0"></iframe>
     </div>
     <div id="permissions" class="expandItem" style="display: none;">
 	<div class="titlebar"> <a href="javascript:closeItem('permsCtrl','permissions');">[X]</a>
 	    <h2>Permissions Manager</h2>
 	</div>
-	<iframe name="perpanel" id="permpanel" scrolling="no" src="/perm_manager.php?target={$path}" frameborder="0"></iframe>
+	<iframe name="perpanel" id="permpanel" scrolling="no" src="/perm_manager.php?target={$path_url}" frameborder="0"></iframe>
     </div>
     <form name="newfold" id="newFolder" class="expandItem" style="display: none;" method="post" action="">
 	<div class="titlebar"> <a href="javascript:closeItem('newFolderCtrl','newFolder');">[X]</a>
@@ -46,9 +46,9 @@
 	<div class="titlebar"> <a href="javascript:closeItem('uploadCtrl','upload');document.getElementById('upload').reset();">[X]</a>
 	    <h2>Upload Files to AFS</h2>
 	</div>
-	<input type="hidden" name="sessionid" id="sessionid" value="{$sid}" />
-	<input type="hidden" name="path" id="path" value="{$path}" />
-	<input type="hidden" name="returnToURI" id="returnToURI" value="{$returnToURI}" />
+	<input type="hidden" name="sessionid" id="sessionid" value="" />
+	<input type="hidden" name="path" id="path" value="" />
+	<input type="hidden" name="returnToURI" id="returnToURI" value="" />
 	<ul>
 	    <li id="file1">
 		<input type="file" name="file" />
@@ -73,7 +73,7 @@
 	<div class="uploadctrl" id="uploadctrl">
 	    <input type="button" name="upload" value="Upload File(s)" onclick="startUpload();" />
 &nbsp;&nbsp; </div>
-	<iframe class="progbar" src="blankpage.html" marginwidth="0" align="center" marginheight="0" scrolling="no" id="progbar" frameborder="0"></iframe>
+	<iframe class="progbar" src="/blankpage.html" marginwidth="0" align="center" marginheight="0" scrolling="no" id="progbar" frameborder="0"></iframe>
     </form>
 </div>
 </div>

@@ -2,7 +2,7 @@
 <html>
 <head>
 <title>
-<?php require_once('../objects/config.php'); ?>
+<?php require_once('../lib/config.php'); ?>
 <?php echo "$service_name"; ?>
 : Web File Access</title>
 <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
