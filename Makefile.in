@@ -34,7 +34,7 @@ SHTMLDIRTARGET= css/fileman.css css/ie6specific.css css/ie5specific.css \
                 php/addfavorites.php php/deletefavorites.php \
                 php/perm_manager.php php/progress.php \
                 php/renamefavorites.php php/viewfavorites.php \
-                php/blankpage.html php/noscript.php
+                php/blankpage.html php/scripterror.php
 
 HTMLDIRTARGET=  css/styles.css php/feedback.php
 

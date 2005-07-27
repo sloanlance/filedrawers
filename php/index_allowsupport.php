@@ -68,7 +68,10 @@ $smarty->assign( 'javascripts', array("/js/filemanage.js",
                                       "/js/allowsupport.js"));
 $smarty->assign( 'stylesheets', array("/fileman.css", "/allowsupport.css"));
 
-$afs->make_smarty_assignments($smarty);
+$smarty->assign( 'js_vars', $afs->get_js_declarations());
+$smarty->assign( 'path_url', urlencode($afs->path));
+$smarty->assign( 'parentPath', urlencode($afs->parentPath()));
+$smarty->assign( 'location', $afs->pathDisplay());
 
 $smarty->assign( 'affiliations', $supportgroups->get_affiliations());
 $smarty->assign( 'supportgroups', $supportgroups->get());

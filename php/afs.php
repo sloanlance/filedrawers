@@ -422,7 +422,7 @@ class Afs
      * variable declarations.
      *
      */
-    public function folderContents_js( $showHidden=false )
+    public function get_foldercontents_js( $showHidden=false )
     {
         $id = 0;
         $files = '';
@@ -464,51 +464,21 @@ class Afs
         return $files;
     }
 
-    /*
-     * List the path variable
-     * as a javascript string.
-     *
-     */
-    function path_js()
+    function get_foldername()
     {
-	return $this->escape_js($this->path);
+	return basename( $this->path );
     }
 
-    /*
-     * List the folder name
-     * as a javascript string.
-     *
-     */
-    function foldername_js()
+    function get_returnToURI()
     {
-	return $this->escape_js(basename( $this->path ));
-    }
-
-    /*
-     * List the path variable variable
-     * as a javascript string.
-     *
-     */
-    function homepath_js()
-    {
-	return $this->escape_js($this->getBasePath());
-    }
-
-    function returnToURI_js()
-    {
-        return $this->escape_js( 'https://' .
-                                 $_SERVER['HTTP_HOST'] .
-	                         $_SERVER['PHP_SELF'] .
-	                         "?path=" .
-	                         urlencode($this->path) .
-	                         "&" .
-	                         "finishid=" .
-                                 $this->sid );
-    }
-
-    function sid_js()
-    {
-	return $this->escape_js($this->sid);
+        return ( 'https://' .
+                  $_SERVER['HTTP_HOST'] .
+	          $_SERVER['PHP_SELF'] .
+	          "?path=" .
+	          urlencode($this->path) .
+	          "&" .
+	          "finishid=" .
+                  $this->sid );
     }
 
     /*
@@ -660,16 +630,39 @@ class Afs
     // Make smarty template variable assignments
     function make_smarty_assignments(&$smart)
     {
-	$smart->assign( 'returnToURI_js', $this->returnToURI_js());
 	$smart->assign( 'path_url', urlencode($this->path));
-	$smart->assign( 'path_js', $this->path_js());
-	$smart->assign( 'folderName_js', $this->foldername_js());
-	$smart->assign( 'folderContents_js', $this->folderContents_js( true ));
-	$smart->assign( 'homePath_js', $this->homepath_js());
 	$smart->assign( 'parentPath', urlencode($this->parentPath()));
-	$smart->assign( 'sid_js', $this->sid_js());
-	$smart->assign( 'readonly_js', $this->readonly );
 	$smart->assign( 'location', $this->pathDisplay());
     }
+
+    function get_js_declarations()
+    {
+        $retstr = "";
+
+	$retstr .= '<script language="JavaScript" type="text/JavaScript">' .
+                    "\n";
+
+        $retstr .= $this->js_var("path", $this->path);
+        $retstr .= $this->js_var("foldername", $this->get_foldername());
+        $retstr .= $this->js_var("folderIcon", "");
+        $retstr .= $this->js_var("homepath", $this->getBasePath());
+        $retstr .= $this->js_var("sid", $this->sid);
+        $retstr .= $this->js_var("returnToURI", $this->get_returnToURI());
+        $retstr .= $this->js_var("readonly", $this->readonly);
+
+	$retstr .= "files = new Array();\n";
+	$retstr .= $this->get_foldercontents_js(true);
+	$retstr .= "</script>\n";
+
+        return $retstr;
+    }
+
+    private function js_var($varname, $contents)
+    {
+        $retstr = "";
+        $retstr .= "var $varname = '" . $this->escape_js($contents) . "';\n";
+        return $retstr;
+    }
+
 }
 ?>

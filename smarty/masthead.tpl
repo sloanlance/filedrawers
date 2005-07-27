@@ -17,18 +17,7 @@
 {foreach from="$javascripts" item="script"}
 <script language="JavaScript" type="text/javascript" src="{$script}"></script>
 {/foreach}
-<script language="JavaScript" type="text/JavaScript">
-var path        = '{$path_js}';
-var foldername  = '{$folderName_js}';
-var folderIcon  = '{$folderIcon_js}';
-var homepath    = '{$homePath_js}';
-var sid         = '{$sid_js}';
-var returnToURI = '{$returnToURI_js}';
-var readonly    = {$readonly_js};
-
-files=new Array();
-{$folderContents_js}
-</script>
+{$js_vars}
 </head>
 <body onload="startPage('{$notifyMsg}','{$warnUser}');">
 <div class="masthead">
