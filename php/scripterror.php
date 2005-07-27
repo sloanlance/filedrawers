@@ -1,9 +1,13 @@
-<h1>Javascript Error</h1>
+<?php
+/*
+ * Copyright (c) 2005 Regents of The University of Michigan.
+ * All Rights Reserved.  See COPYRIGHT.
+ */
 
-<p>
-JavaScript must be enabled in order for you to use this service. However,
-it seems JavaScript is either disabled or not supported by your
-browser. To use our service, enable JavaScript by changing your browser
-options, or use another browser, and then try again.
-</p>
+require_once( '../smarty/smarty.custom.php' );
 
+$smarty = new Smarty_Template;
+$smarty->assign( 'redirect', true );
+$smarty->assign( 'stylesheets', array( '/fileman.css'));
+$smarty->display( 'scripterror.tpl' );
+?>

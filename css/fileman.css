@@ -580,3 +580,14 @@ table.content-text td {
     overflow: hidden;
     height: 20px;
 }
+
+#error {
+	margin-left: 15%;
+	margin-right: 20%;
+	margin-top: 20px;
+	background: #ffff99;
+	padding: 0px 10px 10px 20px;
+	color: #882222;
+	border: 1px dashed #000000;
+}
+

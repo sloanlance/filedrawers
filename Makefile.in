@@ -54,7 +54,8 @@ TEMPLATETARGET= smarty/fileman.tpl smarty/makewebspace.tpl \
                 smarty/permissions.tpl smarty/renameFavorites.tpl \
                 smarty/viewFavorites.tpl smarty/sidebar.tpl \
                 smarty/filelist.tpl smarty/fileman.tpl \
-                smarty/banner.tpl smarty/infobar.tpl
+                smarty/banner.tpl smarty/infobar.tpl \
+				smarty/scripterror.tpl smarty/header.tpl
 
 SIMAGETARGET=   images/checkbox.gif images/doc_lg.gif \
                 images/doc_sm.gif images/download.gif \
