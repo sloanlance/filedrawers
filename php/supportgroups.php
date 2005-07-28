@@ -178,12 +178,12 @@ class Supportgroups {
      */
     private function walk_dirs($dir, $group, $callback)
     {
+
 	if (!is_dir($dir)) {
 	    return false;
 	}
 
         $result = call_user_func($callback, $dir, $group);
-        #$result = $callback($dir);
 
         if (!$result) {
 	    return false;
@@ -206,16 +206,6 @@ class Supportgroups {
 		continue;
             }
 
-            // Special case. Should check for negative rights.
-	    // on the user's directory before attempting to open it.
-	    if ($entry == "dropbox") {
-		continue;
-	    }
-
-	    if ($entry == "Dropbox") {
-		continue;
-	    }
-
             $entry_path = ($dir . "/" . $entry);
 
             if (!is_dir($entry_path)) {
@@ -225,7 +215,8 @@ class Supportgroups {
             // Special case. Check for mount points that
 	    // aren't the users.
 	    $fs_command = self::FS_BINARY . " ls " .
-                          $entry_path;
+                          escapeshellarg($entry_path) .
+			  " 2>&1";
 	    $fs_output = shell_exec( $fs_command );
 
 	    $regex = "/is a mount point for volume '(.*)'/";
@@ -239,7 +230,7 @@ class Supportgroups {
                 continue;
             }
 
-	    if (!$this->walk_dirs($dir . "/" . $entry,
+	    if (!$this->walk_dirs($entry_path,
                                   $group,
 				  $callback)) {
 		closedir($dir_handle);
@@ -281,8 +272,7 @@ class Supportgroups {
 
     private function change_perms_group($dir, $group, $perms) {
 
-        if ( strlen( $perm_set )) {
-            $error_msg .= "Could not set privileges: $directory.";
+        if ( strlen( $perms ) == 0) {
             return false;
         }
 

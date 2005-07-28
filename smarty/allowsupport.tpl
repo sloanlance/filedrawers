@@ -11,9 +11,12 @@ Allowing Support Access to Your Home Directory
 <p class=content-text >
 The departmental support group(s) available to help you with your
 home directory (based on your University Affiliation) are listed below.
-Give
-<a href="">access</a>
-to, or remove it from, these groups as needed.
+Give access to, or remove it from, these groups as needed.
+</p>
+
+<p class=content-text >
+Giving or removing support access may take up to a minute, depending
+on the number of folders within your AFS home directory.
 </p>
 
 {*
