@@ -58,6 +58,10 @@ at http://mfile-dev.www.umich.edu:
 
 3: Build and install the software
 
+Clean out any options from previous installations by running:
+
+  % make clean
+
 Now you are ready to build the software. From the top level of your
 build directory:
 
