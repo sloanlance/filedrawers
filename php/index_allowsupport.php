@@ -12,6 +12,8 @@ require_once( '../../objects/affiliations.php' );
 require_once( '../../objects/supportgroups.php' );
 require_once( '../../smarty/smarty.custom.php' );
 
+browser_check();
+
 $uploadError = process_upload($notifyMsg, $errorMsg);
 
 $path = ( isset( $_GET['path'] )) ? $_GET['path'] : '';
@@ -31,6 +33,12 @@ $remove_support = ( isset( $_POST['remove_support'] )) ?
 
 $supportgroups->give_permissions($give_support);
 $supportgroups->remove_permissions($remove_support);
+
+// Use the "allowsupport.js" javascript
+$javascripts[] = "/js/allowsupport.js";
+
+// Use the "allowsupport.css" stylesheet.
+$stylesheets[] = "/allowsupport.css";
 
 // Set notification messages
 if ( ! empty( $notifyMsg )) {
@@ -64,9 +72,8 @@ $smarty->assign( 'homeSelected', $homeSelected );
 $smarty->assign( 'webSelected', $webSelected );
 
 $smarty->assign( 'trouser_title', 'allow-support');
-$smarty->assign( 'javascripts', array("/js/filemanage.js",
-                                      "/js/allowsupport.js"));
-$smarty->assign( 'stylesheets', array("/fileman.css", "/allowsupport.css"));
+$smarty->assign( 'javascripts', $javascripts);
+$smarty->assign( 'stylesheets', $stylesheets);
 
 $smarty->assign( 'js_vars', $afs->get_js_declarations());
 $smarty->assign( 'path_url', urlencode($afs->path));

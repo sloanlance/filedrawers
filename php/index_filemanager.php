@@ -9,6 +9,8 @@ require_once( '../lib/libdrawers.php' );
 require_once( '../objects/afs.php' );
 require_once( '../smarty/smarty.custom.php' );
 
+browser_check();
+
 $uploadError = process_upload($notifyMsg, $errorMsg);
 
 $path = ( isset( $_GET['path'] )) ? $_GET['path'] : '';
@@ -42,8 +44,8 @@ $smarty->assign( 'homeSelected', $homeSelected );
 $smarty->assign( 'webSelected', $webSelected );
 
 $smarty->assign( 'trouser_title', 'afs file management');
-$smarty->assign( 'javascripts', array("/js/filemanage.js"));
-$smarty->assign( 'stylesheets', array("/fileman.css"));
+$smarty->assign( 'javascripts', $javascripts);
+$smarty->assign( 'stylesheets', $stylesheets);
 
 $smarty->assign( 'js_vars', $afs->get_js_declarations());
 $smarty->assign( 'path_url', urlencode($afs->path));

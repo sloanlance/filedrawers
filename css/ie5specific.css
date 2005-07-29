@@ -1,6 +1,5 @@
 /* Amends and adds rules needed by IE5.x to fileman.css */ 
 body {
-	overflow: hidden;
 	z-index: 1; 
 } 
 
@@ -25,7 +24,7 @@ div.masthead {
 	bottom: 0px;
 	background: #AA9FAA;
 	height: 100%;
-	z-index: 5; 
+	z-index: 1; 
 }
 
 div.content {

@@ -10,12 +10,6 @@
 {foreach from="$stylesheets" item="stylesheet"}
 <link href="{$stylesheet}" rel="stylesheet" type="text/css" />
 {/foreach}
-<!--[if IE 5]> 
- <link href="/ie5specific.css" rel="stylesheet" type="text/css"> 
- <![endif]-->
-<!--[if IE 6]> 
- <link href="/ie6specific.css" rel="stylesheet" type="text/css"> 
- <![endif]-->
 {foreach from="$javascripts" item="script"}
 <script language="JavaScript" type="text/javascript" src="{$script}"></script>
 {/foreach}

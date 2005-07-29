@@ -4,6 +4,12 @@
  * All Rights Reserved.  See COPYRIGHT.
  */
 
+// Standard javascripts
+$javascripts = array("/js/filemanage.js");
+
+// Standard stylesheets
+$stylesheets = array("/fileman.css");
+
 // Take care of file uploads.
 function process_upload(&$notifyMsg, &$errorMsg)
 {
@@ -52,4 +58,58 @@ function process_upload(&$notifyMsg, &$errorMsg)
     }
 
     return $uploadError;
+}
+
+/*
+ * Takes care of browser-specific stylesheet includes
+ * and redirects.
+ */
+function browser_check()
+{
+    global $stylesheets;
+
+    $platform_comps = array();
+
+    $msie_major = 0;
+    $msie_minor = 0;
+
+    $regex = "/(.*) \((.*)\)/";
+    if(preg_match( $regex, $_SERVER['HTTP_USER_AGENT'], $matches )) {
+        $browser_str = $matches[1];
+        $platform_str = $matches[2];
+    }
+
+    $l=strlen($platform_str);
+
+    $token = "";
+    for($i=0;$i<$l;$i++)
+    {
+        if(($i == $l) || (($c=$platform_str[$i]) == ";")) {
+            $platform_comps[] = ltrim(rtrim($token));
+	    $token = "";
+        } else {
+	    $token .= $c;
+        }
+    }
+
+
+    foreach($platform_comps as $comp) {
+	$regex = "/MSIE (\d+)\.(\d+)/";
+	if(preg_match( $regex, $comp, $matches )) {
+	    $msie_major = $matches[1];
+	    $msie_minor = $matches[2];
+	}
+    }
+
+    switch ($msie_major) {
+    case "5":
+        $stylesheets[] = "/ie5specific.css";
+	break;
+    case "6":
+        $stylesheets[] = "/ie6specific.css";
+	break;
+    default:
+	break;
+    }
+  
 }
