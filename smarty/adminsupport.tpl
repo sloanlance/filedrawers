@@ -34,7 +34,6 @@ mapping, using the "delete selected mapping" button and then re-add
 the mapping using the "add new mapping" button.
 </p>
 
-{if $mappings ne null}
 <h2 class=content-text>
 U-M Affiliation to Support Group Mapping:
 </h2>
@@ -91,7 +90,6 @@ Delete?
 <input type="submit" name="delete_mapping" value="delete selected mapping">
 <input type="submit" name="add_mapping" value="add new mapping">
 </form>
-{/if}
 
 </div>
 

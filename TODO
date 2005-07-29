@@ -18,6 +18,9 @@
 - Fix when a single item is selected, display the large mime icon for that item
     under "selected item properties"
 
+- Fix when there are no mappings to display, the "add mapping" button
+    disappears from admin-support.
+
 (0.2) --- Help
 
 - Feature Add "help" button to mfile header.

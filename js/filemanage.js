@@ -78,7 +78,7 @@ function startPage( notifyMsg, warnMsg )
 function init_formvals()
 {
     document.getElementById( 'sessionid' ).value = sid;
-    document.getElementById( 'path' ).value = path;
+    document.getElementById( 'uploadpath' ).value = path;
     document.getElementById( 'returnToURI' ).value = returnToURI;
     document.getElementById( 'newLoc' ).value = path;
 }

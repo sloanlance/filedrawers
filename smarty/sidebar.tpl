@@ -47,7 +47,7 @@
 	    <h2>Upload Files to AFS</h2>
 	</div>
 	<input type="hidden" name="sessionid" id="sessionid" value="" />
-	<input type="hidden" name="path" id="path" value="" />
+	<input type="hidden" name="path" id="uploadpath" value="" />
 	<input type="hidden" name="returnToURI" id="returnToURI" value="" />
 	<ul>
 	    <li id="file1">
