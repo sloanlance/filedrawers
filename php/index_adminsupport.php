@@ -14,6 +14,9 @@ require_once( '../../smarty/smarty.custom.php' );
 
 browser_check();
 
+// Don't display the file manager on this page.
+$displayfileman = 0;
+
 $uploadError = process_upload($notifyMsg, $errorMsg);
 
 $path = ( isset( $_GET['path'] )) ? $_GET['path'] : '';
@@ -78,6 +81,8 @@ $smarty->assign( 'location', $afs->pathDisplay());
 $smarty->assign( 'uniqname', $supportgroups->uniqname);
 $smarty->assign( 'affiliations', $supportgroups->get_affiliations());
 $smarty->assign( 'mappings', $supportgroups->get_mappings());
+
+$smarty->assign( 'js_displayfileman', $displayfileman);
 
 if ($supportgroups->is_admin()) {
     $smarty->display( 'adminsupport.tpl' );

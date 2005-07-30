@@ -52,5 +52,7 @@ $smarty->assign( 'path_url', urlencode($afs->path));
 $smarty->assign( 'parentPath', urlencode($afs->parentPath()));
 $smarty->assign( 'location', $afs->pathDisplay());
 
+$smarty->assign( 'js_displayfileman', $displayfileman);
+
 $smarty->display( 'fileman.tpl' );
 ?>

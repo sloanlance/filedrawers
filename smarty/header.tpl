@@ -13,5 +13,8 @@
 {foreach from="$javascripts" item="script"}
 <script language="JavaScript" type="text/javascript" src="{$script}"></script>
 {/foreach}
+<script language="JavaScript" type="text/JavaScript">
 {$js_vars}
+var displayfileman = {$js_displayfileman};
+</script>
 </head>

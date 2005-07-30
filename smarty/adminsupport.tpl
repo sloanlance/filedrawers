@@ -1,6 +1,5 @@
 {include file="masthead.tpl"}
 {include file="sidebar.tpl"}
-{include file="filelist.tpl"}
 
 <div id=adminsupport>
 

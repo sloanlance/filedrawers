@@ -10,6 +10,9 @@ $javascripts = array("/js/filemanage.js");
 // Standard stylesheets
 $stylesheets = array("/fileman.css");
 
+// Default value for $displayfileman
+$displayfileman = 1;
+
 // Take care of file uploads.
 function process_upload(&$notifyMsg, &$errorMsg)
 {

@@ -1,5 +1,6 @@
 /* Amends and adds rules needed by IE6 to fileman.css */
 html {
+	overflow: hidden; 
 } 
 
 body {

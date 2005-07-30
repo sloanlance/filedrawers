@@ -639,9 +639,6 @@ class Afs
     {
         $retstr = "";
 
-	$retstr .= '<script language="JavaScript" type="text/JavaScript">' .
-                    "\n";
-
         $retstr .= $this->js_var("path", $this->path);
         $retstr .= $this->js_var("foldername", $this->get_foldername());
         $retstr .= $this->js_var("folderIcon", "");
@@ -652,9 +649,8 @@ class Afs
 
 	$retstr .= "files = new Array();\n";
 	$retstr .= $this->get_foldercontents_js(true);
-	$retstr .= "</script>\n";
 
-        return $retstr;
+	return $retstr;
     }
 
     private function js_var($varname, $contents)

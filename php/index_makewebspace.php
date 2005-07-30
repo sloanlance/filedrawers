@@ -27,6 +27,9 @@ $homeSelected = false;
 // Use the "makewebspace.css" stylesheet.
 $stylesheets[] = "/makewebspace.css";
 
+// Don't display the file manager on this page.
+$displayfileman = 0;
+
 // Set notification messages
 if ( ! empty( $notifyMsg )) {
     $smarty->assign( 'notifyMsg', $notifyMsg );
@@ -79,5 +82,7 @@ $smarty->assign('private_prepared',
                                  Webspaces::STATUS_PREPARED));
 
 $smarty->assign( 'prep_results', $prep_results);
+$smarty->assign( 'js_displayfileman', $displayfileman);
+
 $smarty->display( 'makewebspace.tpl' );
 ?>

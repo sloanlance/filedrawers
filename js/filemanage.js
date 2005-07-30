@@ -270,8 +270,10 @@ function displayFileList()
         files.sort( sortFunc );
 
     // Display the file list
-    createFileList();
-    selectColumn( sortBy );
+    if (displayfileman) {
+	createFileList();
+	selectColumn( sortBy );
+    }
 }
 
 // This function turns the array of file info into an html table
