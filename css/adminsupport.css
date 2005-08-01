@@ -4,13 +4,11 @@
  * All Rights Reserved.  See COPYRIGHT.
  */
 
-div#adminsupport {
-    position: absolute;
-    top: 95px;
-    left: 220px;
-    width: 640px;
-    padding: 0px;
-    z-index: 2;
+#adminsupport {
+        margin-left: 220px;
+        padding: 0px;
+        padding-top: 95px;
+        width: 640px;
 }
 
 #adminsupport a:hover {

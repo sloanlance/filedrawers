@@ -4,17 +4,12 @@
  * All Rights Reserved.  See COPYRIGHT.
  */
 
-div#content {
-        visibility: hidden;
-}
 
-div#makewebspace {
-    position: absolute;
-    top: 95px;
-    left: 220px;
-    width: 530px;
-    padding: 0px;
-    z-index: 2;
+#makewebspace {
+        margin-left: 220px;
+        padding: 0px;
+        padding-top: 95px;
+        width: 530px;
 }
 
 table.prep-results {
