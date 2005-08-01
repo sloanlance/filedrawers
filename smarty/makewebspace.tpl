@@ -145,18 +145,12 @@ Your prepared webspaces:
 {foreach from=$public_prepared item="space" name="public_prepared" }
 {if $smarty.foreach.public_prepared.first eq true}
 <tr>
-<th colspan=3>
-Public
-</th>
+	<th colspan=3>Public</th>
 </tr>
 {/if}
 <tr bgcolor="{cycle values="#ffffff,#f1f1f1" name="iw_cycle_3"}">
-<td width="40%">
-{$space.name}
-</td>
-<td width="60%">
-<a href="{$space.url}">{$space.url}</a>
-</td>
+	<td width="40%"><a href="/?path={$space.path|escape:"url"}">{$space.name}</a></td>
+	<td width="60%"><a href="{$space.url}">{$space.url}</a></td>
 </tr>
 {foreachelse}
 {/foreach}
@@ -167,18 +161,12 @@ Public
 {foreach from=$private_prepared item="space" name="private_prepared" }
 {if $smarty.foreach.private_prepared.first eq true}
 <tr>
-<th colspan=3>
-Private
-</th>
+	<th colspan=3>Private</th>
 </tr>
 {/if}
 <tr bgcolor="{cycle values="#ffffff,#f1f1f1" name="iw_cycle_4"}">
-<td width="40%">
-{$space.name}
-</td>
-<td width="60%">
-<a href="{$space.url}">{$space.url}</a>
-</td>
+	<td width="40%"><a href="/?path={$space.path|escape:"url"}">{$space.name}</a></td>
+	<td width="60%"><a href="{$space.url}">{$space.url}</a></td>
 </tr>
 {foreachelse}
 {/foreach}
