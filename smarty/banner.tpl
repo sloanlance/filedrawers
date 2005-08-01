@@ -22,6 +22,7 @@
 		<li><a href="/">Home</a></li>
 	{/if}
 	<li><a href="/make-webspace/">Web Sites</a></li>
+	<li><a href="/help.php">Help</a></li>
 	<li><a href="{$secure_service_url}/cgi-bin/logout?{$service_url}/">Logout</a></li>
 </ul>
 </div>

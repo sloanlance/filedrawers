@@ -74,6 +74,13 @@ div.masthead {
 	padding-top: 95px;
 }
 
+#lone_content {
+	margin-left: 100px;
+	margin-right: 120px;
+	padding: 0px;
+	padding-top: 25px;
+}
+
  /* -- End basic layout section -- */
 #content a {
 	text-decoration: none;
