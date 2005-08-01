@@ -76,4 +76,7 @@
 	<iframe class="progbar" src="/blankpage.html" marginwidth="0" align="center" marginheight="0" scrolling="no" id="progbar" frameborder="0"></iframe>
     </form>
 </div>
+<div id=version>
+filedrawers version: {$filedrawers_version}
+</div>
 </div>

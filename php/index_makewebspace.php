@@ -5,6 +5,7 @@
  * All Rights Reserved.  See COPYRIGHT.
  */
 
+require_once( '../../lib/version.php' );
 require_once( '../../lib/config.php' );
 require_once( '../../lib/libdrawers.php' );
 require_once( '../../objects/webspaces.php' );
@@ -83,6 +84,8 @@ $smarty->assign('private_prepared',
 
 $smarty->assign( 'prep_results', $prep_results);
 $smarty->assign( 'js_displayfileman', $displayfileman);
+
+$smarty->assign( 'filedrawers_version', $filedrawers_version);
 
 $smarty->display( 'makewebspace.tpl' );
 ?>

@@ -5,6 +5,7 @@
  * All Rights Reserved.  See COPYRIGHT.
  */
 
+require_once( '../../lib/version.php' );
 require_once( '../../lib/config.php' );
 require_once( '../../lib/libdrawers.php' );
 require_once( '../../objects/afs.php' );
@@ -83,6 +84,8 @@ $smarty->assign( 'affiliations', $supportgroups->get_affiliations());
 $smarty->assign( 'mappings', $supportgroups->get_mappings());
 
 $smarty->assign( 'js_displayfileman', $displayfileman);
+
+$smarty->assign( 'filedrawers_version', $filedrawers_version);
 
 if ($supportgroups->is_admin()) {
     $smarty->display( 'adminsupport.tpl' );

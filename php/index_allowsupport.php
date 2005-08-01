@@ -5,6 +5,7 @@
  * All Rights Reserved.  See COPYRIGHT.
  */
 
+require_once( '../../lib/version.php' );
 require_once( '../../lib/config.php' );
 require_once( '../../lib/libdrawers.php' );
 require_once( '../../objects/afs.php' );
@@ -89,6 +90,7 @@ $smarty->assign( 'give_support', $give_support);
 $smarty->assign( 'remove_support', $remove_support);
 
 $smarty->assign( 'js_displayfileman', $displayfileman);
+$smarty->assign( 'filedrawers_version', $filedrawers_version);
 
 $smarty->display( 'allowsupport.tpl' );
 ?>

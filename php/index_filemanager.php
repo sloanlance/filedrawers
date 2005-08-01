@@ -4,6 +4,7 @@
  * All Rights Reserved.  See COPYRIGHT.
  */
 
+require_once( '../lib/version.php' );
 require_once( '../lib/config.php' );
 require_once( '../lib/libdrawers.php' );
 require_once( '../objects/afs.php' );
@@ -53,6 +54,8 @@ $smarty->assign( 'parentPath', urlencode($afs->parentPath()));
 $smarty->assign( 'location', $afs->pathDisplay());
 
 $smarty->assign( 'js_displayfileman', $displayfileman);
+
+$smarty->assign( 'filedrawers_version', $filedrawers_version);
 
 $smarty->display( 'fileman.tpl' );
 ?>
