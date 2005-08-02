@@ -52,7 +52,7 @@ char            	*user = NULL;
 func_initialize( char **dir, struct cgi_list *cl )
 {
     int			i;
-
+    extern              cgi_file_clobber;
 
     for ( i = 0; cl[i].cl_key != NULL; i++ ) {
 
@@ -129,6 +129,23 @@ func_initialize( char **dir, struct cgi_list *cl )
 	    fprintf( stderr, "func_init - key is file\n" );
 	    continue;
 	}
+
+	if ( strcmp( cl[i].cl_key, "overwrite_file") == 0 ) {
+            if (cgi_file_clobber == 1) {
+		continue;
+	    }
+
+	    if ( cl[i].cl_data == NULL ) {
+		continue;
+	    }
+	    if ( strcmp( cl[i].cl_data, "on") != 0 ) {
+		continue;
+	    }
+	    fprintf( stderr, "file clobber is turned on\n" );
+	    cgi_file_clobber = 1;
+	    continue;
+	}
+
 
     } /* for */
     return( 0 );

@@ -12,6 +12,7 @@ var folderMime       = '0000000dir';   // Fake mime type used for folders
 var clipboardSeparat = '*#~!@@@';
 var maxInspFileList  = 6;
 var showHiddenFiles  = 0;
+var clobberFiles     = 0;
 var agent            = navigator.userAgent.toLowerCase();
 var browserSafari    = ( agent.indexOf( "safari" ) != -1 );
 var sigFigures       = 0;              // Number of significant figures for fractions
@@ -559,6 +560,14 @@ function startUpload()
     baseUrl += '?sessionid=' + sid;
     document.getElementById( 'progbar' ).src = baseUrl;
     showProgress();
+    /*
+     * overwrite_file must come before the files in the form submission,
+     * but we want to be able to display the checkbox after the file list.
+     * therefore, we need to set it manually beforfe submit.
+     */
+    document.getElementById( 'overwrite_file' ).value =
+	    ((document.getElementById( 'overwrite_box' ).checked) ?
+            document.getElementById( 'overwrite_box' ).value : "");
     document.getElementById( 'upload' ).submit();
 }
 
@@ -682,8 +691,9 @@ function fileInspector()
             setInspControl( 'newFolderCtrl', '', 'Create a New Folder' );
         } else {
             setInspControl('uploadCtrl',
+                           'initClobberCheckbox();' +
                            'expandItem(\'uploadCtrl\',\'upload\')',
-           'Upload File(s)' );
+                           'Upload File(s)' );
             setInspControl( 'newFolderCtrl',
               'expandItem(\'newFolderCtrl\',\'newFolder\')',
               'Create a New Folder' );
@@ -876,6 +886,23 @@ function processCheckedItem( checkbox )
     }
 
     fileInspector();
+}
+
+/*
+ * Save the value of the clobber files checkbox when checked
+ * or unchecked.
+ */
+function processClobberCheckbox()
+{
+    setCookie( 'clobberFiles',
+               (document.getElementById( 'overwrite_box' ).checked) ? 1 : 0);
+}
+
+function initClobberCheckbox()
+{
+    clobberFiles = readCookie( 'clobberFiles' );
+    clobberFiles = ((clobberFiles == 1) ? clobberFiles : 0);
+    document.getElementById( 'overwrite_box' ).checked = clobberFiles;
 }
 
 /*

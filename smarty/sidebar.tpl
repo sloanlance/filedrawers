@@ -49,6 +49,7 @@
 	<input type="hidden" name="sessionid" id="sessionid" value="" />
 	<input type="hidden" name="path" id="uploadpath" value="" />
 	<input type="hidden" name="returnToURI" id="returnToURI" value="" />
+	<input type="hidden" name="overwrite_file" id="overwrite_file" value="" />
 	<ul>
 	    <li id="file1">
 		<input type="file" name="file" />
@@ -71,7 +72,9 @@
 	    </li>
 	</ul>
 	<div class="uploadctrl" id="uploadctrl">
-	    <input type="button" name="upload" value="Upload File(s)" onclick="startUpload();" />
+	    Overwrite files during upload?
+	    <input type="checkbox" name="overwrite_box" id="overwrite_box" onClick="processClobberCheckbox();">
+	    <input type="button" name="upload" value="Upload File(s)" onClick="startUpload();" />
 &nbsp;&nbsp; </div>
 	<iframe class="progbar" src="/blankpage.html" marginwidth="0" align="center" marginheight="0" scrolling="no" id="progbar" frameborder="0"></iframe>
     </form>
