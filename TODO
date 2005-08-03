@@ -18,24 +18,6 @@
 - Fix when a single item is selected, display the large mime icon for that item
     under "selected item properties"
 
-- Fix when there are no mappings to display, the "add mapping" button
-    disappears from admin-support.
-
-(0.2) --- Help
-
-- Feature Add "help" button to mfile header.
-    Add "help" button and a corresponding documentation page.
-
-    Documentation exists. "Online documentation" from mfile main page.
-
-    Use the mfile look and feel to link to the various mfile
-    documentation pages.
-
-    Link to our mailing list (mfile-help?).
-    List needs to get created.
-
-    documentation page:
-    http://www.itd.umich.edu/itcsdocs/s4311/
 
 (0.3) --- LS&A Permissions Feature
 
@@ -92,16 +74,6 @@
     Change mfile header so that it "lines up" exactly with
     the non-ssl mfile login page. Right now it's looking a bit odd.
 
-- Fix the handling of uploading an existing file.
-    The current implementation doesn't allow the "clobbering" of an existing
-    file and simply fails.
-
-    A pop-up box should give you the option to perform the clobber.
-
-    A fancier option would give you a checkbox to "remember these
-    settings", but remembering the settings would require some
-    sort of ".mfile" file kept in the users AFS space.
-
 - Fix Sort files without regard to upper and lower case. (case insensitive)
 
 - Fix add secondary key (filename, alphabetical) to sort fields when
@@ -116,9 +88,6 @@
 - Feature: view/click/download links for documents
     in webspace: display link, view inline, download
     in non-webspace: view inline, download
-
-- Feature integrate make-webspace functionality.
-    (willn)
 
 --- Minor UI enhancements
 
@@ -225,8 +194,6 @@
     Look for how many new users we get every week.
     (willn)
 
-- Feature: Put mfile version number (subtle) in lower left corner.
-
 - Feature: restructure Favorite Locations to "Shared Locations"
     * make Favorites directory a special virtual directory (dotfile)
     * store favorites, group spaces, dropboxes, and shared
@@ -240,8 +207,6 @@
 
 - Feature: restructure navigation bar to be more contextually sensitive
     * integrate "show hidden files" into rest of nav list
-
-- Feature: work to get approval of new name "filedrawers", and reserve domain name.
 
 - Feature: showcase
 
