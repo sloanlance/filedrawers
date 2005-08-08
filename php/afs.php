@@ -656,7 +656,10 @@ class Afs
     private function js_var($varname, $contents)
     {
         $retstr = "";
-        $retstr .= "var $varname = '" . $this->escape_js($contents) . "';\n";
+        $retstr .= "var $varname = " .
+                   (is_string($contents) ? "'".$this->escape_js($contents)."'"
+                                         : $contents) .
+                   ";\n";
         return $retstr;
     }
 
