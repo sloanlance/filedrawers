@@ -7,8 +7,7 @@
             <th width="52%" align="left" id="titlesel"><a href="javascript:reorderFileList('title');">Title</a> <span id="sortTitle"></span></th>
             <th>&nbsp;</th>
             <th width="13%" id="sizesel"><a href="javascript:reorderFileList('size');">Size</a> <span id="sortSize"></span></th>
-            <th width="23%" id="datesel"><a href="javascript:reorderFileList('date');">Last
-                    Modified</a> <span id="sortDate"></span></th>
+            <th width="23%" id="datesel"><a href="javascript:reorderFileList('date');">Last Modified</a> <span id="sortDate"></span></th>
         </tr>
     </thead>
     <tbody id="sortResults">
