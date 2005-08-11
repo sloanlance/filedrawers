@@ -73,6 +73,7 @@ function browser_check( )
     $platform_comps = array( );
     $msie_major = 0;
     $msie_minor = 0;
+    $mac = 0;
 
     $regex = "/(.*) \((.*)\)/";
     if( preg_match( $regex, $_SERVER['HTTP_USER_AGENT'], $matches )) {
@@ -83,36 +84,43 @@ function browser_check( )
     $l=strlen( $platform_str );
 
     $token = "";
-    for( $i=0; $i<$l; $i++ )
+    for( $i=0; $i<=$l; $i++ )
     {
         if(( $i == $l ) || (( $c=$platform_str[$i] ) == ";" )) {
             $platform_comps[] = ltrim( rtrim( $token ));
-	    $token = "";
+            $token = "";
         } else {
-	    $token .= $c;
+            $token .= $c;
         }
     }
 
     foreach( $platform_comps as $comp ) {
-	$regex = "/MSIE (\d+)\.(\d+)/";
-	if( preg_match( $regex, $comp, $matches )) {
-	    $msie_major = $matches[1];
-	    $msie_minor = $matches[2];
+        $regex = "/MSIE (\d+)\.(\d+)/";
+        if( preg_match( $regex, $comp, $matches )) {
+            $msie_major = $matches[1];
+            $msie_minor = $matches[2];
 
-        if ( preg_match( "/$msie_minor/i", 'mac' ) {
-            header( "Location: /scriptversion.php" );
         }
-	}
+
+        if ( preg_match( "/^Mac/i", $comp, $matches)) {
+            $mac = 1;
+        }
     }
 
+    // We currently don't support MSIE on mac
+    if ($msie_major && $mac) {
+        header( "Location: /scriptversion.php" );
+    }
+
+    // MSIE requires additional stylesheets
     switch ( $msie_major ) {
     case "5":
         $stylesheets[] = "/ie5specific.css";
-	break;
+        break;
     case "6":
         $stylesheets[] = "/ie6specific.css";
-	break;
+        break;
     default:
-	break;
+        break;
     }
 }
