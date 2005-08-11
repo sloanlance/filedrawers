@@ -34,7 +34,8 @@ SHTMLDIRTARGET= css/fileman.css css/ie6specific.css css/ie5specific.css \
                 php/addfavorites.php php/deletefavorites.php \
                 php/perm_manager.php php/progress.php \
                 php/renamefavorites.php php/viewfavorites.php \
-                php/blankpage.html php/scripterror.php php/help.php
+                php/blankpage.html php/scripterror.php php/help.php \
+                php/scriptversion.php
 
 HTMLDIRTARGET=  css/styles.css php/feedback.php
 
@@ -57,7 +58,7 @@ TEMPLATETARGET= smarty/fileman.tpl smarty/makewebspace.tpl \
                 smarty/filelist.tpl smarty/fileman.tpl \
                 smarty/banner.tpl smarty/infobar.tpl \
 				smarty/scripterror.tpl smarty/header.tpl \
-				smarty/help.tpl
+				smarty/help.tpl smarty/scriptversion.tpl
 
 SIMAGETARGET=   images/checkbox.gif images/doc_lg.gif \
                 images/doc_sm.gif images/download.gif \
