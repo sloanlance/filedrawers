@@ -67,44 +67,45 @@ function process_upload(&$notifyMsg, &$errorMsg)
  * Takes care of browser-specific stylesheet includes
  * and redirects.
  */
-function browser_check()
+function browser_check( )
 {
     global $stylesheets;
-
-    $platform_comps = array();
-
+    $platform_comps = array( );
     $msie_major = 0;
     $msie_minor = 0;
 
     $regex = "/(.*) \((.*)\)/";
-    if(preg_match( $regex, $_SERVER['HTTP_USER_AGENT'], $matches )) {
+    if( preg_match( $regex, $_SERVER['HTTP_USER_AGENT'], $matches )) {
         $browser_str = $matches[1];
         $platform_str = $matches[2];
     }
 
-    $l=strlen($platform_str);
+    $l=strlen( $platform_str );
 
     $token = "";
-    for($i=0;$i<$l;$i++)
+    for( $i=0; $i<$l; $i++ )
     {
-        if(($i == $l) || (($c=$platform_str[$i]) == ";")) {
-            $platform_comps[] = ltrim(rtrim($token));
+        if(( $i == $l ) || (( $c=$platform_str[$i] ) == ";" )) {
+            $platform_comps[] = ltrim( rtrim( $token ));
 	    $token = "";
         } else {
 	    $token .= $c;
         }
     }
 
-
-    foreach($platform_comps as $comp) {
+    foreach( $platform_comps as $comp ) {
 	$regex = "/MSIE (\d+)\.(\d+)/";
-	if(preg_match( $regex, $comp, $matches )) {
+	if( preg_match( $regex, $comp, $matches )) {
 	    $msie_major = $matches[1];
 	    $msie_minor = $matches[2];
+
+        if ( preg_match( "/$msie_minor/i", 'mac' ) {
+            header( "Location: /scriptversion.php" );
+        }
 	}
     }
 
-    switch ($msie_major) {
+    switch ( $msie_major ) {
     case "5":
         $stylesheets[] = "/ie5specific.css";
 	break;
@@ -114,5 +115,4 @@ function browser_check()
     default:
 	break;
     }
-  
 }
