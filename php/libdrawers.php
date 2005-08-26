@@ -64,8 +64,8 @@ function process_upload(&$notifyMsg, &$errorMsg)
 }
 
 /*
- * Takes care of browser-specific stylesheet includes
- * and redirects.
+ * Takes care of browser-specific stylesheet includes and redirects.
+ * See docs/HTTP_USER_AGENTS file for partial list of brower IDs reference
  */
 function browser_check( )
 {
@@ -74,9 +74,44 @@ function browser_check( )
     $msie_major = 0;
     $msie_minor = 0;
     $mac = 0;
+	$platform_str = '';
+	$b_id = $_SERVER['HTTP_USER_AGENT'];
+
+	# look into php's get_browser()
+
+	# not suitable for lynx
+    if ( preg_match( '/Lynx/i', $b_id )) {
+        header( "Location: /scriptversion.php" );
+    }
+
+	# Firefox, Mozilla, Netscape, and Camino 
+	# all need to be at least "rv:1.7.2" to pass
+	if ( preg_match( '/Gecko/', $b_id ) &&
+		preg_match( '/ rv:1.7.([^)]*)\)/', $b_id, $Rev )) {
+		if ( strlen( $Rev[0] ) && 
+			( !strlen( $Rev[1] )  || ( $Rev[1] < 2 ))) {
+				header( "Location: /scriptversion.php" );
+		}
+	}
+
+	# Win Opera 7.5 is broken, but 8 works
+    if ( preg_match( '/Opera\/7/', $b_id )) {
+        header( "Location: /scriptversion.php" );
+    }
+
+    # We currently don't support Omniweb 4.5, although 5.1.1 works
+    if ( preg_match( '/OmniWeb\/v496$/', $b_id )) {
+        header( "Location: /scriptversion.php" );
+    }
+
+	# Check for Safari after Omniweb, since OW uses Safari's string
+    if ( preg_match( '/Safari\/(.*)$/', $b_id, $Rev ) &&
+		( !strlen( $Rev[1] )  || ( $Rev[1] < 2 ))) {
+        header( "Location: /scriptversion.php" );
+   } 
 
     $regex = "/(.*) \((.*)\)/";
-    if( preg_match( $regex, $_SERVER['HTTP_USER_AGENT'], $matches )) {
+    if( preg_match( $regex, $b_id, $matches )) {
         $browser_str = $matches[1];
         $platform_str = $matches[2];
     }
@@ -102,13 +137,16 @@ function browser_check( )
 
         }
 
-        if ( preg_match( "/^Mac/i", $comp, $matches)) {
+        if ( preg_match( "/^Mac/i", $comp, $matches )) {
             $mac = 1;
         }
     }
 
     // We currently don't support MSIE on mac
-    if ($msie_major && $mac) {
+	// This also catches Opera 7.5 and 8 for mac.
+	// Mac Opera 7.5 is broken, Opera 8 works, but they both have the
+	// same browser identification string. PUNT! Use a real browser!
+    if ( $msie_major && $mac ) {
         header( "Location: /scriptversion.php" );
     }
 
