@@ -3,7 +3,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
 {if $redirect ne true}
-<noscript><meta http-equiv=refresh content="0; url=/scripterror.php"></noscript>
+<noscript><meta http-equiv=refresh content="0; url=https://{$smarty.server.SERVER_NAME}/scripterror.php"></noscript>
 {/if}
 <title>mfile: {$trouser_title}</title>
 <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
