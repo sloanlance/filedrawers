@@ -1,23 +1,32 @@
-Note: This is not a comprehensive list of every browser that works or
-doesn't. It's more of a boundary-finding guideline.
+HTTP_USER_AGENTS
+----------------
+This is not a comprehensive list of every browser that works or
+doesn't. It's more of a boundary-finding guideline. I'm listing here the
+known min and max versions of various web browser / platform combinations
+that work or don't work.
+
+Please keep these in alphabetical order. It makes it easier to find things.
 
 Works
 ===========
 
 Mac:
 -------------
-FireFox:
-Mozilla/5.0 (Macintosh; U; PPC Mac OS X Mach-O; en-US; rv:1.7.5) Gecko/20041107 Firefox/1.0
-Mozilla/5.0 (Macintosh; U; PPC Mac OS X Mach-O; en-US; rv:1.7.8) Gecko/20050511 Firefox/1.0.4
-
 Camino:
 Mozilla/5.0 (Macintosh; U; PPC Mac OS X Mach-O; en-US; rv:1.8b4) Gecko/20050718 Camino/0.9a2
+
+FireFox:
+Mozilla/5.0 (Macintosh; U; PPC Mac OS X Mach-O; en-US; rv:1.7.5) Gecko/20041107 Firefox/1.0
+Mozilla/5.0 (Macintosh; U; PPC Mac OS X Mach-O; en-US; rv:1.7.10) Gecko/20050716 Firefox/1.0.6
 
 Netscape:
 Mozilla/5.0 (Macintosh; U; PPC Mac OS X Mach-O; en-US; rv:1.7.2) Gecko/20040804 Netscape/7.2
 
 Safari:
 Mozilla/5.0 (Macintosh; U; PPC Mac OS X; en) AppleWebKit/312.1 (KHTML, like Gecko) Safari/312
+# jaguar
+Mozilla/5.0 (Macintosh; U; PPC Mac OS X; en) AppleWebKit/412.6 (KHTML, like Gecko) Safari/412.2
+# tiger
 
 Omniweb:
 Mozilla/5.0 (Macintosh; U; PPC Mac OS X; en-US) AppleWebKit/125.4 (KHTML, like Gecko, Safari) OmniWeb/v563.51
@@ -30,11 +39,12 @@ Mac:
 ---------------
 FireFox:
 Mozilla/5.0 (Macintosh; U; PPC Mac OS X Mach-O; en-US; rv:1.7) Gecko/20040803 Firefox/0.9.3
-(FF 0.9.3 itself claims to be a broken browser)
+# FF 0.9.3 itself claims to be a broken browser
 
 Opera:
 Mozilla/4.0 (compatible; MSIE 5.23; Mac_PowerPC) Opera 7.54 [en]
-(this version works, but since it uses the same string as 7.54, which is broken, I'm ditching both)
+# this version works, but since it uses the same string as 7.54, which
+# is broken, and I just want to get this done, I'm ditching both
 
 
 Broken
@@ -44,6 +54,9 @@ Mac:
 -----------
 IE:
 Mozilla/4.0 (compatible; MSIE 5.23; Mac_PowerPC)
+
+Netscape:
+Mozilla/5.0 (Macintosh; U; PPC Mac OS X Mach-O; en-US; rv:1.4) Gecko/20030624 Netscape/7.1
 
 Omniweb:
 Mozilla/5.0 (Macintosh; U; PPC Mac OS X; en-US) AppleWebKit/85 (KHTML, like Gecko) OmniWeb/v496
