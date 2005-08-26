@@ -87,7 +87,7 @@ function init_formvals()
 // Returns a form checkbox or something else if approriate
 function createItemSelect( id, cuts )
 {
-    if ( readonly ) {
+    if ( !writable ) {
             return document.createTextNode( '' );
     } else if ( cuts && cuts.inArray( files[id].title ) ) {
         return document.createTextNode( 'cut' );
@@ -95,6 +95,10 @@ function createItemSelect( id, cuts )
         // Create a checkbox and add it to the file list
         var c = document.createElement( 'input' );
         c.setAttribute( 'name','softsel[]' );
+
+		/*  Mac/IE 5 seems to want TYPE in UPPERCASE, but
+		    Win/IE 6 doesn't like TYPE, so we're not using it.
+            If you want to add support, feel free  */
         c.setAttribute( 'type','checkbox' );
         c.setAttribute( 'value', id);
         c.id = 'CB' + id;
@@ -134,7 +138,7 @@ function createFileName( id )
         l.setAttribute( 'href', './?path=' + getFilenameUrl(id));
         l.appendChild( document.createTextNode( files[id].title));
         return l;
-    } else if ( readonly ) {
+    } else if ( !writable ) {
         return document.createTextNode( files[id].title);
     } else {
         var l = document.createElement( 'a' );
@@ -148,7 +152,7 @@ function createFileName( id )
 // Returns a download icon that is linked to the appropriate place
 function createDlIcon( id )
 {
-    if ( files[id].type !== folderMime && ! readonly ) {
+    if ( files[id].type !== folderMime && writable ) {
         var i = document.createElement( 'img' );
         i.setAttribute( 'src',  imgStore + '/download.gif' );
         i.setAttribute( 'width', '16' );
@@ -660,7 +664,7 @@ function activateLocationCtrl( active )
 // Display a locked folder icon if this directory is read only
 function getFolderIcon()
 {
-    if ( readonly ) {
+    if ( !writable ) {
         document.getElementById('selectedItem').background = imgStore
                 + '/folder_locked.gif';
     } else {
@@ -686,7 +690,7 @@ function fileInspector()
 
     // This is the sidebar menu state for no items selected
     if ( itemInfo.numSel == 0 ) {
-        if ( readonly ) {
+        if ( !writable ) {
             setInspControl( 'uploadCtrl', '', 'Upload File(s)' );
             setInspControl( 'newFolderCtrl', '', 'Create a New Folder' );
         } else {
