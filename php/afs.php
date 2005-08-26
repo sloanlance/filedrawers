@@ -27,7 +27,10 @@ class Afs
     public    $errorMsg      = '';
     public    $notifyMsg     = '';
     public    $parPath;           // Path to the parent of current path
-    public    $readonly      = 0; // Are we limited to read only permission?
+    #this stuff doesn't quite work yet, so set it to 1 for now
+    public    $writable      = 1; // Can we write to this directory?
+    public    $readable      = 1; // Can we read from this directory?
+    public    $viewable      = 1; // Can we view the contents of this directory?
     public    $path          = '';
     public    $sid;
     protected $newName       = '';
@@ -38,10 +41,18 @@ class Afs
 
         $this->setPath( $path );
         $this->parPath = $this->parentPath();
-
-        /*if ( ! is_writable( $this->path )) {
-            $this->readonly = 1;
-        } THIS DOESN'T WORK WITH PHP 5*/
+ 
+		/*
+        if ( is_writable( $this->path )) {
+            $this->writable= 1;
+        }
+        if ( is_readable( $this->path )) {
+            $this->readable= 1;
+        }
+		if ( is_dir( $this->path )) {
+            $this->viewable= 1;
+        }
+		*/
 
         $this->processCommand();
     }
@@ -645,7 +656,9 @@ class Afs
         $retstr .= $this->js_var("homepath", $this->getBasePath());
         $retstr .= $this->js_var("sid", $this->sid);
         $retstr .= $this->js_var("returnToURI", $this->get_returnToURI());
-        $retstr .= $this->js_var("readonly", $this->readonly);
+        $retstr .= $this->js_var("writable", $this->writable);
+        $retstr .= $this->js_var("readable", $this->readable);
+        $retstr .= $this->js_var("viewable", $this->viewable);
 
 	$retstr .= "files = new Array();\n";
 	$retstr .= $this->get_foldercontents_js(true);
