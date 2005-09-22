@@ -66,7 +66,7 @@ class Supportgroups {
 	$this->supportgroups = array();
 
         // Create an array of all known support groups.
-	$query = "select * from affiliations;";
+	$query = "select * from affiliations order by name;";
 	$result = $this->db_query($query);
 
 	while ($row = mysql_fetch_array($result)) {

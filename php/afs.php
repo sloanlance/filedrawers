@@ -19,7 +19,6 @@ if ( !extension_loaded( 'posix' )) {
 class Afs
 {
     protected $selectedItems;
-    protected $afsBase       = '/afs/umich.edu/user/';
     protected $afsUtils      = '/usr/bin';
     protected $folderLocs    = array( 'site' => 'public/html/' );
     public    $confirmMsg    = '';
@@ -38,6 +37,8 @@ class Afs
     public function __construct( $path="" )
     {
         $this->sid = md5( uniqid( rand(), true ));
+
+	$this->uniqname = $_SERVER['REMOTE_USER'];
 
         $this->setPath( $path );
         $this->parPath = $this->parentPath();
@@ -526,30 +527,6 @@ class Afs
 	return $o;
     }
 
-    /*
-     * This will probably be replaced with a function
-     * that looks up a user's afs path
-     * It calculates the root of a user's afs space based on his/her uniqname.
-     */
-    function getBasePath( $user='' )
-    {
-        $user = ( $user ) ? $user : $_SERVER['REMOTE_USER'];
-
-        if ( !$user ) {
-            return false;
-        }
-
-        $path = $this->afsBase . $user[0]
-          . "/" . $user[1] . "/" . $user;
-
-        $regEx = "/[^a-zA-z]/";
-        if ( preg_match( $regEx, $user )) {
-            return false;
-        } else {
-            return $path;
-        }
-    }
-
     // Generate the path of the folder one level above the current
     function parentPath()
     {
@@ -607,7 +584,7 @@ class Afs
         }
 
         if ( ! $this->path ) {
-            $this->path = $this->getBasePath();
+            $this->path = getBasePath($this->uniqname);
         }
     }
 
@@ -653,7 +630,8 @@ class Afs
         $retstr .= $this->js_var("path", $this->path);
         $retstr .= $this->js_var("foldername", $this->get_foldername());
         $retstr .= $this->js_var("folderIcon", "");
-        $retstr .= $this->js_var("homepath", $this->getBasePath());
+        $retstr .= $this->js_var("homepath",
+                                 getBasePath($this->uniqname));
         $retstr .= $this->js_var("sid", $this->sid);
         $retstr .= $this->js_var("returnToURI", $this->get_returnToURI());
         $retstr .= $this->js_var("writable", $this->writable);

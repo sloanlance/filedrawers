@@ -66,9 +66,8 @@ class Webspaces {
 	 * Create a list of potential webspaces for this user.
 	 */
 
-	if (!$this->GetDir( $this->uniqname, $dir, $error_msg )) {
-	    # throw new Exception($error_msg);
-	}
+
+	$dir = getBasePath($this->uniqname);
 
         // Add Private and Public webspaces
 	$this->init_webspace($this->uniqname, $dir);

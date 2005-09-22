@@ -13,6 +13,9 @@ $stylesheets = array("/fileman.css");
 // Default value for $displayfileman
 $displayfileman = 1;
 
+// AFS homedir default location.
+$afsBase       = '/afs/umich.edu/user/';
+
 // Take care of file uploads.
 function process_upload(&$notifyMsg, &$errorMsg)
 {
@@ -162,3 +165,28 @@ function browser_check( )
         break;
     }
 }
+
+/*
+ * This will probably be replaced with a function
+ * that looks up a user's afs path
+ * It calculates the root of a user's afs space based on his/her uniqname.
+ */
+function getBasePath( $user )
+{
+    global $afsBase;
+
+    if ( !$user ) {
+	return false;
+    }
+ 
+    $path = $afsBase . $user[0]
+      . "/" . $user[1] . "/" . $user;
+
+    $regEx = "/[^a-zA-z]/";
+    if ( preg_match( $regEx, $user )) {
+	return false;
+    } else {
+	return $path;
+    }
+}
+?>

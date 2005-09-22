@@ -29,6 +29,17 @@ Location: Michigan Union (Basement level, in the Union Computing Site)
 </p>
 </blockquote>
 
+<h2>Allowing Support Access to Your Home Directory</h2>
+
+<p>When looking for technical support with your home directory, you may be
+asked by support staff for permission to access your home directory.
+</p>
+<p>
+Use the mfile
+<a href="{$secure_service_url}/allow-support/">Allow-support</a>
+page to give support staff access to your home directory.
+</p>
+
 <h2>Technical Issues</h2>
 
 <p>
