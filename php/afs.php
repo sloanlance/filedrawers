@@ -383,7 +383,7 @@ class Afs
             return false;
         }
 
-	if ( strstr( $result, "fs:" )) {
+	if ( preg_match( '/^fs:/', $result )) {
 	    $this->errorMsg =
 		    "Warning: Unable to read the access control list.";
             return false;
