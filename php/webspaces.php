@@ -18,7 +18,7 @@ class Webspaces {
     const URL_PERS_PUBLIC = 'http://www-personal.umich.edu/~';
     const URL_PERS_PRIVATE = 'https://personal.www.umich.edu/~';
     const URL_GROUP_PUBLIC = 'http://www.umich.edu/~';
-    const URL_GROUP_PRIVATE = 'https://cgi.www.umich.edu/~';
+    const URL_GROUP_PRIVATE = 'https://private.www.umich.edu/~';
 
     const WEBSPACE_STATUS_PREPARED = 0;
     const WEBSPACE_STATUS_NODIR = 1;
