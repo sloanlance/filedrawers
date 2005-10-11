@@ -377,12 +377,14 @@ function formatBytes( bytes )
     } else if ( bytes >= 1024 ) {
         return roundNum( bytes / 1024 ) + ' KB';
     } else if ( bytes > 768 && bytes < 1024 ) {
-        return bytes + '1 KB';
+        return '1 KB';
     } else if ( bytes > 0 && bytes < 768 ) {
         return '< 1 KB';
     } else {
-        return "--";
+        return 0;
     }
+
+    return bytes;
 }
 
 function formatDate( rawDate )
@@ -401,7 +403,7 @@ function formatDate( rawDate )
 function File( title, date, size, selected, type )
 {
     this.title     = title;    // The title of the item
-    this.date      = date;     // The modify date of the item
+    this.date      = date * 1; // The modify date of the item
     this.size      = size;     // The size of the item
     this.selected  = selected; // Is the item selected?
     this.type      = type;     // The file type of the item
