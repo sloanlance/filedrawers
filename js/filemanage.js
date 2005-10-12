@@ -404,6 +404,7 @@ function File( title, date, size, selected, type )
 {
     this.title     = title;    // The title of the item
     this.date      = date * 1; // The modify date of the item
+				// multiply by 1 to cast to an int
     this.size      = size;     // The size of the item
     this.selected  = selected; // Is the item selected?
     this.type      = type;     // The file type of the item
