@@ -18,6 +18,14 @@
 - Fix when a single item is selected, display the large mime icon for that item
     under "selected item properties"
 
+- Add in support (under php 5.1) for is_readable and is_writable for AFS
+    * suppress download links when not readable
+    * suppress upload link when not writable
+
+- Actually verify after file upload that the file has been successfully
+    uploaded before announcing this. (currently, one can try uploading to
+    a directory they don't have permission to, and everything looks like
+    it worked)
 
 (0.3) --- LS&A Permissions Feature
 
