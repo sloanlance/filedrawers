@@ -1,12 +1,12 @@
 # Process this file with autoconf to produce a configure script.
-AC_INIT(trouser, 0.5, BUG-REPORT-ADDRESS)
+AC_INIT(filedrawers, 0.5, BUG-REPORT-ADDRESS)
 AC_CONFIG_SRCDIR([upload/tpupload.c])
 
 AC_ARG_WITH(project_name,
             AC_HELP_STRING([--with-project_name=project_name],
-                           [name of trouser root directory]),
+                           [name of filedrawers root directory]),
             project_name="$withval",
-            [project_name="trouser"])
+            [project_name="filedrawers"])
 AC_SUBST(project_name)
 
 AC_ARG_WITH(shtml_dir_name,
@@ -67,14 +67,14 @@ AC_SUBST(service_name)
 
 AC_ARG_WITH(service_url,
             AC_HELP_STRING([--with-service_url=service_url],
-                           [url for the trouser service]),
+                           [url for the filedrawers service]),
             service_url="$withval",
             [service_url="http://mfile.umich.edu"])
 AC_SUBST(service_url)
 
 AC_ARG_WITH(secure_service_url,
             AC_HELP_STRING([--with-secure_service_url=secure_service_url],
-                           [secure url for the trouser service]),
+                           [secure url for the filedrawers service]),
             secure_service_url="$withval",
             [secure_service_url="https://mfile.umich.edu"])
 AC_SUBST(secure_service_url)
@@ -85,6 +85,34 @@ AC_ARG_WITH(error_url,
             error_url="$withval",
             [error_url="https://mfile.umich.edu/?error=true"])
 AC_SUBST(error_url)
+
+AC_ARG_WITH(sdb_host,
+            AC_HELP_STRING([--with-sdb_host=sdb_host],
+                           [hostname for supportgroups database]),
+            sdb_host="$withval",
+            [sdb_host=""])
+AC_SUBST(sdb_host)
+
+AC_ARG_WITH(sdb_name,
+            AC_HELP_STRING([--with-sdb_name=sdb_name],
+                           [database name for supportgroups database]),
+            sdb_name="$withval",
+            [sdb_name=""])
+AC_SUBST(sdb_name)
+
+AC_ARG_WITH(sdb_ro_user,
+            AC_HELP_STRING([--with-sdb_ro_user=sdb_ro_user],
+                           [username for supportgroups database]),
+            sdb_ro_user="$withval",
+            [sdb_ro_user=""])
+AC_SUBST(sdb_ro_user)
+
+AC_ARG_WITH(sdb_ro_password,
+            AC_HELP_STRING([--with-sdb_ro_password=sdb_ro_password],
+                           [read-only password for supportgroups database]),
+            sdb_ro_password="$withval",
+            [sdb_ro_password=""])
+AC_SUBST(sdb_ro_password)
 
 # Checks for programs.
 AC_PROG_CC

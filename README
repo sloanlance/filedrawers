@@ -2,7 +2,7 @@ Copyright (c) 2005 Regents of The University of Michigan.
 All Rights Reserved.  See COPYRIGHT.
 
 ------------------------------------------------
-Quick instructions for installing trouser
+Quick instructions for installing filedrawers
 ------------------------------------------------
 
 % ./configure
@@ -15,7 +15,7 @@ More detailed instructions
 
 1: Getting the source
 
-Download the source from http://rsug.itd.umich.edu/software/trouser and
+Download the source from http://rsug.itd.umich.edu/software/filedrawers and
 uncompress it into a build directory of your liking. The build directory
 should be different from your install directory.  The current development
 source is also available through an anonymous CVS server.
@@ -31,8 +31,8 @@ The configure scripts take several options.  To see them, run:
 
   % ./configure --help
 
-The following options were used to configure the build of trouser
-at http://mfile.umich.edu, which installs trouser into
+The following options were used to configure the build of filedrawers
+at http://mfile.umich.edu, which installs filedrawers into
 /usr/local/projects/mfile on the webserver.
 
 ./configure \
@@ -43,8 +43,12 @@ at http://mfile.umich.edu, which installs trouser into
 --with-secure_service_url="https://mfile.umich.edu" \
 --with-error_url="https://mfile.umich.edu/?error=true" \
 --with-install_group=staff
+--with-sdb_host='' \
+--with-sdb_name='mfile' \
+--with-sdb_ro_user='mfile' \
+--with-sdb_ro_password=''
 
-The following options were use to configure the build of trouser
+The following options were use to configure the build of filedrawers
 at http://mfile-dev.www.umich.edu:
 
 ./configure \
@@ -54,7 +58,11 @@ at http://mfile-dev.www.umich.edu:
 --with-service_url="http://mfile-dev.www.umich.edu" \
 --with-secure_service_url="https://mfile-dev.www.umich.edu" \
 --with-error_url="https://mfile-dev.www.umich.edu/?error=true" \
---with-install_group=staff
+--with-install_group=staff \
+--with-sdb_host='' \
+--with-sdb_name='mfile' \
+--with-sdb_ro_user='mfile' \
+--with-sdb_ro_password=''
 
 3: Build and install the software
 

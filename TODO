@@ -1,7 +1,16 @@
 (0.2) --- Bugs & Security
 
+- Change makefile so that an install only changes files that actually
+  have changes, instead of updating all timestamps
+  (for ease of radmind transcript creation)
+
+- Remove the ability to delete "." and ".." directories from the file
+  manager.
+
+- Move filedwawers to sourceforge. CVS repository, mailing list, forum?
+
 - Fix user jport can't view the contents of his Private directory.
-   It's visible on mongolian, but not on japanese. What's wrong?
+  It's visible on mongolian, but not on japanese. What's wrong?
 
 - Fix the "rename" function
     In file rename, fix it so that hitting the return key completes
@@ -11,9 +20,6 @@
 
     Currently, this doesn't work. A possible solution would be to
     create a copy, prefaced with "copy of" or simply numbered.
-
-- Fix incompatible browser detection needs to be added. Right now
-    older browers (IE 5 on mac, for example) display garbled tables.
 
 - Fix when a single item is selected, display the large mime icon for that item
     under "selected item properties"

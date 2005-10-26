@@ -7,14 +7,15 @@
 
 class Supportgroups {
 
+
     public $uniqname = null;
     private $homedir = null;
     private $supportgroups = null;
 
-    private $db_host = "urdu.web";
-    private $db_name = "mfile";
-    private $db_ro_user = "mfile";
-    private $db_ro_password = "mdiTG!";
+    private $db_host;
+    private $db_name;
+    private $db_ro_user;
+    private $db_ro_password;
 
     private $db = null;
     private $conn = null;
@@ -33,6 +34,16 @@ class Supportgroups {
     {
 	$error_msg = null;
 	$dir = null;
+
+	global $sdb_host;
+	global $sdb_name;
+	global $sdb_ro_user;
+	global $sdb_ro_password;
+
+	$this->db_host = $sdb_host;
+	$this->db_name = $sdb_name;
+	$this->db_ro_user = $sdb_ro_user;
+	$this->db_ro_password = $sdb_ro_password;
 
         $this->uniqname = $_SERVER['REMOTE_USER'];
         $this->homedir = $this->get_homedir();

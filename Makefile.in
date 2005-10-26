@@ -98,6 +98,14 @@ php/config.php: Makefile
 	echo "\$$service_url = \"@service_url@\";" >> php/config.php
 	echo "\$$secure_service_url = \"@secure_service_url@\";" >> \
 	     php/config.php
+	echo "\$$sdb_host = \"@sdb_host@\";" >> \
+	     php/config.php
+	echo "\$$sdb_name = \"@sdb_name@\";" >> \
+	     php/config.php
+	echo "\$$sdb_ro_user = \"@sdb_ro_user@\";" >> \
+	     php/config.php
+	echo "\$$sdb_ro_password = \"@sdb_ro_password@\";" >> \
+	     php/config.php
 	echo '?>' >> php/config.php
 
 php/version.php: VERSION
