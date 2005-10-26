@@ -19,6 +19,7 @@ class Favorites extends Afs
 
     public function __construct( $target="" )
     {
+        $this->uniqname = $_SERVER['REMOTE_USER'];
         $this->setFavoritesStore();
         $this->setFavoriteTarget( $target );
         $this->processFavoritesCommand();
@@ -52,13 +53,13 @@ class Favorites extends Afs
     // The location inside a user's afs space to store the favorites symlinks
     private function setFavoritesStore()
     {
-        $this->setPath( $this->getBasePath( $_SERVER['REMOTE_USER'] ));
+        $this->setPath( getBasePath( $this->uniqname ));
         if ( ! $this->folderExists( $this->path . '/Favorites' )) {
             $this->selectedItems = 'Favorites';
             $this->createFolder();
         }
 
-        $this->setPath( $this->getBasePath( $_SERVER['REMOTE_USER'] )
+        $this->setPath( getBasePath( $this->uniqname )
           . '/Favorites' );
     }
 
@@ -95,7 +96,7 @@ class Favorites extends Afs
         }
 
         if ( ! $this->favoriteTarget ) {
-            $this->favoriteTarget = $this->getBasePath();
+            $this->favoriteTarget = getBasePath($this->uniqname);
         }
     }
 
@@ -139,7 +140,7 @@ class Favorites extends Afs
             if ( ! is_link( $this->path . '/' . $link ) ||
               ! @unlink( $this->path . '/' . $link )) {
                 $this->errorMsg = "Unable to delete $link.";
-				return false;
+                                return false;
             }
         }
     }

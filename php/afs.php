@@ -5,6 +5,7 @@
  */
 
 require_once( 'mime.php' );
+require_once( '../lib/libdrawers.php' );
 define( "CLIPSEPARATOR", "*#~!@@@" );
 
 if ( !extension_loaded( 'posix' )) {
@@ -32,6 +33,7 @@ class Afs
     public    $viewable      = 1; // Can we view the contents of this directory?
     public    $path          = '';
     public    $sid;
+    private   $uniqname      = '';
     protected $newName       = '';
 
     public function __construct( $path="" )
