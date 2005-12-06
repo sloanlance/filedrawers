@@ -5,7 +5,6 @@
  */
 
 require_once( 'mime.php' );
-require_once( '../lib/libdrawers.php' );
 define( "CLIPSEPARATOR", "*#~!@@@" );
 
 if ( !extension_loaded( 'posix' )) {

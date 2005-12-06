@@ -4,9 +4,9 @@
  * All Rights Reserved.  See COPYRIGHT.
  */
 
-require_once( '../objects/afs.php' );
-require_once( '../objects/favorites.php' );
-require_once( '../smarty/smarty.custom.php' );
+require_once( 'afs.php' );
+require_once( 'favorites.php' );
+require_once( 'smarty.custom.php' );
 $fav    = new Favorites( $_GET['target'] );
 $smarty = new Smarty_Template;
 $smarty->assign( 'favorites', $fav->getFavorites());

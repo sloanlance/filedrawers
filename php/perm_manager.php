@@ -4,9 +4,9 @@
  * All Rights Reserved.  See COPYRIGHT.
  */
 
-require_once( '../objects/afs.php' );
-require_once( '../objects/favorites.php' );
-require_once( '../smarty/smarty.custom.php' );
+require_once( 'afs.php' );
+require_once( 'favorites.php' );
+require_once( 'smarty.custom.php' );
 
 $afs = new Afs( $_GET['target'] );
 $perms = array( 'l', 'r', 'w', 'i', 'd', 'k', 'a' );

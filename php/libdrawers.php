@@ -8,7 +8,7 @@
 $javascripts = array("/js/filemanage.js");
 
 // Standard stylesheets
-$stylesheets = array("/fileman.css");
+$stylesheets = array("/css/fileman.css");
 
 // Default value for $displayfileman
 $displayfileman = 1;
@@ -156,10 +156,10 @@ function browser_check( )
     // MSIE requires additional stylesheets
     switch ( $msie_major ) {
     case "5":
-        $stylesheets[] = "/ie5specific.css";
+        $stylesheets[] = "/css/ie5specific.css";
         break;
     case "6":
-        $stylesheets[] = "/ie6specific.css";
+        $stylesheets[] = "/css/ie6specific.css";
         break;
     default:
         break;

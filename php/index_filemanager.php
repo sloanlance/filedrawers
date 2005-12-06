@@ -4,11 +4,11 @@
  * All Rights Reserved.  See COPYRIGHT.
  */
 
-require_once( '../lib/version.php' );
-require_once( '../lib/config.php' );
-require_once( '../lib/libdrawers.php' );
-require_once( '../objects/afs.php' );
-require_once( '../smarty/smarty.custom.php' );
+require_once( 'version.php' );
+require_once( 'config.php' );
+require_once( 'libdrawers.php' );
+require_once( 'afs.php' );
+require_once( 'smarty.custom.php' );
 
 browser_check();
 

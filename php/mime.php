@@ -5,7 +5,7 @@
  */
 
 define( "DIRMIMETYPE", "0000000dir" );
-define( "PATHTOIMGS", "../html-ssl/images/mime/small/" );
+define( "PATHTOIMGS", "/images/mime/small/" );
 
 if ( !extension_loaded( 'fileinfo' )) {
     dl( 'fileinfo.' . PHP_SHLIB_SUFFIX );

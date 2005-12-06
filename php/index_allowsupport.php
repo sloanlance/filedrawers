@@ -5,13 +5,13 @@
  * All Rights Reserved.  See COPYRIGHT.
  */
 
-require_once( '../../lib/version.php' );
-require_once( '../../lib/config.php' );
-require_once( '../../lib/libdrawers.php' );
-require_once( '../../objects/afs.php' );
-require_once( '../../objects/affiliations.php' );
-require_once( '../../objects/supportgroups.php' );
-require_once( '../../smarty/smarty.custom.php' );
+require_once( 'version.php' );
+require_once( 'config.php' );
+require_once( 'libdrawers.php' );
+require_once( 'afs.php' );
+require_once( 'affiliations.php' );
+require_once( 'supportgroups.php' );
+require_once( 'smarty.custom.php' );
 
 browser_check();
 
@@ -42,7 +42,7 @@ $supportgroups->remove_permissions($remove_support);
 $javascripts[] = "/js/allowsupport.js";
 
 // Use the "allowsupport.css" stylesheet.
-$stylesheets[] = "/allowsupport.css";
+$stylesheets[] = "/css/allowsupport.css";
 
 // Set notification messages
 if ( ! empty( $notifyMsg )) {

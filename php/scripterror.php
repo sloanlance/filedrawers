@@ -4,11 +4,11 @@
  * All Rights Reserved.  See COPYRIGHT.
  */
 
-require_once( '../smarty/smarty.custom.php' );
+require_once( 'smarty.custom.php' );
 
 $smarty = new Smarty_Template;
 $smarty->assign( 'trouser_title', 'javascript-error');
 $smarty->assign( 'redirect', true );
-$smarty->assign( 'stylesheets', array( '/fileman.css'));
+$smarty->assign( 'stylesheets', array( '/css/fileman.css'));
 $smarty->display( 'scripterror.tpl' );
 ?>

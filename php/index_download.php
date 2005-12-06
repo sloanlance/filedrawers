@@ -4,7 +4,7 @@
  * All Rights Reserved.  See COPYRIGHT.
  */
 
-require_once( '../../objects/afs.php' );
+require_once( 'afs.php' );
 
 $download = new Afs( $_GET['path'] );
 // replace " with \" to escape quoted " in html header

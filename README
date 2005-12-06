@@ -79,3 +79,53 @@ Once that is done, you can install the service into the directory
 you configured with ./configure.
 
   # make install
+
+4: Configure apache aliases
+
+Filedrawers is normally configured as two separate document roots, the
+ssl document root (default name: html-ssl) and the non-ssl document root
+(default name: html).
+
+The parent directory of these document roots (default name: filedrawers)
+contain several directories that contain common components for the
+document root directories. These directories are:
+
+    images   - contains site images
+    lib      - contains php non-object library functions
+    objects  - contains php objects
+    js       - contains javascript
+    smarty   - directory containing smarty templates and configuration
+
+All references to these directories within filedrawers php and html code
+are done as absolute references (/images for the images directory, for example).
+
+To make this work, it will be necessary to add Alias directives under your
+apache filedrawers configuration for the following directories:
+    images
+    js
+    css
+
+For example... if you used ./configure to configure an installation
+prefix of "/usr/local/projects" with the default project name of
+"filedrawers" then you'd add the following lines to your filedrawers
+apache configuration file:
+
+    Alias /images/ /usr/local/projects/filedrawers/images/
+    Alias /js/ /usr/local/projects/filedrawers/js/
+    Alias /css/ /usr/local/projects/filedrawers/css/
+
+You'll also need to add the following directories to the php include path.
+    lib
+    objects
+    smarty
+
+This is done by adding a "php_value" line to your apache filedrawers
+configuration.
+
+For example... if you used ./configure to configure an installation prefix
+of '/usr/local/projects' with the default project name of "filedrawers"
+and a php include directory of '/usr/lib/php' then you'd add the following
+line to your filedrawers apache configuration file:
+
+php_value include_path .:/usr/lib/php:/usr/local/projects/filedrawers/lib:
+/usr/local/projects/filedrawers/objects:/usr/local/projects/filedrawers/smarty

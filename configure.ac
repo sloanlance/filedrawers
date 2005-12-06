@@ -51,6 +51,20 @@ AC_ARG_WITH(lib_dir_name,
             [lib_dir_name="lib"])
 AC_SUBST(lib_dir_name)
 
+AC_ARG_WITH(js_dir_name,
+            AC_HELP_STRING([--with-js_dir_name=js_dir_name],
+                           [name of sub-directory to contain javascript]),
+            js_dir_name="$withval",
+            [js_dir_name="js"])
+AC_SUBST(js_dir_name)
+
+AC_ARG_WITH(css_dir_name,
+            AC_HELP_STRING([--with-css_dir_name=css_dir_name],
+                           [name of sub-directory to contain style sheets]),
+            css_dir_name="$withval",
+            [css_dir_name="css"])
+AC_SUBST(css_dir_name)
+
 AC_ARG_WITH(install_group,
             AC_HELP_STRING([--with-install_group=cgi_dir_name],
                            [name of group to have installed file ownership]),

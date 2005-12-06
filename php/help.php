@@ -4,14 +4,14 @@
  * All Rights Reserved.  See COPYRIGHT.
  */
 
-require_once( '../lib/version.php' );
-require_once( '../lib/config.php' );
-require_once( '../smarty/smarty.custom.php' );
+require_once( 'version.php' );
+require_once( 'config.php' );
+require_once( 'smarty.custom.php' );
 
 $smarty = new Smarty_Template;
 $smarty->assign( 'trouser_title', 'help');
 $smarty->assign( 'redirect', true );
-$smarty->assign( 'stylesheets', array( '/fileman.css'));
+$smarty->assign( 'stylesheets', array( '/css/fileman.css'));
 $smarty->assign( 'filedrawers_version', $filedrawers_version);
 $smarty->assign( 'secure_service_url', $secure_service_url);
 $smarty->display( 'help.tpl' );

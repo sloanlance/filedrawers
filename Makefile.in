@@ -14,30 +14,27 @@ OBJDIR=${ROOTDIR}/@object_dir_name@
 SMARTY=${ROOTDIR}/@smarty_dir_name@
 CGIDIR=${ROOTDIR}/@cgi_dir_name@
 LIBDIR=${ROOTDIR}/@lib_dir_name@
+JSDIR=${ROOTDIR}/@js_dir_name@
+CSSDIR=${ROOTDIR}/@css_dir_name@
+IMAGES=${ROOTDIR}/images
 
 # Derived directory names
-SIMAGES=${SHTMLDIR}/images
-JSDIR=${SHTMLDIR}/js
 MWSDIR=${SHTMLDIR}/make-webspace
 ASDIR=${SHTMLDIR}/allow-support
 ADMINDIR=${SHTMLDIR}/admin-support
-IMAGES=${HTMLDIR}/images
 DOWNLOADDIR=${SHTMLDIR}/download
 TEMPLATES=${SMARTY}/templates
 TEMPLATES_C=${SMARTY}/templates_c
 
 CFLAGS=         ${OPTOPTS} -g -O2
 
-SHTMLDIRTARGET= css/fileman.css css/ie6specific.css css/ie5specific.css \
-                css/favorites.css css/makewebspace.css \
-                css/allowsupport.css css/adminsupport.css \
-                php/addfavorites.php php/deletefavorites.php \
+SHTMLDIRTARGET= php/addfavorites.php php/deletefavorites.php \
                 php/perm_manager.php php/progress.php \
                 php/renamefavorites.php php/viewfavorites.php \
                 php/blankpage.html php/scripterror.php php/help.php \
                 php/scriptversion.php
 
-HTMLDIRTARGET=  css/styles.css php/feedback.php
+HTMLDIRTARGET=  php/feedback.php
 
 OBJDIRTARGET=   php/afs.php php/favorites.php php/mime.php \
                 php/webspaces.php php/affiliations.php \
@@ -60,14 +57,13 @@ TEMPLATETARGET= smarty/fileman.tpl smarty/makewebspace.tpl \
 				smarty/scripterror.tpl smarty/header.tpl \
 				smarty/help.tpl smarty/scriptversion.tpl
 
-SIMAGETARGET=   images/checkbox.gif images/doc_lg.gif \
+IMAGETARGET=    images/checkbox.gif images/doc_lg.gif \
                 images/doc_sm.gif images/download.gif \
                 images/folder.gif images/folder_locked.gif \
                 images/sort_ascend.gif images/sort_decend.gif \
                 images/text.gif images/support_remove.gif \
-                images/support_give.gif
-
-IMAGETARGET=    images/blue_tabcap_r.gif images/bulb_large.gif \
+                images/support_give.gif \
+                images/blue_tabcap_r.gif images/bulb_large.gif \
                 images/bulb_small.gif images/first_time.gif \
                 images/header_afs_cabinet.gif images/header_text_afs.gif \
                 images/link_arrow.gif images/login-anim.gif \
@@ -75,6 +71,11 @@ IMAGETARGET=    images/blue_tabcap_r.gif images/bulb_large.gif \
                 images/spacer.gif
 
 JSDIRTARGET=    js/filemanage.js js/allowsupport.js
+
+CSSDIRTARGET=   css/adminsupport.css css/allowsupport.css \
+		css/favorites.css css/fileman.css \
+		css/ie5specific.css css/ie6specific.css \
+		css/makewebspace.css css/styles.css
 
 all: php/version.php php/config.php upload/upload.cgi
 
@@ -132,18 +133,18 @@ install: all
 	$(INSTALL) -g @install_group@ -m 0775 php/index_filemanager.php \
 	           ${SHTMLDIR}/index.php
 
-        # Install shtml Images
-	mkdir -p ${SIMAGES}
-	chmod 0775 ${SIMAGES}
-	chgrp @install_group@ ${SIMAGES}
-	for i in ${SIMAGETARGET}; do \
-		$(INSTALL) -g @install_group@ -m 0664 -c $$i ${SIMAGES}/; \
+        # Install Images
+	mkdir -p ${IMAGES}
+	chmod 0775 ${IMAGES}
+	chgrp @install_group@ ${IMAGES}
+	for i in ${IMAGETARGET}; do \
+		$(INSTALL) -g @install_group@ -m 0664 -c $$i ${IMAGES}/; \
 	done
 
         # Install mime images.
-	cp -R images/mime ${SIMAGES}
-	chmod -R 0775 ${SIMAGES}/mime
-	chgrp -R @install_group@ ${SIMAGES}/mime
+	cp -R images/mime ${IMAGES}
+	chmod -R 0775 ${IMAGES}/mime
+	chgrp -R @install_group@ ${IMAGES}/mime
 
 	mkdir -p ${HTMLDIR}
 	chmod 775 ${HTMLDIR}
@@ -163,6 +164,13 @@ install: all
 		$(INSTALL) -g @install_group@ -m 0664 -c $$i ${JSDIR}/; \
 	done
 
+	mkdir -p ${CSSDIR}
+	chmod 775 ${CSSDIR}
+	chgrp @install_group@ ${CSSDIR}
+	for i in ${CSSDIRTARGET}; do \
+		$(INSTALL) -g @install_group@ -m 0664 -c $$i ${CSSDIR}/; \
+	done
+
 	mkdir -p ${OBJDIR}
 	chmod 775 ${OBJDIR}
 	chgrp @install_group@ ${OBJDIR}
@@ -177,13 +185,6 @@ install: all
 		$(INSTALL) -g @install_group@ -m 0775 -c $$i ${LIBDIR}/; \
 	done
 
-        # Install html Images
-	mkdir -p ${IMAGES}
-	chmod 0775 ${IMAGES}
-	chgrp @install_group@ ${IMAGES}
-	for i in ${IMAGETARGET}; do \
-		$(INSTALL) -g @install_group@ -m 0664 -c $$i ${IMAGES}/; \
-	done
 
 	mkdir -p ${SMARTY}
 	chmod 775 ${SMARTY}

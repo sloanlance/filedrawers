@@ -4,6 +4,8 @@
  * All Rights Reserved.  See COPYRIGHT.
  */
 
+require_once( 'libdrawers.php' );
+
 if ( !extension_loaded( 'posix' )) {
     if ( !dl( 'posix.so' )) {
         error_log("mFile: Couldn't load necessary posix function");

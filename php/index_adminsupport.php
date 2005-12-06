@@ -5,13 +5,13 @@
  * All Rights Reserved.  See COPYRIGHT.
  */
 
-require_once( '../../lib/version.php' );
-require_once( '../../lib/config.php' );
-require_once( '../../lib/libdrawers.php' );
-require_once( '../../objects/afs.php' );
-require_once( '../../objects/affiliations.php' );
-require_once( '../../objects/supportgroups.php' );
-require_once( '../../smarty/smarty.custom.php' );
+require_once( 'version.php' );
+require_once( 'config.php' );
+require_once( 'libdrawers.php' );
+require_once( 'afs.php' );
+require_once( 'affiliations.php' );
+require_once( 'supportgroups.php' );
+require_once( 'smarty.custom.php' );
 
 browser_check();
 
@@ -61,7 +61,7 @@ $webSelected = false;
 $homeSelected = true;
 
 // Use the "adminsupport.css" stylesheet.
-$stylesheets[] = "/adminsupport.css";
+$stylesheets[] = "/css/adminsupport.css";
 
 $smarty->assign( 'service_name', $service_name);
 $smarty->assign( 'service_url', $service_url);
