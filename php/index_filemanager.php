@@ -25,10 +25,12 @@ if ( ! empty( $notifyMsg )) {
     $smarty->assign( 'notifyMsg', $afs->notifyMsg );
 }
 
+$smarty->assign( 'js_vars', $afs->get_js_declarations());
+
 // Set error messages
 if ( $uploadError ) {
     $smarty->assign( 'warnUser', rawurlencode( $errorMsg ));
-} else if ( ! empty( $afs->errorMsg )) {
+} else if ( !empty( $afs->errorMsg )) {
     $smarty->assign( 'warnUser', rawurlencode( $afs->errorMsg ));
 } else if ( isset( $_GET['error'] )) {
     $smarty->assign( 'warnUser', 'Unable to upload the selected file(s).' );
@@ -48,7 +50,6 @@ $smarty->assign( 'trouser_title', 'afs file management');
 $smarty->assign( 'javascripts', $javascripts);
 $smarty->assign( 'stylesheets', $stylesheets);
 
-$smarty->assign( 'js_vars', $afs->get_js_declarations());
 $smarty->assign( 'path_url', urlencode($afs->path));
 $smarty->assign( 'parentPath', urlencode($afs->parentPath()));
 $smarty->assign( 'location', $afs->pathDisplay());
