@@ -1,5 +1,7 @@
 (0.2) --- Bugs & Security
 
+- Either make the code XHTML compliant, or HTML compliant
+
 - Change makefile so that an install only changes files that actually
   have changes, instead of updating all timestamps
   (for ease of radmind transcript creation)
