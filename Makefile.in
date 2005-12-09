@@ -211,6 +211,8 @@ install: all
 	chgrp @install_group@ ${DOWNLOADDIR}
 	$(INSTALL) -g @install_group@ -m 0775 php/index_download.php \
 	           ${DOWNLOADDIR}/index.php
+	$(INSTALL) -g @install_group@ -m 0775 php/view.php \
+	           ${DOWNLOADDIR}/view.php
 
 	mkdir -p ${CGIDIR}
 	chmod 755 ${CGIDIR}
