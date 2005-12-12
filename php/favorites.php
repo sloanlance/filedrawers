@@ -8,7 +8,7 @@ require_once( 'libdrawers.php' );
 
 if ( !extension_loaded( 'posix' )) {
     if ( !dl( 'posix.so' )) {
-        error_log("mFile: Couldn't load necessary posix function");
+        error_log("Couldn't load necessary posix function");
         echo "<p>Couldn't load necessary posix function</p>\n";
         exit( 1 );
     }

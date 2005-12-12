@@ -9,7 +9,7 @@ define( "CLIPSEPARATOR", "*#~!@@@" );
 
 if ( !extension_loaded( 'posix' )) {
     if ( !dl( 'posix.so' )) {
-        error_log( "mFile: Couldn't load necessary posix function" );
+        error_log( "Couldn't load necessary posix function" );
         echo "<p>Couldn't load necessary posix function</p>\n";
         exit( 1 );
     }
@@ -26,8 +26,9 @@ class Afs
     public    $errorMsg      = '';
     public    $notifyMsg     = '';
     public    $parPath;           // Path to the parent of current path
+	public    $filename;
     #this stuff doesn't quite work yet, so set it to 1 for now
-    public    $writable      = 1; // Can we write to this directory?
+    public    $writable      = 0; // Can we write to this directory?
     public    $readable      = 1; // Can we read from this directory?
     public    $viewable      = 1; // Can we view the contents of this directory?
     public    $path          = '';
@@ -38,23 +39,25 @@ class Afs
     public function __construct( $path="" )
     {
         $this->sid = md5( uniqid( rand(), true ));
-
-	$this->uniqname = $_SERVER['REMOTE_USER'];
-
+		$this->uniqname = $_SERVER['REMOTE_USER'];
         $this->setPath( $path );
-        $this->parPath = $this->parentPath();
- 
+
+		// Generate the path of the folder one level above the current
+		preg_match( "/(.*\/)([^\/]+)\/?$/", $this->path, $Matches );
+		$this->parPath = $Matches[1];
+		$this->filename = $Matches[2];
+
 		/*
-        if ( is_writable( $this->path )) {
-            $this->writable= 1;
+		if ( is_dir( $this->path )) {
+            $this->viewable= 1;
         }
         if ( is_readable( $this->path )) {
             $this->readable= 1;
         }
-		if ( is_dir( $this->path )) {
-            $this->viewable= 1;
-        }
 		*/
+        if ( posix_access( $this->path, POSIX_W_OK )) {
+            $this->writable = 1;
+        }
 
         $this->processCommand();
     }
@@ -441,11 +444,7 @@ class Afs
         $files = '';
 
         // Open the path and read its contents
-        if ( !@is_dir( $this->path )) {
-            $this->errorMsg = "Unable to view $this->path.";
-            return false;
-        }
-        if ( !$dh = @opendir( $this->path )) {
+        if ( !@is_dir( $this->path ) || !$dh = @opendir( $this->path )) {
             $this->errorMsg = "Unable to view $this->path.";
             return false;
         }
@@ -527,14 +526,6 @@ class Afs
 
 	return $o;
     }
-
-    // Generate the path of the folder one level above the current
-    function parentPath()
-    {
-        $regEx = "/([^\/]*\/?)$/";
-        return preg_replace( $regEx, "", $this->path );
-    }
-
 
     // Prevent users from breaking outside of afs on the web server
     function pathSecurity( $path='' )
@@ -619,9 +610,9 @@ class Afs
     // Make smarty template variable assignments
     function make_smarty_assignments(&$smart)
     {
-	$smart->assign( 'path_url', urlencode($this->path));
-	$smart->assign( 'parentPath', urlencode($this->parentPath()));
-	$smart->assign( 'location', $this->pathDisplay());
+		$smart->assign( 'path_url', urlencode($this->path));
+		$smart->assign( 'parentPath', urlencode($this->parPath ));
+		$smart->assign( 'location', $this->pathDisplay());
     }
 
     function get_js_declarations()

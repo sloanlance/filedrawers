@@ -142,8 +142,8 @@ function createFileName( id )
         return document.createTextNode( files[id].title);
     } else {
         var l = document.createElement( 'a' );
-        l.setAttribute( 'href', downloadURI + '/?path=' +
-			 getFilenameUrl(id));
+	// #!# modify the download link based on mime type
+        l.setAttribute( 'href', downloadURI + '/view.php/?path=' + getFilenameUrl(id));
         l.appendChild( document.createTextNode(files[id].title));
         return l;
     }
@@ -538,14 +538,14 @@ function readCookie( name )
     return null;
 }
 
-// Adds an inspector menu item layer over top of the mFile UI
+// Adds an inspector menu item layer over top of the UI
 function expandItem( itemCtrl, overlay )
 {
     document.getElementById( itemCtrl ).className = 'inspSelected';
     document.getElementById( overlay ).style.display = 'block';
 }
 
-// Removes an inspector menu item layer that was placed over the mFile UI
+// Removes an inspector menu item layer that was placed over the UI
 function closeItem( itemCtrl, overlay )
 {
     document.getElementById( overlay ).style.display = 'none';
@@ -669,10 +669,10 @@ function getFolderIcon()
 {
     if ( !writable ) {
         document.getElementById('selectedItem').background = imgStore
-                + '/folder_locked.gif';
+			+ '/folder_locked.gif';
     } else {
-            document.getElementById('selectedItem').background = imgStore
-                    + '/folder.gif';
+		document.getElementById('selectedItem').background = imgStore
+			+ '/folder.gif';
     }
 }
 

@@ -81,7 +81,7 @@ $smarty->assign( 'stylesheets', $stylesheets);
 
 $smarty->assign( 'js_vars', $afs->get_js_declarations());
 $smarty->assign( 'path_url', urlencode($afs->path));
-$smarty->assign( 'parentPath', urlencode($afs->parentPath()));
+$smarty->assign( 'parentPath', urlencode( $afs->parentPath ));
 $smarty->assign( 'location', $afs->pathDisplay());
 
 $smarty->assign( 'affiliations', $supportgroups->get_affiliations());
