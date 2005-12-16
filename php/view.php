@@ -5,6 +5,10 @@
  */
 
 require_once( 'afs.php' );
+if ( !isset( $_GET['path'] ) || !strlen( $_GET['path'] )) {
+	echo "<p>Error: file not specified</p>\n";
+	exit( 1 );
+}
 $download = new Afs( $_GET['path'] );
 $mime = new Mime( );
 $mimetype = $mime->getMimeType( $download->path );
@@ -17,6 +21,7 @@ switch( $mimetype )
 	case 'video/mpeg':
 	case 'video/quicktime':
 	case 'audio/mpeg':
+	case 'application/x-shockwave-flash':
 	#text/plain has multiple endings
 	case ( preg_match( '/^text\/plain/', $mimetype ) == TRUE ):
 		header( 'Content-Type: '.$mimetype );
@@ -26,7 +31,6 @@ switch( $mimetype )
 		@readfile( $download->path );
 		break;
 	default:
-		require( 'index.php' );
 		break;
 }
 
