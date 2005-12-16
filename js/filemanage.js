@@ -152,7 +152,7 @@ function createFileName( id )
 // Returns a download icon that is linked to the appropriate place
 function createDlIcon( id )
 {
-    if ( files[id].type !== folderMime && writable ) {
+    if ( files[id].type !== folderMime && readable ) {
         var i = document.createElement( 'img' );
         i.setAttribute( 'src',  imgStore + '/download.gif' );
         i.setAttribute( 'width', '16' );
