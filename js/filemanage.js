@@ -656,6 +656,7 @@ function setInspControl( id, cmd, label )
 function activateLocationCtrl( active )
 {
     if ( active == true ) {
+		document.getElementById( 'newLoc' ).value = path;
         document.getElementById( 'location' ).style.display     = 'none';
         document.getElementById( 'changeDir' ).style.display    = 'none';
         document.getElementById( 'newLoc' ).style.display       = 'inline';
