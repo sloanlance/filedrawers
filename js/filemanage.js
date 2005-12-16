@@ -58,9 +58,12 @@ function startPage( notifyMsg, warnMsg )
         showHiddenFiles = 0;
     }
 
-    init_formvals();
-    displayFileList();
-    fileInspector();
+	init_formvals();
+	// only initialize filemanager if we're viewing files
+    if ( displayfileman ) {
+		displayFileList();
+		fileInspector();
+	}
 
     if ( notifyMsg ) {
         notifyUser( notifyMsg );
@@ -78,10 +81,17 @@ function startPage( notifyMsg, warnMsg )
 // Initialize form input values that can't be done with html.
 function init_formvals()
 {
+    document.getElementById( 'newLoc' ).value = path;
+
+	// if upload doesn't exist, no sidebar, then following vars don't exist
+	if ( !document.getElementById( 'upload' )) {
+		return 0;
+	}
     document.getElementById( 'sessionid' ).value = sid;
     document.getElementById( 'uploadpath' ).value = path;
     document.getElementById( 'returnToURI' ).value = returnToURI;
-    document.getElementById( 'newLoc' ).value = path;
+
+	return 1;
 }
 
 // Returns a form checkbox or something else if approriate
@@ -120,32 +130,22 @@ function createListIcon( id )
     i.setAttribute( 'width', '16' );
     i.setAttribute( 'height', '16' );
 
-    if ( files[id].type == folderMime ) {
-        var l = document.createElement( 'a' );
-        l.setAttribute( 'href', './?path=' + getFilenameUrl(id));
-        l.appendChild(i);
-        return l;
-    } else {
-        return i;
-    }
+	var l = document.createElement( 'a' );
+	l.setAttribute( 'href', './?path=' + getFilenameUrl(id));
+	l.appendChild(i);
+	return l;
 }
 
 
 function createFileName( id )
 {
-    if ( files[id].type == folderMime ) {
+    if ( files[id].type == folderMime || readable ) {
         var l = document.createElement( 'a' );
         l.setAttribute( 'href', './?path=' + getFilenameUrl(id));
         l.appendChild( document.createTextNode( files[id].title));
         return l;
-    } else if ( !writable ) {
-        return document.createTextNode( files[id].title);
     } else {
-        var l = document.createElement( 'a' );
-	// #!# modify the download link based on mime type
-        l.setAttribute( 'href', downloadURI + '/view.php/?path=' + getFilenameUrl(id));
-        l.appendChild( document.createTextNode(files[id].title));
-        return l;
+        return document.createTextNode( files[id].title);
     }
 }
 
@@ -275,17 +275,14 @@ function displayFileList()
         files.sort( sortFunc );
 
     // Display the file list
-    if (displayfileman) {
 	createFileList();
 	selectColumn( sortBy );
-    }
 }
 
 // This function turns the array of file info into an html table
 function createFileList()
 {
     var cuts = getClipboard();  // Gets a list of files currently marked as cut
-    var mytable = document.getElementById( 'fileList' );
     var mytbody = document.getElementById( 'sortResults' );
     var myNewtbody = document.createElement( 'tbody' );
     myNewtbody.id = 'sortResults';
@@ -293,6 +290,7 @@ function createFileList()
     var trElem, tdElem, txtNode;
     var i = 0;  // Only counts rows that are actually displayed
     var className = '';
+    var mytable = '';
 
     for ( var j = 0; j < files.length; j++ ) {
 
@@ -356,7 +354,11 @@ function createFileList()
 
     // Attaches all of the html generated above to the document
     myNewtbody.appendChild( docFragment );
-    mytable.replaceChild( myNewtbody, mytbody );
+
+	if ( document.getElementById( 'fileList' )) {
+		mytable = document.getElementById( 'fileList' );
+		mytable.replaceChild( myNewtbody, mytbody );
+	}
 }
 
 // Rounds a number to the specified number of significant figures
@@ -440,8 +442,7 @@ function notifyUser( msg )
 {
     originalNotify = document.getElementById( 'notifyArea' ).innerHTML;
     document.getElementById('notifyArea' ).innerHTML =
-            '<span class="notify" ' +
-            'id="location" >' + msg + '</span>';
+            '<span class="notify" id="location" >' + msg + '</span>';
     setTimeout("resetnotifyArea(originalNotify)", notifyHoldTime );
 }
 
@@ -627,8 +628,13 @@ function setHiddenFilesCtrl()
 // This function greys out a link when it isn't appropriate
 function setInspControl( id, cmd, label )
 {
-    var item = document.getElementById( id );
+    var item = '';
 
+	if ( !document.getElementById( id )) {
+		return;
+	}
+
+	item = document.getElementById( id );
     if ( cmd ) {
         var newItem = document.createElement( 'a' );
         newItem.appendChild( document.createTextNode( label ));

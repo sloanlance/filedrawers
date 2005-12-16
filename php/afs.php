@@ -26,13 +26,15 @@ class Afs
     public    $errorMsg      = '';
     public    $notifyMsg     = '';
     public    $parPath;           // Path to the parent of current path
-	public    $filename;
+	public    $filename      = '';
     #this stuff doesn't quite work yet, so set it to 1 for now
     public    $writable      = 0; // Can we write to this directory?
     public    $readable      = 1; // Can we read from this directory?
     public    $viewable      = 1; // Can we view the contents of this directory?
     public    $path          = '';
     public    $sid;
+	public    $type          = '';
+	public    $mimetype      = '';
     private   $uniqname      = '';
     protected $newName       = '';
 
@@ -41,6 +43,7 @@ class Afs
         $this->sid = md5( uniqid( rand(), true ));
 		$this->uniqname = $_SERVER['REMOTE_USER'];
         $this->setPath( $path );
+		$this->type = $this->getType( );
 
 		// Generate the path of the folder one level above the current
 		preg_match( "/(.*\/)([^\/]+)\/?$/", $this->path, $Matches );
@@ -62,6 +65,20 @@ class Afs
         $this->processCommand();
     }
 
+	public function getType( )
+	{
+		if ( !file_exists( $this->path )) {
+			return 'none';
+		}
+
+		if ( is_dir( $this->path )) {
+			$type = 'dir';
+		} elseif ( is_file( $this->path )) {
+			$type = 'file';
+			$this->mimetype = Mime::getMimeType( $this->path );
+		}
+		return $type;
+	}
 
     public function processCommand()
     {
@@ -445,7 +462,7 @@ class Afs
 
         // Open the path and read its contents
         if ( !@is_dir( $this->path ) || !$dh = @opendir( $this->path )) {
-            $this->errorMsg = "Unable to view $this->path.";
+            $this->errorMsg = "Unable to view: $this->path.";
             return false;
         }
 
@@ -459,7 +476,7 @@ class Afs
             $modTime = @filemtime( $fullpath );
             $mime    = Mime::mimeIcon( $fullpath );
 
-	    $filename = $this->escape_js($filename);
+			$filename = $this->escape_js($filename);
 
             if ( $showHidden ) {
                 $files .= "files[$id]=new File('$filename', '$modTime', $size, "
@@ -569,7 +586,7 @@ class Afs
     {
         if ( $path ) {
             if ( ! file_exists( $path )) {
-		$this->errorMsg = "The specified path does not exist. ($path)";
+				$this->errorMsg = "The specified path does not exist. ($path)";
             } else {
                 $this->path = $this->pathSecurity( $path );
             }
@@ -586,6 +603,11 @@ class Afs
         $path     = explode( '/', $this->path );
         $pathDisp = '';
         $pathURI  = '';
+		$filename = '';
+
+		if ( $this->getType( ) == 'file' ) {
+			$filename = array_pop( $path );
+		}
 
         foreach ( $path as $piece ) {
 
@@ -604,7 +626,7 @@ class Afs
             }
         }
 
-        return $pathDisp;
+        return $pathDisp.'/'.$filename;
     }
 
     // Make smarty template variable assignments
@@ -622,18 +644,19 @@ class Afs
         $retstr .= $this->js_var("path", $this->path);
         $retstr .= $this->js_var("foldername", $this->get_foldername());
         $retstr .= $this->js_var("folderIcon", "");
-        $retstr .= $this->js_var("homepath",
-                                 getBasePath($this->uniqname));
+        $retstr .= $this->js_var("homepath", getBasePath($this->uniqname));
         $retstr .= $this->js_var("sid", $this->sid);
         $retstr .= $this->js_var("returnToURI", $this->get_returnToURI());
         $retstr .= $this->js_var("writable", $this->writable);
         $retstr .= $this->js_var("readable", $this->readable);
         $retstr .= $this->js_var("viewable", $this->viewable);
 
-	$retstr .= "files = new Array();\n";
-	$retstr .= $this->get_foldercontents_js(true);
+		if ( $this->type == 'dir' ) {
+			$retstr .= "files = new Array();\n";
+			$retstr .= $this->get_foldercontents_js(true);
+		}
 
-	return $retstr;
+		return $retstr;
     }
 
     private function js_var($varname, $contents)

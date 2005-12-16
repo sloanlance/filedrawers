@@ -16,6 +16,7 @@ $uploadError = process_upload($notifyMsg, $errorMsg);
 
 $path = ( isset( $_GET['path'] )) ? $_GET['path'] : '';
 $afs  = new Afs( $path );
+
 $smarty = new Smarty_Template;
 
 // Set notification messages
@@ -46,7 +47,7 @@ $smarty->assign( 'secure_service_url', $secure_service_url);
 $smarty->assign( 'homeSelected', $homeSelected );
 $smarty->assign( 'webSelected', $webSelected );
 
-$smarty->assign( 'trouser_title', 'afs file management');
+$smarty->assign( 'filedrawers_title', 'afs file management');
 $smarty->assign( 'javascripts', $javascripts);
 $smarty->assign( 'stylesheets', $stylesheets);
 
@@ -58,5 +59,13 @@ $smarty->assign( 'js_displayfileman', $displayfileman);
 
 $smarty->assign( 'filedrawers_version', $filedrawers_version);
 
-$smarty->display( 'fileman.tpl' );
+$smarty->assign( 'type', $afs->type );
+if ( $afs->type == 'file' ) {
+	$smarty->assign( 'js_displayfileman', 0 );
+	$smarty->assign( 'mimetype', $afs->mimetype );
+	$smarty->display( 'viewfile.tpl' );
+} else {
+	$smarty->display( 'fileman.tpl' );
+}
+
 ?>
