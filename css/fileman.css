@@ -393,7 +393,7 @@ div.expandItem h2, form.expandItem h2 {
 	border: 1px solid #6699CC;
 	font-weight: normal;
 	color: #404040;
-	padding: 4px 4px 4px 4px;
+	padding: 4px;
     margin: 0;
 	overflow: hidden;
 	height: 20px;
@@ -593,6 +593,11 @@ table.content-text td {
 	padding: 0px 10px 10px 20px;
 	color: #882222;
 	border: 1px dashed #000000;
+}
+
+#viewfile {
+	margin: 95px 10px 10px 30px;
+	padding: 10px;
 }
 
 #version {
