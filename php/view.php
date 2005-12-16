@@ -22,8 +22,6 @@ switch( $mimetype )
 	case 'video/quicktime':
 	case 'audio/mpeg':
 	case 'application/x-shockwave-flash':
-	#text/plain has multiple endings
-	case ( preg_match( '/^text\/plain/', $mimetype ) == TRUE ):
 		header( 'Content-Type: '.$mimetype );
 		header( 'Content-Length: ' . filesize( $download->path )); 
 		header( 'Content-disposition: inline; filename="'.
