@@ -9,7 +9,7 @@ require_once( 'config.php' );
 require_once( 'smarty.custom.php' );
 
 $smarty = new Smarty_Template;
-$smarty->assign( 'trouser_title', 'help');
+$smarty->assign( 'filedrawers_title', 'help');
 $smarty->assign( 'redirect', true );
 $smarty->assign( 'stylesheets', array( '/css/fileman.css'));
 $smarty->assign( 'filedrawers_version', $filedrawers_version);

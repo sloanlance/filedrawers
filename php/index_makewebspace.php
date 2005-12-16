@@ -54,7 +54,7 @@ $smarty->assign( 'secure_service_url', $secure_service_url);
 $smarty->assign( 'homeSelected', $homeSelected );
 $smarty->assign( 'webSelected', $webSelected );
 
-$smarty->assign( 'trouser_title', 'make-webspace');
+$smarty->assign( 'filedrawers_title', 'make-webspace');
 $smarty->assign( 'javascripts', $javascripts);
 $smarty->assign( 'stylesheets', $stylesheets);
 

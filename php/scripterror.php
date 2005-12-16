@@ -7,7 +7,7 @@
 require_once( 'smarty.custom.php' );
 
 $smarty = new Smarty_Template;
-$smarty->assign( 'trouser_title', 'javascript-error');
+$smarty->assign( 'filedrawers_title', 'javascript-error');
 $smarty->assign( 'redirect', true );
 $smarty->assign( 'stylesheets', array( '/css/fileman.css'));
 $smarty->display( 'scripterror.tpl' );

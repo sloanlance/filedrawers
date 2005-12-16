@@ -14,7 +14,7 @@
 </div>
 
 <div id="banner">
-<h1>mFile: {$trouser_title}</h1>
+<h1>mFile: {$filedrawers_title}</h1>
 <ul id="menubar">
 	{if $homeSelected}
 		<li><a href="/" class="active">Home</a></li>

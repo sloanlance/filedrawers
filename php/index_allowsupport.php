@@ -75,7 +75,7 @@ $smarty->assign( 'secure_service_url', $secure_service_url);
 $smarty->assign( 'homeSelected', $homeSelected );
 $smarty->assign( 'webSelected', $webSelected );
 
-$smarty->assign( 'trouser_title', 'allow-support');
+$smarty->assign( 'filedrawers_title', 'allow-support');
 $smarty->assign( 'javascripts', $javascripts);
 $smarty->assign( 'stylesheets', $stylesheets);
 
