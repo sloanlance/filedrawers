@@ -51,7 +51,8 @@
 			'<p>This file uses a MIME type ('.$afs->mimetype.
 			") which is not viewable in most web browers.</p>\n".
 			'<p>You may '.$dl_link.'download</a> '.
-			$dl_link.'<img src="/images/download.gif"></a> '.
+			$dl_link.'<img src="/images/download.gif" width="16" '.
+			'height="16" alt="Download"></a> '.
 			'this file, or <a href="/?path='.$afs->parPath.'">return '.
 			'to the parent directory</a>.</p>'.
 			'</div>';

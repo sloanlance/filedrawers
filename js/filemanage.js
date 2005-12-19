@@ -157,6 +157,7 @@ function createDlIcon( id )
         i.setAttribute( 'src',  imgStore + '/download.gif' );
         i.setAttribute( 'width', '16' );
         i.setAttribute( 'height', '16' );
+        i.setAttribute( 'alt', 'Download' );
 
         var l = document.createElement( 'a' );
         l.setAttribute( 'href', downloadURI + '/?path=' +
