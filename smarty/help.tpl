@@ -47,7 +47,7 @@ If you experience a technical issue with the application, you can send
 email to <a href="mailto:mfile-help@umich.edu">mfile-help@umich.edu</a>,
 to reach help desk support. If they don't have the answer, they'll
 escalate the issue to the developers. They can also be reached by phone
-at 764-HELP.
+at (734) 764-HELP (764-4357).
 </p>
 
 <h2>Source Code</h2>
