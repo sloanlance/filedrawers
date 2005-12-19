@@ -622,27 +622,35 @@ class Afs
         $pathDisp = '';
         $pathURI  = '';
 		$filename = '';
+		$lastDisp = '';
+		$lastURI  = '';
+
+		while ( !strlen( $path[0] )) {
+			array_shift( $path );
+		}
+		if ( $path[0] == 'afs' ) {
+			$pathURI = '/'.array_shift( $path );
+			$pathDisp = htmlentities( $pathURI );
+		}
 
 		if ( $this->getType( ) == 'file' ) {
 			$filename = array_pop( $path );
+		} else {
+			$lastURI = '/'.array_pop( $path );
+			$lastDisp = htmlentities( $lastURI );
 		}
 
         foreach ( $path as $piece ) {
-
             if ( $piece == '' ) {
                 continue;
             }
-
-            $pathURI  .= "/$piece";
-
-            if ( $piece == 'afs' ) {
-                $pathDisp .= '/' . htmlentities( $piece );
-            } else {
-                $pathDisp .= "/<a href=\"/?path="
-                  . rawurlencode( $pathURI ) . "\">"
-                  . htmlentities( $piece ) . "</a>";
-            }
+            $pathURI .= "/$piece";
+			$pathDisp .= "/<a href=\"/?path="
+			  . rawurlencode( $pathURI ) . "\">"
+			  . htmlentities( $piece ) . "</a>";
         }
+		$pathURI .= $lastURI;
+		$pathDisp .= $lastDisp;
 
         return $pathDisp.'/'.$filename;
     }
