@@ -600,6 +600,11 @@ table.content-text td {
 	padding: 10px;
 }
 
+#viewfile a:hover {
+	text-decoration: none;
+	border: none;
+}
+
 #version {
     margin-top: 2px;
     color: #9c9c9c;
