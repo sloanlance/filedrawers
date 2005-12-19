@@ -547,15 +547,34 @@ class Afs
     // Prevent users from breaking outside of afs on the web server
     function pathSecurity( $path='' )
     {
+		$pos = '';
+		$tail = '';
+		$decrement = 0;
+
         if ( !$path ) {
             return false;
         }
         if ( strpos( $path, '/afs/' ) !== 0 ) {
             return false;
         }
+		# if parent reference exists, trim path accordingly
         if ( strpos( $path, '..' ) !== false ) {
-            return false;
-        }
+			$Split = explode( '/', $path );
+			$path = '';
+
+			foreach( $Split as $segment ) {
+				if ( $segment == '..' ) {
+					$decrement++;
+				} elseif ( strlen( $segment )) {
+					$path .= '/'.$segment;
+				}
+			}
+
+			for ( ; $decrement > 0; $decrement-- ) {
+				$path = preg_replace( '/\/[^\/]+\/?$/', '', $path );
+			}
+		}
+
         if ( is_link( $path )) {
             $target = readlink( $path );
             if ( strpos( $target, '/afs/' ) !== 0 || strpos( $target, '..' )
@@ -565,7 +584,6 @@ class Afs
         }
 
         $pos = strrpos( $path, '/' );
-
         if ( $pos == strlen( $path ) - 1 ) {
             // Remove the final / in the target path if it exists
             return substr_replace( $path, '', $pos );
