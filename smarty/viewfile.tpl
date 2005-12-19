@@ -23,9 +23,13 @@
 			echo '<embed src="/download/view.php?path='.
 				urlencode( $afs->path ).'" type="'.$afs->mimetype.'"/>';
 			break;
-		case 'text': 
 		case 'html': 
-			highlight_file( $afs->path );
+		case 'text': 
+			if ( $mSubtype == 'rtf' ) {
+				$supported = 0;
+			} else {
+				highlight_file( $afs->path );
+			}
 			break;
 		case 'application':
 			if ( $mSubtype == 'x-shockwave-flash' ) {
@@ -41,13 +45,15 @@
 		}
 
 	if ( !$supported ) {
+		$dl_link = '<a href="/download/?path='.$afs->path.'">';
 		echo '<div id="error">'.
 			"<h2>Unsupported MIME type</h2>\n".
 			'<p>This file uses a MIME type ('.$afs->mimetype.
 			") which is not viewable in most web browers.</p>\n".
-			'<p>You may <a href="/download/?path='.$afs->path.
-			'">download</a> this file, or <a href="/?path='.$afs->parPath.
-			'">return to the parent directory</a>.</p>'.
+			'<p>You may '.$dl_link.'download</a> '.
+			$dl_link.'<img src="/images/download.gif"></a> '.
+			'this file, or <a href="/?path='.$afs->parPath.'">return '.
+			'to the parent directory</a>.</p>'.
 			'</div>';
 	}
 
