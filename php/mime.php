@@ -24,6 +24,13 @@ class Mime
         $mimetype = finfo_file( $res, $path );
         finfo_close( $res );
 
+		# this is a hack, but people complain, and it's not obvious why
+		# excel files are getting msword mimetypes
+		if (( $mimetype == 'application/msword' ) &&
+			( preg_match( '/.xls$/', $path ))) {
+			$mimetype = 'application/msexcel';
+		} 
+
         // Eliminate any warning messages from finfo that could cause js problems
         // return ( strpos( $mimetype, ' ' ) !== false ) ? '' : $mimetype;
         return $mimetype;
