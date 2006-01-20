@@ -108,6 +108,8 @@ php/config.php: Makefile
 	     php/config.php
 	echo "\$$sdb_ro_password = \"@sdb_ro_password@\";" >> \
 	     php/config.php
+	echo "\$$allow_support_logging = \"@allow_support_logging@\";" >> \
+	     php/config.php
 	echo '?>' >> php/config.php
 
 php/version.php: VERSION

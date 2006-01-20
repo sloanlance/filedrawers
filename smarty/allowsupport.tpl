@@ -65,7 +65,7 @@ Change Support Access
 {foreach from=$supportgroups item="supportgroup" name="supportgroups"}
 <tr bgcolor="{cycle values="#ffffff,#f1f1f1" name="supportgroups"}">
 <td>
-{if $supportgroup.affiliated eq false && $supportgroup.permitted eq true}
+{if $supportgroup.affiliated eq false && $supportgroup.permitted eq 1}
 <span class="supportgroups_warn">
 {$supportgroup.name}
 </span>
@@ -74,7 +74,7 @@ Change Support Access
 {/if}
 </td>
 <td>
-{if $supportgroup.permitted eq true}
+{if $supportgroup.permitted eq 1}
 <span class="supportgroups_warn">
 YES
 </span>
@@ -83,7 +83,7 @@ NO
 {/if}
 </td>
 <td>
-{if $supportgroup.permitted eq true}
+{if $supportgroup.permitted eq 1}
 <a href="javascript:remove_submit('{$supportgroup.name}');">
 <img src="/images/support_remove.gif" width="158" height="22" border="0">
 </a>

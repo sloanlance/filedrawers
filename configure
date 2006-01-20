@@ -312,7 +312,7 @@ ac_includes_default="\
 #endif"
 
 ac_subdirs_all="$ac_subdirs_all libcgi"
-ac_subst_vars='SHELL PATH_SEPARATOR PACKAGE_NAME PACKAGE_TARNAME PACKAGE_VERSION PACKAGE_STRING PACKAGE_BUGREPORT exec_prefix prefix program_transform_name bindir sbindir libexecdir datadir sysconfdir sharedstatedir localstatedir libdir includedir oldincludedir infodir mandir build_alias host_alias target_alias DEFS ECHO_C ECHO_N ECHO_T LIBS project_name shtml_dir_name html_dir_name object_dir_name smarty_dir_name cgi_dir_name lib_dir_name js_dir_name css_dir_name install_group service_name service_url secure_service_url error_url sdb_host sdb_name sdb_ro_user sdb_ro_password CC CFLAGS LDFLAGS CPPFLAGS ac_ct_CC EXEEXT OBJEXT INSTALL_PROGRAM INSTALL_SCRIPT INSTALL_DATA SET_MAKE CPP EGREP LIBOBJS subdirs LTLIBOBJS'
+ac_subst_vars='SHELL PATH_SEPARATOR PACKAGE_NAME PACKAGE_TARNAME PACKAGE_VERSION PACKAGE_STRING PACKAGE_BUGREPORT exec_prefix prefix program_transform_name bindir sbindir libexecdir datadir sysconfdir sharedstatedir localstatedir libdir includedir oldincludedir infodir mandir build_alias host_alias target_alias DEFS ECHO_C ECHO_N ECHO_T LIBS project_name shtml_dir_name html_dir_name object_dir_name smarty_dir_name cgi_dir_name lib_dir_name js_dir_name css_dir_name install_group service_name service_url secure_service_url error_url sdb_host sdb_name sdb_ro_user sdb_ro_password allow_support_logging CC CFLAGS LDFLAGS CPPFLAGS ac_ct_CC EXEEXT OBJEXT INSTALL_PROGRAM INSTALL_SCRIPT INSTALL_DATA SET_MAKE CPP EGREP LIBOBJS subdirs LTLIBOBJS'
 ac_subst_files=''
 
 # Initialize some variables set by options.
@@ -841,6 +841,12 @@ if test -n "$ac_init_help"; then
      short | recursive ) echo "Configuration of filedrawers 0.5:";;
    esac
   cat <<\_ACEOF
+
+Optional Features:
+  --disable-FEATURE       do not include FEATURE (same as --enable-FEATURE=no)
+  --enable-FEATURE[=ARG]  include FEATURE [ARG=yes]
+  --enable-allow_support_logging
+                          enables the creation of logs for allow-support
 
 Optional Packages:
   --with-PACKAGE[=ARG]    use PACKAGE [ARG=yes]
@@ -1519,6 +1525,15 @@ if test "${with_sdb_ro_password+set}" = set; then
   sdb_ro_password="$withval"
 else
   sdb_ro_password=""
+fi;
+
+
+# Check whether --enable-allow_support_logging or --disable-allow_support_logging was given.
+if test "${enable_allow_support_logging+set}" = set; then
+  enableval="$enable_allow_support_logging"
+  allow_support_logging="yes"
+else
+  allow_support_logging=""
 fi;
 
 
@@ -4462,6 +4477,7 @@ s,@sdb_host@,$sdb_host,;t t
 s,@sdb_name@,$sdb_name,;t t
 s,@sdb_ro_user@,$sdb_ro_user,;t t
 s,@sdb_ro_password@,$sdb_ro_password,;t t
+s,@allow_support_logging@,$allow_support_logging,;t t
 s,@CC@,$CC,;t t
 s,@CFLAGS@,$CFLAGS,;t t
 s,@LDFLAGS@,$LDFLAGS,;t t

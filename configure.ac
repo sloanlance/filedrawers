@@ -128,6 +128,9 @@ AC_ARG_WITH(sdb_ro_password,
             [sdb_ro_password=""])
 AC_SUBST(sdb_ro_password)
 
+AC_ARG_ENABLE(allow_support_logging, AC_HELP_STRING([--enable-allow_support_logging], [enables the creation of logs for allow-support]), allow_support_logging="yes", allow_support_logging="" )
+AC_SUBST(allow_support_logging)
+
 # Checks for programs.
 AC_PROG_CC
 AC_PROG_INSTALL
