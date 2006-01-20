@@ -176,8 +176,7 @@ class Supportgroups {
             }
         }
 
-        // scam XXX remove
-        return true;
+        return false;
     }
 
     /*
