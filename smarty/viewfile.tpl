@@ -45,7 +45,7 @@
 		}
 
 	if ( !$supported ) {
-		$dl_link = '<a href="/download/?path='.$afs->path.'">';
+		$dl_link = '<a href="/download/?path='.urlencode( $afs->path ).'">';
 		echo '<div id="error">'.
 			"<h2>Unsupported MIME type</h2>\n".
 			'<p>This file uses a MIME type ('.$afs->mimetype.
