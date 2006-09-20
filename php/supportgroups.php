@@ -582,7 +582,7 @@ class Supportgroups {
         // Verify that supportgroup is a legitimate pts group.
 
         $pts_command = self::PTS_BINARY . " examine " .
-                      $supportgroup;
+                      escapeshellarg( $supportgroup );
         $pts_output = shell_exec( $pts_command );
 
         $regex = "/id: (-?\d+)/";
