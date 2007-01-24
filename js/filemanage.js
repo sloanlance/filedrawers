@@ -572,10 +572,10 @@ function startUpload()
     /*
      * overwrite_file must come before the files in the form submission,
      * but we want to be able to display the checkbox after the file list.
-     * therefore, we need to set it manually beforfe submit.
+     * therefore, we need to set it manually before submit.
      */
     document.getElementById( 'overwrite_file' ).value =
-	    ((document.getElementById( 'overwrite_box' ).checked) ?
+	    (( document.getElementById( 'overwrite_box' ).checked ) ?
             document.getElementById( 'overwrite_box' ).value : "");
     document.getElementById( 'upload' ).submit();
 }
