@@ -33,6 +33,10 @@
 #define DEBUG(x)
 #endif
 
+static char * post_getline( CGIHANDLE * );
+static int mp_read( CGIHANDLE *, char *, int, char * );
+static int cgi_querystring( char *, struct cgi_list * );
+
 /*
  * Global variable indicating whether or not mp_get_file()
  * should clobber an existing file during a file upload.
@@ -581,56 +585,38 @@ DEBUG( fprintf( stderr, "DB: calling mp_get_file\n" ));
 
     } /* for */
 }
-#ifdef notdef
     char *
 cgi_unescape( char *raw )
 {
-    char    *unesc;
-    char    *ptr;
+    char    	*unesc;
+    char    	*ptr;
+    char	buf[ 3 ];
 
-    ptr = unesc;
+    ptr = unesc = raw;
     for ( ; *raw != '\0'; raw++ ) {
 	switch( *raw ) {
-        case '+'
+        case '+':
             *ptr = ' ';
             ptr++;
             break;
-        case '%'
+
+        case '%':
             raw++;
-            *ptr = (char)strtol( raw, &ptr, 16 );
-            raw++;
+	    if (( *raw == '\0' ) || (*(raw + 1) == '\0' )) {
+		return( NULL );
+	    }
+	    buf[ 0 ] = *raw++;
+	    buf[ 1 ] = *raw;
+	    buf[ 2 ] = '\0';
+	    *ptr++ = (char)strtol( buf, NULL, 16 );
             break;
+
         default:
             *ptr = *raw;
             ptr++;
 	}
     }
-
-    return( unesc );
-}
-#endif
-    char *
-cgi_unescape( char *raw )
-{
-    char    *unesc;
-    char    *ptr;
-
-    ptr = unesc;
-    for ( ; *raw != '\0'; raw++ ) {
-        if ( *raw == '+' ) {
-            *ptr = ' ';
-            ptr++;
-            break;
-	}
-        if ( *raw != '%' ) {
-            *ptr = *raw;
-            ptr++;
-	    break;
-	}
-            raw++;
-            *ptr = (char)strtol( raw, &ptr, 16 );
-            raw++;
-    }
+    *ptr = '\0';
 
     return( unesc );
 }
@@ -641,28 +627,32 @@ cgi_querystring( char *line, struct cgi_list *cl )
 {
     char 	*key, *data;
     int		i;
-
 DEBUG( fprintf( stderr, "DB: in cgi_qs\n" ));
-    for ( key = strtok( line, "=" ); key != NULL; key = strtok( NULL, "=" )) {
+    for ( key = strtok( line, "&" ); key != NULL; key = strtok( NULL, "&" )) {
 
-	key = cgi_unescape( key );
-	data = strtok( NULL, "&" );
-	for ( i = 0; cl[i].cl_key != NULL; i++ ) {
-	    if ( strcmp( cl[i].cl_key, key ) == 0 ) {
+	if (( data = strchr( key, '=' )) == NULL ) {
+	    return( -1 );
+	}
+	*data++ = '\0';
+	if (( key = cgi_unescape( key )) == NULL ) {
+	    return( -1 );
+	}
+	for ( i = 0; cl[ i ].cl_key != NULL; i++ ) {
+	    if ( strcmp( cl[ i ].cl_key, key ) == 0 ) {
 		if (( data == NULL ) || ( *data == '\0' )) {
-		    cl[i].cl_data = NULL;
+		    cl[ i ].cl_data = NULL;
 		    break;
 		}
-		data = cgi_unescape( data );
-		cl[i].cl_data = strdup( data ); 
-		if (( cl[i].cl_data = strdup( data )) == NULL ) {
-		    return ( -1 );
+		if (( data = cgi_unescape( data )) == NULL ) {
+		    return( -1 );
+		}
+		if (( cl[ i ].cl_data = strdup( data )) == NULL ) {
+		    return( -1 );
 		}
 		break;
 	    }
 	}
     }
-
     return( 0 );
 }
 
@@ -729,7 +719,6 @@ DEBUG( fprintf( stderr, "DB: in cgi_post\n" ));
     if (( line = post_getline( cgi )) == NULL ) {
 	return( -1 );
     }
-
     if (( cgi_querystring( line, cl )) != 0 ) {
 	return( -1 );
     }
