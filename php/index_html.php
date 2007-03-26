@@ -95,12 +95,19 @@ require_once('config.php');
             <td colspan="2" class="tipbox-header">IFS news & tips</td>
           </tr>
           <tr>
+	  <td valign="top" class="tipbox-img-white">
+	      <img src="/images/bulb_small.gif" width="14" height="20">
+	  </td>
+	<td class="tipbox-text-white"><p>Access the most recent back of your files in mFile using <a href="http://www.itd.umich.edu/itcsdocs/s4110/">oldfiles</a></p>
+	  </td>
+      </tr>
+      <tr>
 	  <td valign="top" class="tipbox-img-blue">
 	      <img src="/images/bulb_small.gif" width="14" height="20">
 	  </td>
-	<td class="tipbox-text-blue"><p>As of May 3 2003, IFS no longer accepts insecure FTP connections. See <a href="http://www.umich.edu/~gpcc/ssh/">Security Changes to the ITCS Login Service</a> for more information, or contact <a href="http://www.itd.umich.edu/4help/">(734) 764-HELP</a> (764-4357).</p>
-	  </td>
-      </tr>
+	<td class="tipbox-text-blue"><p>You can <a href="http://www.itd.umich.edu/itcsdocs/s4311/#publishing">publish a web site</a> using mFile and your home directory</p>
+              </td>
+          </tr>
       <tr>
 	  <td valign="top" class="tipbox-img-white">
 	      <img src="/images/bulb_small.gif" width="14" height="20">
