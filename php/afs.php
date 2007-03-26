@@ -618,13 +618,18 @@ class Afs
     // Makes each piece of a file path clickable
     function pathDisplay()
     {
-        $path     = explode( '/', $this->path );
+		$path     = '';
         $pathDisp = '';
         $pathURI  = '';
 		$filename = '';
 		$lastDisp = '';
 		$lastURI  = '';
 
+		if ( empty( $this->path )) {
+			return '';
+		}
+
+        $path = explode( '/', $this->path );
 		while ( !strlen( $path[0] )) {
 			array_shift( $path );
 		}
