@@ -73,7 +73,7 @@ class Afs
 
 		if ( is_dir( $this->path )) {
 			$type = 'dir';
-		} elseif ( is_file( $this->path )) {
+		} else if ( is_file( $this->path )) {
 			$type = 'file';
 			$this->mimetype = Mime::getMimeType( $this->path );
 		}
@@ -565,7 +565,7 @@ class Afs
 			foreach( $Split as $segment ) {
 				if ( $segment == '..' ) {
 					$decrement++;
-				} elseif ( strlen( $segment )) {
+				} else if ( strlen( $segment )) {
 					$path .= '/'.$segment;
 				}
 			}
