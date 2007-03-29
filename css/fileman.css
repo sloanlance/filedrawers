@@ -51,12 +51,13 @@ iframe {
     text-decoration: underline;
 }
 
-div.sidebar {
+#sidebar {
 	position: fixed;
 	width: 200px;
 	left: 1.5%;
 	top: 95px;
 	padding: 0px;
+	margin: 0 70% 0 0;
 }
 
 div.masthead {
@@ -92,12 +93,12 @@ div.masthead {
 	border: none;
 }
 
-div.sidebar a {
+#sidebar a {
 	text-decoration: none;
 	border: none;
 }
 
-div.sidebar a:hover {
+#sidebar a:hover {
 	text-decoration: underline;
 }
 
@@ -412,11 +413,6 @@ div.expandItem h2, form.expandItem h2 {
 	background-color: #bbcbff;
 }
 
-#sidebar {
-	margin: 0 70% 0 0;
-	padding: 0 0 0 15px;
-}
-
 #inspector {
 	width: 190px;
 	border: 1px solid #336699;
@@ -615,4 +611,20 @@ table.content-text td {
 
 #overwrite_box {
     margin-right: 20px;
+}
+
+#lbtop {
+	visibility:hidden;
+	width: 85%;
+	height: 20px;
+	border: 1px solid #cccccc;
+	padding: 1px;
+	margin: 15px auto 15px auto;
+}
+
+#lbinner {
+	width: 0%;
+	height: 20px;
+	background-color: #336699;
+	border: 1px solid #000000;
 }

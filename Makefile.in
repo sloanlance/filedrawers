@@ -32,7 +32,8 @@ SHTMLDIRTARGET= php/addfavorites.php php/deletefavorites.php \
                 php/perm_manager.php php/progress.php \
                 php/renamefavorites.php php/viewfavorites.php \
                 php/blankpage.html php/scripterror.php php/help.php \
-                php/scriptversion.php php/view.php
+                php/scriptversion.php php/view.php \
+				php/upload-info-server.php
 
 HTMLDIRTARGET=  php/feedback.php
 

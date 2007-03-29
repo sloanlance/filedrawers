@@ -276,8 +276,9 @@ DEBUG( fprintf( stderr, "DB: in mp_read\n" ));
 	    cgi->ci_cur = cgi->ci_buf;
 	}
 
-	if (( rc = read( 0, cgi->ci_end, cgi->ci_buflen - 
-		    ( cgi->ci_end - cgi->ci_buf ))) <= 0 ) {
+	/* use "fread" to fix premature end of read when data is binary */ 
+	if (( rc = fread( cgi->ci_end, 1, cgi->ci_buflen - 
+		( cgi->ci_end - cgi->ci_buf ), stdin )) <= 0 ) { 	
 	    CGI_PARSERR( cgi, "mp_read: did not get any characters" );
 	    CGI_LOGERR( cgi );
 	    return( -1 );
@@ -337,6 +338,11 @@ mp_get_file( struct cgi_file *upfile, CGIHANDLE *cgi, char *boundary, struct fun
 DEBUG( fprintf( stderr, "DB: in mp_get_file\n" ));
 
     upfile->cf_size = 0;
+
+	/* fix: small file doesn't properly overwrite large */
+	if( cgi_file_clobber ) {
+		unlink( upfile->cf_tmp );
+	}
 
     // write the file out directly 
     if (( file_content = open( upfile->cf_tmp, O_WRONLY|O_CREAT|

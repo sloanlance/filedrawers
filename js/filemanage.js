@@ -6,7 +6,7 @@
 
 var imgStore         = '/images';       // General UI icons
 var mimeStore        = '/images/mime';  // Mime type icons
-var uploadLocation   = 'progress.php'; // Where the upload form posts
+var uploadLocation   = '/progress.php'; // Where the upload form posts
 var downloadURI      = 'download'      // Location of download script
 var folderMime       = '0000000dir';   // Fake mime type used for folders
 var clipboardSeparat = '*#~!@@@';
@@ -15,11 +15,62 @@ var showHiddenFiles  = 0;
 var clobberFiles     = 0;
 var agent            = navigator.userAgent.toLowerCase();
 var browserSafari    = ( agent.indexOf( "safari" ) != -1 );
-var sigFigures       = 0;              // Number of significant figures for fractions
+var sigFigures       = 1;              // significant figures for fractions
 var notifyHoldTime   = 5000;           // Time to display notification messages
 var previousHTML     = '';
 var sortDecending    = 0;
 var sortBy           = 'title';        // Default category to sort by
+var readOnlyPath     = 'snapshot.afs';
+
+var uploadloopcnt = 0;
+
+function ajaxupload() {
+    document.getElementById( 'overwrite_file' ).value =
+        (( document.getElementById( 'overwrite_box' ).checked ) ?
+        document.getElementById( 'overwrite_box' ).value : "" );
+
+    if ( uploadloopcnt == 0 ) {
+        document.getElementById( 'upload' ).submit();
+    }
+    document.getElementById( 'lbtop' ).style.visibility = 'visible';
+
+    var xmlHttpReq = false;
+    var self = this;
+    if ( window.XMLHttpRequest ) {
+        self.xmlHttpReq = new XMLHttpRequest();
+    } else if ( window.ActiveXObject ) {
+        self.xmlHttpReq = new ActiveXObject( "Microsoft.XMLHTTP" );
+    }
+    self.xmlHttpReq.open( 'POST', "/upload-info-server.php", true );
+    self.xmlHttpReq.setRequestHeader( 'Content-Type', 
+        'application/x-www-form-urlencoded' );
+
+    self.xmlHttpReq.onreadystatechange = function() {
+        if ( self.xmlHttpReq.readyState == 4 ) {
+                var results = self.xmlHttpReq.responseText;
+                var fields = results.split( ":" );
+                var total = fields[1];
+            if ( fields.length >= 3 ) {
+                var uploaded = fields[2];
+                if ( uploaded.match( /^[0-9]+/ ) && 
+                        total.match( /^[0-9]+$/ ) && total > 0 ) {
+                    var percent = Math.round( uploaded / total * 100 );
+                    document.getElementById( 'lbinner' ).style.width = 
+                        percent + '%';
+                    document.getElementById( 'lbpercent' ).innerHTML = 
+                        percent + '%';
+                    document.getElementById( 'fileinfo' ).innerHTML = 
+                        "Uploaded: " + formatBytes( uploaded ) + "/" + 
+                        formatBytes( total );
+                }
+            }
+            //ajaxtimerid = setTimeout( 'ajaxupload()',1000 );
+            ajaxtimerid = setTimeout( 'ajaxupload()',10 );
+            uploadloopcnt++;
+        }
+    }
+    self.xmlHttpReq.send( 'filename = ' + sid );
+}
 
 // Determines if a value exists in an array
 // From: embimedia.com
@@ -58,12 +109,12 @@ function startPage( notifyMsg, warnMsg )
         showHiddenFiles = 0;
     }
 
-	init_formvals();
-	// only initialize filemanager if we're viewing files
+    init_formvals();
+    // only initialize filemanager if we're viewing files
     if ( displayfileman ) {
-		displayFileList();
-		fileInspector();
-	}
+        displayFileList();
+        fileInspector();
+    }
 
     if ( notifyMsg ) {
         notifyUser( notifyMsg );
@@ -71,8 +122,8 @@ function startPage( notifyMsg, warnMsg )
 
     if ( warnMsg ) {
         alert( unescape( warnMsg ));
-        if ( window.location.href.indexOf( 'error=true' )!= -1 ) {
-            var regex=/\?error=true/gi;
+        if ( window.location.href.indexOf( 'error=true' ) != -1 ) {
+            var regex = /\?error=true/gi;
             window.location.href = window.location.href.replace( regex, '' );
         }
     }
@@ -83,23 +134,25 @@ function init_formvals()
 {
     document.getElementById( 'newLoc' ).value = path;
 
-	// if upload doesn't exist, no sidebar, then following vars don't exist
-	if ( !document.getElementById( 'upload' )) {
-		return 0;
-	}
+    // if upload doesn't exist, no sidebar, then following vars don't exist
+    if ( !document.getElementById( 'upload' )) {
+        return 0;
+    }
     document.getElementById( 'sessionid' ).value = sid;
     document.getElementById( 'uploadpath' ).value = path;
     document.getElementById( 'returnToURI' ).value = returnToURI;
 
-	return 1;
+    return 1;
 }
 
 // Returns a form checkbox or something else if approriate
 function createItemSelect( id, cuts )
 {
-    if ( !writable ) {
-            return document.createTextNode( '' );
-    } else if ( cuts && cuts.inArray( files[id].title ) ) {
+    // checkbox is placed in fileList checkbox column when in readOnlyPath
+
+    if ( !writable && !path.match( readOnlyPath )) {
+        return document.createTextNode( '' );
+    } else if ( cuts && cuts.inArray( files[id].title )) {
         return document.createTextNode( 'cut' );
     } else {
         // Create a checkbox and add it to the file list
@@ -110,9 +163,9 @@ function createItemSelect( id, cuts )
 		    Win/IE 6 doesn't like TYPE, so we're not using it.
             If you want to add support, feel free  */
         c.setAttribute( 'type','checkbox' );
-        c.setAttribute( 'value', id);
+        c.setAttribute( 'value', id );
         c.id = 'CB' + id;
-        c.onclick = function() { processCheckedItem(this); }
+        c.onclick = function() { processCheckedItem( this ); }
 
         if ( files[id].selected ) {
             c.setAttribute( 'checked', 'checked' );
@@ -126,14 +179,30 @@ function createItemSelect( id, cuts )
 function createListIcon( id )
 {    
     var i = document.createElement( 'img' );
-    i.setAttribute( 'src',  mimeStore + '/small/' + files[id].type + '.gif' );
-    i.setAttribute( 'width', '16' );
-    i.setAttribute( 'height', '16' );
 
-	var l = document.createElement( 'a' );
-	l.setAttribute( 'href', './?path=' + getFilenameUrl(id));
-	l.appendChild(i);
-	return l;
+	/*
+    if ( files[id].type == 'jpeg' || 
+			files[id].type == 'gif' ||
+			files[id].type == 'png' ) {
+        i.setAttribute( 'src',  
+            '/download/view.php?path=' + getFilenameUrl( id ));
+        i.setAttribute( 'width', '16' );
+        i.setAttribute( 'height', '16' );
+        i.onmouseover = function( evt ) { 
+            if ( !evt ) evt = window.event;
+            showImage( id, evt.clientX, evt.clientY );
+        }
+    } else { */
+        i.setAttribute( 'src',  mimeStore + '/small/' + files[id].type + '.gif' );
+        i.setAttribute( 'width', '16' );
+        i.setAttribute( 'height', '16' );
+    // }
+    
+    var l = document.createElement( 'a' );
+    l.setAttribute( 'href', './?path=' + getFilenameUrl( id ));
+    l.appendChild( i );
+
+    return l;
 }
 
 
@@ -141,11 +210,11 @@ function createFileName( id )
 {
     if ( files[id].type == folderMime || readable ) {
         var l = document.createElement( 'a' );
-        l.setAttribute( 'href', './?path=' + getFilenameUrl(id));
-        l.appendChild( document.createTextNode( files[id].title));
+        l.setAttribute( 'href', './?path=' + getFilenameUrl( id ));
+        l.appendChild( document.createTextNode( files[id].title ));
         return l;
     } else {
-        return document.createTextNode( files[id].title);
+        return document.createTextNode( files[id].title );
     }
 }
 
@@ -161,8 +230,8 @@ function createDlIcon( id )
 
         var l = document.createElement( 'a' );
         l.setAttribute( 'href', downloadURI + '/?path=' +
-			 getFilenameUrl(id));
-        l.appendChild(i);
+             getFilenameUrl( id ));
+        l.appendChild( i );
         return l;
     } else {
         return document.createTextNode( '' );
@@ -225,7 +294,7 @@ function selectColumn( sortFlag )
         i.setAttribute( 'src', imgStore + '/' + 'sort_ascend.gif' );
     }
 
-    l.setAttribute( 'href', "javascript:reorderFileList('" + sortFlag + "');" );
+    l.setAttribute( 'href', "javascript:reorderFileList( '" + sortFlag + "' );" );
     l.appendChild( i );
     parentElem.appendChild( l );
     setCookie( 'sortby', sortFlag );
@@ -276,8 +345,97 @@ function displayFileList()
         files.sort( sortFunc );
 
     // Display the file list
-	createFileList();
-	selectColumn( sortBy );
+    createFileList();
+    selectColumn( sortBy );
+}
+
+function mouseOver() {
+    var obj = this;
+
+    if ( obj.id.match( /^img_/ )) {
+        var fileindex = obj.id.replace( /^img_/, "" );
+        var curleft = curtop = 0;
+
+        if ( obj.offsetParent ) {
+            curleft = obj.offsetLeft
+            curtop = obj.offsetTop
+            while ( obj = obj.offsetParent ) {
+                curleft += obj.offsetLeft
+                curtop += obj.offsetTop
+            }
+        }
+    } else {
+        var imgs = document.getElementsByTagName( 'img' );
+        for ( var j = 0; j<imgs.length; j++ ) {
+            if ( imgs[j].id.match( /^theimg_/ )) {
+                imgs[j].style.visibility = 'hidden';
+            }
+        }
+    }
+}
+
+function showImage( id, x, y ) {
+    try {
+        var i = document.getElementById( 'theimg_' + id );
+        i.style.left = x + 'px';
+        i.style.top = y + 'px';
+        var w = i.width;
+        var h = i.height;
+        var scale = 1;
+
+        if ( w > 200 || h > 200 ) {
+            scale = 200 / Math.max( w,h );
+        }
+        if ( w != 0 && h != 0 ) {
+            i.setAttribute( 'width', w * scale );
+            i.setAttribute( 'height', h * scale );
+        }
+        
+        i.style.visibility = 'visible';
+    } catch ( error ) {
+        if ( !document.getElementById( "display" )) {
+            var div = document.createElement( 'div' );
+            document.body.appendChild( div );
+            div.id = 'display';
+        }
+        document.getElementById( "display" ).innerHTML = 'showImage: ' + error;
+    }
+}
+
+function addImage( fileurl, id ) {
+    try {
+        var image = new Image();
+        image.onload = function ( evt ) { }
+        image.onerror = function ( evt ) {
+            if ( !document.getElementById( "loaderror" )) {
+                var div = document.createElement( 'div' );
+                document.body.appendChild( div );
+                div.id = 'loaderror';
+            }
+            document.getElementById( "loaderror" ).innerHTML = 
+                'load error: ' + evt;
+        }
+
+        image.src = '/download/view.php?path=' + fileurl;
+        image.id = 'theimg_' + id;
+        image.style.border = '1px solid #000000';
+        image.style.position = 'absolute';
+        image.style.left = '0px';
+        image.style.top = '0px';
+        image.style.visibility = 'hidden';
+        image.onmouseover = function( evt ) { 
+            if ( !evt ) evt = window.event;
+            showImage( id, evt.clientX, evt.clientY );
+        }
+        document.body.appendChild( image );
+    } catch ( error ) {
+        if ( !document.getElementById( "display" )) {
+            var div = document.createElement( 'div' );
+            document.body.appendChild( div );
+            div.id = 'display';
+        }
+        document.getElementById( "display" ).innerHTML = 'addImage: ' + error;
+    }
 }
 
 // This function turns the array of file info into an html table
@@ -313,6 +471,16 @@ function createFileList()
         trElem.appendChild( tdElem );
 
         tdElem  = document.createElement( 'td' );
+
+		/*
+        if ( files[j].type == 'jpeg' || 
+                files[j].type == 'jpg' ||
+                files[j].type == 'gif' ||
+                files[j].type == 'png' ) {
+            tdElem.setAttribute( 'id', 'img_' + j );
+            addImage( getFilenameUrl( j ), j );
+        }
+		*/
         tdElem.appendChild( createListIcon( j ));
         trElem.appendChild( tdElem );
 
@@ -340,7 +508,8 @@ function createFileList()
     if ( files.length < 3 ) {
         trElem = document.createElement( 'tr' );
         tdElem = document.createElement( 'td' );
-        tdElem.setAttribute( 'colspan', '6' );
+        //tdElem.setAttribute( "colspan", 6 ); IE7 Doesn't Work with this function
+        tdElem.colSpan = 6; //All browsers work with this
         var emElem = document.createElement( 'em' );
         txtNode = document.createTextNode( 'This folder contains no files or '
           + 'folders.' );
@@ -353,12 +522,16 @@ function createFileList()
         docFragment.appendChild( trElem );
     }
 
-    // Attaches all of the html generated above to the document
-    myNewtbody.appendChild( docFragment );
-
+	// Attaches all of the html generated above to the document
+	myNewtbody.appendChild( docFragment );
 	if ( document.getElementById( 'fileList' )) {
 		mytable = document.getElementById( 'fileList' );
 		mytable.replaceChild( myNewtbody, mytbody );
+
+		var tds = document.getElementsByTagName( 'td' );
+		for ( var j = 0; j < tds.length; j++ ) {
+			tds[j].onmouseover = mouseOver;
+		}   
 	}
 }
 
@@ -366,27 +539,27 @@ function createFileList()
 // Necessary because early versions of Safari don't support toFoxed()
 function roundNum( num )
 {
-    return Math.round( num * Math.pow( 10, sigFigures )) / Math.pow( 10,
-    sigFigures );
+    return Math.round( num * Math.pow( 10, sigFigures )) / 
+		Math.pow( 10, sigFigures );
 }
 
 // Returns a user friendly file size
-function formatBytes( bytes )
+function formatBytes( bytesstr )
 {
+    var bytes = parseInt( bytesstr );
+    var tmp = 0.0;
+
     if ( bytes >= 1073741824 ) {
         return ( bytes / 1073741824 ) + ' GB';
     } else if ( bytes >= 1048576 ) {
         return roundNum( bytes / 1048576 ) + ' MB';
-    } else if ( bytes >= 1024 ) {
+    } else if ( bytes > 102 ) {
         return roundNum( bytes / 1024 ) + ' KB';
-    } else if ( bytes > 768 && bytes < 1024 ) {
-        return '1 KB';
-    } else if ( bytes > 0 && bytes < 768 ) {
-        return '< 1 KB';
+    } else if ( bytes > 0 ) {
+        return '< .1 KB';
     } else {
-        return 0;
+        return 'empty';
     }
-
     return bytes;
 }
 
@@ -407,7 +580,7 @@ function File( title, date, size, selected, type )
 {
     this.title     = title;    // The title of the item
     this.date      = date * 1; // The modify date of the item
-				// multiply by 1 to cast to an int
+                // multiply by 1 to cast to an int
     this.size      = size;     // The size of the item
     this.selected  = selected; // Is the item selected?
     this.type      = type;     // The file type of the item
@@ -423,7 +596,7 @@ function SelectedFileInfo()
     this.lastId    = 0;
     var ids        = getSelectedItems();
 
-    for ( var j=0; j < ids.length; j++ ) {
+    for ( var j = 0; j < ids.length; j++ ) {
         this.filelist += files[ids[j]].title + "<br />";
         this.totalSize += files[ids[j]].size;
         this.numSel++;
@@ -438,18 +611,18 @@ function SelectedFileInfo()
             + this.filelist + '</li></ul>' : '';
 }
 
-// Notify user of status changes (e.g. upload complete, file deleted, etc.)
+// Notify user of status changes ( e.g. upload complete, file deleted, etc. )
 function notifyUser( msg )
 {
     originalNotify = document.getElementById( 'notifyArea' ).innerHTML;
-    document.getElementById('notifyArea' ).innerHTML =
+    document.getElementById( 'notifyArea' ).innerHTML =
             '<span class="notify" id="location" >' + msg + '</span>';
-    setTimeout("resetnotifyArea(originalNotify)", notifyHoldTime );
+    setTimeout( "resetnotifyArea( originalNotify )", notifyHoldTime );
 }
 
 function resetnotifyArea( original )
 {
-    document.getElementById('notifyArea').innerHTML = original;
+    document.getElementById( 'notifyArea' ).innerHTML = original;
 }
 
 // Get the contents of the clipboard from the browser cookie file
@@ -459,7 +632,7 @@ function getClipboard()
     var clipPath   = readCookie( 'filepath' );
     var clipAction = readCookie( 'clipaction' );
     
-    if ( clipboard && clipAction == 'cut' && path == clipPath) {
+    if ( clipboard && clipAction == 'cut' && path == clipPath ) {
         return clipboard.split( clipboardSeparat );
     } else {
         return null;
@@ -528,7 +701,7 @@ function readCookie( name )
     for ( var i = 0; i < ca.length; i++ ) {
         var c = ca[i];
 
-        while ( c.charAt(0) == ' ' ) {
+        while ( c.charAt( 0 ) == ' ' ) {
             c = c.substring( 1, c.length );
         }
 
@@ -575,8 +748,8 @@ function startUpload()
      * therefore, we need to set it manually before submit.
      */
     document.getElementById( 'overwrite_file' ).value =
-	    (( document.getElementById( 'overwrite_box' ).checked ) ?
-            document.getElementById( 'overwrite_box' ).value : "");
+        (( document.getElementById( 'overwrite_box' ).checked ) ?
+            document.getElementById( 'overwrite_box' ).value : "" );
     document.getElementById( 'upload' ).submit();
 }
 
@@ -586,15 +759,15 @@ function setPMpath()
 {
     var itemInfo = new SelectedFileInfo();
 
-    document.getElementById( 'permpanel' ).src = '/perm_manager.php?target=' +
-	    getFilenameUrl(itemInfo.lastId);
+    document.getElementById( 'permpanel' ).src = 
+		'/perm_manager.php?target=' + getFilenameUrl( itemInfo.lastId );
 }
 
 // Sets the path for the iframe that displays the user's list of favorite locations
 function setFavPath()
 {
-    document.getElementById( 'favpanel' ).src = '/viewfavorites.php?target='
-            + path;
+    document.getElementById( 'favpanel' ).src = 
+		'/viewfavorites.php?target=' + path;
 }
 
 // Toggles the show hidden files variable
@@ -631,11 +804,11 @@ function setInspControl( id, cmd, label )
 {
     var item = '';
 
-	if ( !document.getElementById( id )) {
-		return;
-	}
+    if ( !document.getElementById( id )) {
+        return;
+    }
 
-	item = document.getElementById( id );
+    item = document.getElementById( id );
     if ( cmd ) {
         var newItem = document.createElement( 'a' );
         newItem.appendChild( document.createTextNode( label ));
@@ -657,7 +830,7 @@ function setInspControl( id, cmd, label )
 function activateLocationCtrl( active )
 {
     if ( active == true ) {
-		document.getElementById( 'newLoc' ).value = path;
+        document.getElementById( 'newLoc' ).value = path;
         document.getElementById( 'location' ).style.display     = 'none';
         document.getElementById( 'changeDir' ).style.display    = 'none';
         document.getElementById( 'newLoc' ).style.display       = 'inline';
@@ -676,24 +849,28 @@ function activateLocationCtrl( active )
 function getFolderIcon()
 {
     if ( !writable ) {
-        document.getElementById('selectedItem').background = imgStore
-			+ '/folder_locked.gif';
+        document.getElementById( 'selectedItem' ).background = imgStore
+            + '/folder_locked.gif';
     } else {
-		document.getElementById('selectedItem').background = imgStore
-			+ '/folder.gif';
+        document.getElementById( 'selectedItem' ).background = imgStore
+            + '/folder.gif';
     }
 }
 
-// Displays a dynamic inspector-type interface that changes based on user selections
-// This function displays inspector items as greyed out or clickable links as
-// apprpriate
+/* Displays a dynamic inspector-type interface that changes based on 
+ * user selections. This function displays inspector items as greyed out 
+ * or clickable links as appropriate
+ */
 function fileInspector()
 {
     var itemInfo  = new SelectedFileInfo();
     var content = '';
 
+    // handle special case of readOnlyPath holder(s)
+    notIgnore = !path.match( readOnlyPath );
+
     // Only show the paste option if there is something in the clipboard
-        if ( readCookie( "clipboard" )) {
+    if ( readCookie( "clipboard" ) && notIgnore ) {
         setInspControl( 'pasteCtrl', 'paste()', 'Paste to This Folder' );
     } else {
         setInspControl( 'pasteCtrl', '', 'Paste to This Folder' );
@@ -705,20 +882,20 @@ function fileInspector()
             setInspControl( 'uploadCtrl', '', 'Upload File(s)' );
             setInspControl( 'newFolderCtrl', '', 'Create a New Folder' );
         } else {
-            setInspControl('uploadCtrl',
+            setInspControl( 'uploadCtrl',
                            'initClobberCheckbox();' +
-                           'expandItem(\'uploadCtrl\',\'upload\')',
+                           'expandItem(\'uploadCtrl\',\'upload\' )',
                            'Upload File(s)' );
             setInspControl( 'newFolderCtrl',
-              'expandItem(\'newFolderCtrl\',\'newFolder\')',
+              'expandItem( \'newFolderCtrl\', \'newFolder\' )',
               'Create a New Folder' );
         }
-
+    
         setInspControl( 'cutCtrl', '', 'Cut Selected Item(s)' );
-        setInspControl( 'copyCtrl', '', 'Copy Selected Item(s)' );
         setInspControl( 'renameCtrl', '', 'Rename Selected Item' );
         setInspControl( 'deleteCtrl', '', 'Delete Selected Item(s)' );
         setInspControl( 'permsCtrl', '', 'Set Permissions for Folder' );
+        setInspControl( 'copyCtrl', '', 'Copy Selected Item(s)' );
         document.getElementById( 'inspTitle' ).innerHTML = 'Folder Properties';
         document.getElementById( 'selectedItem' ).innerHTML = foldername;
         document.getElementById( 'itemInfo' ).innerHTML = '';
@@ -726,16 +903,24 @@ function fileInspector()
     // This is the sidebar menu state for 1 item selected
     } else if ( itemInfo.numSel == 1 ) {
         setInspControl( 'uploadCtrl', '', 'Upload File(s)' );
-        setInspControl( 'cutCtrl', 'setClipboard(\'cut\')',
-          'Cut Selected Item(s)' );
-        setInspControl( 'copyCtrl', 'setClipboard(\'copy\')',
+        if ( notIgnore ) {
+          setInspControl( 'cutCtrl', 'setClipboard(\'cut\' )',
+            'Cut Selected Item(s)' );
+          setInspControl( 'renameCtrl', 'rename()', 'Rename Selected Item' );
+          setInspControl( 'deleteCtrl', 'delFiles( files )',
+            'Delete Selected Item(s)' );
+        } else {
+          setInspControl( 'cutCtrl', '', 'Cut Selected Item(s)' );
+          setInspControl( 'renameCtrl', '', 'Rename Selected Item' );
+          setInspControl( 'deleteCtrl', '', 'Delete Selected Item(s)' );
+        }
+
+        setInspControl( 'pasteCtrl', '', 'Paste to This Folder' );
+        setInspControl( 'copyCtrl', 'setClipboard( \'copy\' )',
           'Copy Selected Item(s)' );
-        setInspControl( 'renameCtrl', 'rename()', 'Rename Selected Item' );
-        setInspControl( 'deleteCtrl', 'delFiles(files)',
-          'Delete Selected Item(s)' );
         setInspControl( 'newFolderCtrl', '', 'Create a New Folder' );
         
-        if ( files[ itemInfo.lastId ].type == folderMime ) {
+        if ( files[ itemInfo.lastId ].type == folderMime && notIgnore ) {
             setInspControl( 'permsCtrl',
                             'permsCtrl_cmd()',
                             'Set Permissions for Folder' );
@@ -743,7 +928,6 @@ function fileInspector()
             setInspControl( 'permsCtrl', '', 'Set Permissions for Folder' );
         }
 
-        setInspControl( 'pasteCtrl', '', 'Paste to This Folder' );
         document.getElementById( 'inspTitle' ).innerHTML =
                 'Selected Item Properties';
         document.getElementById( 'selectedItem' ).innerHTML =
@@ -752,19 +936,25 @@ function fileInspector()
     // This is the sidebar menu state for many items selected
     } else {
         setInspControl( 'uploadCtrl', '', 'Upload File(s)' );
-        setInspControl( 'cutCtrl',
-                        'setClipboard(\'cut\')',
-                        'Cut Selected Item(s)' );
-        setInspControl( 'copyCtrl',
-                        'setClipboard(\'copy\')',
-                        'Copy Selected Item(s)' );
+        if ( notIgnore ) {
+          setInspControl( 'cutCtrl',
+                          'setClipboard( \'cut\' )',
+                          'Cut Selected Item(s)' );
+          setInspControl( 'deleteCtrl',
+                          'delFiles( files )',
+                          'Delete Selected Item(s)' );
+        } else {
+          setInspControl( 'cutCtrl', '', 'Cut Selected Item(s)' );
+          setInspControl( 'deleteCtrl', '', 'Delete Selected Item(s)' );
+        }
+
         setInspControl( 'renameCtrl', '', 'Rename Selected Item' );
-        setInspControl( 'deleteCtrl',
-                        'delFiles(files)',
-                        'Delete Selected Item(s)' );
+        setInspControl( 'pasteCtrl', '', 'Paste to This Folder' );
         setInspControl( 'newFolderCtrl', '', 'Create a New Folder' );
         setInspControl( 'permsCtrl', '', 'Set Permissions for Folder' );
-        setInspControl( 'pasteCtrl', '', 'Paste to This Folder' );
+        setInspControl( 'copyCtrl',
+                        'setClipboard( \'copy\' )',
+                        'Copy Selected Item(s)' );
         document.getElementById( 'inspTitle' ).innerHTML =
           'Selected Items Properties';
         document.getElementById( 'selectedItem' ).innerHTML =
@@ -779,7 +969,7 @@ function fileInspector()
 function permsCtrl_cmd()
 {
     setPMpath();
-    expandItem('permsCtrl','permissions');
+    expandItem( 'permsCtrl', 'permissions' );
 }
 
 // Toggles the display of a hidden object. I don't this this is still used
@@ -815,7 +1005,7 @@ function rename()
     cell.appendChild( spacer );
     cell.appendChild( cButton );
     cButton.onclick = function() { cancelRename( oldContent, cell ); }
-    rButton.onclick = function(id)
+    rButton.onclick = function( id )
             { finishRename( tBox.value, oldContent, cell ); }
     tBox.focus();
 
@@ -859,7 +1049,7 @@ function getSelectedItems()
 
     for ( var j = 0; j < files.length; j++ ) {
             if ( files[j].selected === true ) {
-                    ids.push(j);
+                    ids.push( j );
             }
     }
 
@@ -910,13 +1100,13 @@ function processCheckedItem( checkbox )
 function processClobberCheckbox()
 {
     setCookie( 'clobberFiles',
-               (document.getElementById( 'overwrite_box' ).checked) ? 1 : 0);
+               ( document.getElementById( 'overwrite_box' ).checked ) ? 1 : 0 );
 }
 
 function initClobberCheckbox()
 {
     clobberFiles = readCookie( 'clobberFiles' );
-    clobberFiles = ((clobberFiles == 1) ? clobberFiles : 0);
+    clobberFiles = (( clobberFiles == 1 ) ? clobberFiles : 0 );
     document.getElementById( 'overwrite_box' ).checked = clobberFiles;
 }
 
@@ -926,13 +1116,13 @@ function initClobberCheckbox()
  */
 function getFilenameUrl( id )
 {
-    return urlescape(path + '/' + files[id].title );
+    return urlescape( path + '/' + files[id].title );
 }
 
 // escape() doesn't handle the "+" character? odd.
 function urlescape( str )
 {
-    str = escape(str);
-    str = str.replace(/\+/g, "%2B");
+    str = escape( str );
+    str = str.replace( /\+/g, "%2B" );
     return str;
 }

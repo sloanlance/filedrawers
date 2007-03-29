@@ -1,4 +1,4 @@
-<div class="sidebar">
+<div id="sidebar">
 <div id="inspector">
     <h3 id="inspTitle">Folder Properties</h3>
     <div id="selectedItem" style="background-image: url(/images/folder.gif);">item
@@ -74,9 +74,16 @@
 	<div class="uploadctrl" id="uploadctrl">
 	    Overwrite files during upload?
 	    <input type="checkbox" name="overwrite_box" id="overwrite_box" onClick="processClobberCheckbox();">
-	    <input type="button" name="upload" value="Upload File(s)" onClick="startUpload();" />
+
+	    <input type="button" name="upload" value="Upload File(s)" onClick="uploadloopcnt=0; ajaxupload();" />
 &nbsp;&nbsp; </div>
-	<iframe class="progbar" src="/blankpage.html" marginwidth="0" align="center" marginheight="0" scrolling="no" id="progbar" frameborder="0"></iframe>
+	<div id="lbtop">
+		<div id="lbinner"></div>
+		<table width="100%">
+		<tr><td id=fileinfo></td><td align="right" id="lbpercent"></td></tr>
+		</table>
+	</div>
+
     </form>
 </div>
 <div id=version>
