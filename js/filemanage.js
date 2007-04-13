@@ -159,8 +159,8 @@ function createItemSelect( id, cuts )
         var c = document.createElement( 'input' );
         c.setAttribute( 'name','softsel[]' );
 
-		/*  Mac/IE 5 seems to want TYPE in UPPERCASE, but
-		    Win/IE 6 doesn't like TYPE, so we're not using it.
+        /*  Mac/IE 5 seems to want TYPE in UPPERCASE, but
+            Win/IE 6 doesn't like TYPE, so we're not using it.
             If you want to add support, feel free  */
         c.setAttribute( 'type','checkbox' );
         c.setAttribute( 'value', id );
@@ -180,10 +180,10 @@ function createListIcon( id )
 {    
     var i = document.createElement( 'img' );
 
-	/*
+    /*
     if ( files[id].type == 'jpeg' || 
-			files[id].type == 'gif' ||
-			files[id].type == 'png' ) {
+            files[id].type == 'gif' ||
+            files[id].type == 'png' ) {
         i.setAttribute( 'src',  
             '/download/view.php?path=' + getFilenameUrl( id ));
         i.setAttribute( 'width', '16' );
@@ -208,13 +208,21 @@ function createListIcon( id )
 
 function createFileName( id )
 {
+    title = files[id].title;
+    if ( title == '.' ) {
+        title += ' (current directory)';
+    }
+    if ( title == '..' ) {
+        title += ' (parent directory)';
+    }
+
     if ( files[id].type == folderMime || readable ) {
         var l = document.createElement( 'a' );
         l.setAttribute( 'href', './?path=' + getFilenameUrl( id ));
-        l.appendChild( document.createTextNode( files[id].title ));
+        l.appendChild( document.createTextNode( title ));
         return l;
     } else {
-        return document.createTextNode( files[id].title );
+        return document.createTextNode( title );
     }
 }
 
@@ -467,12 +475,13 @@ function createFileList()
         trElem.id = 'TR' + j;
 
         tdElem  = document.createElement( 'td' );
-        tdElem.appendChild( createItemSelect( j, cuts ));
+        if ( files[j].title != '.' && files[j].title != '..' ) {
+            tdElem.appendChild( createItemSelect( j, cuts ));
+        }
         trElem.appendChild( tdElem );
 
         tdElem  = document.createElement( 'td' );
-
-		/*
+        /*
         if ( files[j].type == 'jpeg' || 
                 files[j].type == 'jpg' ||
                 files[j].type == 'gif' ||
@@ -480,7 +489,7 @@ function createFileList()
             tdElem.setAttribute( 'id', 'img_' + j );
             addImage( getFilenameUrl( j ), j );
         }
-		*/
+        */
         tdElem.appendChild( createListIcon( j ));
         trElem.appendChild( tdElem );
 
@@ -522,17 +531,17 @@ function createFileList()
         docFragment.appendChild( trElem );
     }
 
-	// Attaches all of the html generated above to the document
-	myNewtbody.appendChild( docFragment );
-	if ( document.getElementById( 'fileList' )) {
-		mytable = document.getElementById( 'fileList' );
-		mytable.replaceChild( myNewtbody, mytbody );
+    // Attaches all of the html generated above to the document
+    myNewtbody.appendChild( docFragment );
+    if ( document.getElementById( 'fileList' )) {
+        mytable = document.getElementById( 'fileList' );
+        mytable.replaceChild( myNewtbody, mytbody );
 
-		var tds = document.getElementsByTagName( 'td' );
-		for ( var j = 0; j < tds.length; j++ ) {
-			tds[j].onmouseover = mouseOver;
-		}   
-	}
+        var tds = document.getElementsByTagName( 'td' );
+        for ( var j = 0; j < tds.length; j++ ) {
+            tds[j].onmouseover = mouseOver;
+        }   
+    }
 }
 
 // Rounds a number to the specified number of significant figures
@@ -540,7 +549,7 @@ function createFileList()
 function roundNum( num )
 {
     return Math.round( num * Math.pow( 10, sigFigures )) / 
-		Math.pow( 10, sigFigures );
+        Math.pow( 10, sigFigures );
 }
 
 // Returns a user friendly file size
@@ -760,14 +769,14 @@ function setPMpath()
     var itemInfo = new SelectedFileInfo();
 
     document.getElementById( 'permpanel' ).src = 
-		'/perm_manager.php?target=' + getFilenameUrl( itemInfo.lastId );
+        '/perm_manager.php?target=' + getFilenameUrl( itemInfo.lastId );
 }
 
 // Sets the path for the iframe that displays the user's list of favorite locations
 function setFavPath()
 {
     document.getElementById( 'favpanel' ).src = 
-		'/viewfavorites.php?target=' + path;
+        '/viewfavorites.php?target=' + path;
 }
 
 // Toggles the show hidden files variable
