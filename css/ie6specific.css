@@ -7,7 +7,7 @@ body {
 	overflow: auto; 
 }
  
-div.sidebar {
+div#sidebar {
 	position: absolute;
 	padding: 0px;
 	height: 100%; 

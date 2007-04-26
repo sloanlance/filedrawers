@@ -4,7 +4,7 @@ body {
 	z-index: 1; 
 } 
 
-div.sidebar {
+div#sidebar {
 	position: absolute;
 	z-index: 6;
 	overflow: hidden; 
