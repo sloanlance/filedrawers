@@ -70,24 +70,7 @@ require_once('config.php');
               </td>
             </tr>
           </table>
-          <table width="100%" border="0" cellspacing="0" cellpadding="0">
-            <tr>
-              <td>&nbsp;</td>
-            </tr>
-            <tr>
-              <td class="cont-textbox1"><table border="0" cellspacing="0" cellpadding="0">
-                  <tr>
-                    <td nowrap class="tab-text"> native afs clients</td>
-                    <td class="tab-cap"><img src="/images/blue_tabcap_r.gif" width="8" height="24"></td>
-                  </tr>
-                </table>
-                  <p class="content-text">
-      If you prefer using a native AFS client, visit the <a href="http://www.openafs.org">OpenAFS web site</a> to learn about installing and using an OpenAFS client on your own computer.<br>
-                  </p>
-              </td>
-            </tr>
-          </table>
-          <p>&nbsp;</p></td>
+		</td>
         <td class="colspace1">&nbsp;</td>
         <td width="275" valign="top"><br>          
           <table width="100%" border="0" cellpadding="0" cellspacing="0" class="cont-tipbox">
@@ -126,8 +109,7 @@ require_once('config.php');
 	  <td valign="top" class="tipbox-img-white">
 	      <img src="/images/bulb_small.gif" width="14" height="20">
 	  </td>
-            <td class="tipbox-text-white"><p>JavaScript must be active in your browser for most
-<?php echo "$service_name"; ?> features.</p>
+            <td class="tipbox-text-white"><p>JavaScript must be active in your browser for most mFile features.</p>
                 </td>
           </tr>
         </table>

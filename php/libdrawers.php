@@ -5,65 +5,65 @@
  */
 
 // Standard javascripts
-$javascripts = array("/js/filemanage.js");
+$javascripts 	= array( "/js/filemanage.js" );
 
 // Standard stylesheets
-$stylesheets = array("/css/fileman.css");
+$stylesheets 	= array( "/css/fileman.css" );
 
 // Default value for $displayfileman
-$displayfileman = 1;
+$displayfileman	= 1;
 
 // AFS homedir default location.
-$afsBase       = '/afs/umich.edu/user/';
+$afsBase	   	= '/afs/umich.edu/user/';
 
 // Take care of file uploads.
-function process_upload(&$notifyMsg, &$errorMsg)
+function process_upload( &$notifyMsg, &$errorMsg )
 {
 
-    $uploadError = false;
-    $errorMsg    = '';
+	$uploadError = false;
+	$errorMsg	 = '';
 
-    if ( isset( $_GET['finishid'] )) {
-        $temppath = "/tmp/" . $_GET['finishid'];
+	if ( isset( $_GET['finishid'] )) {
+		$temppath = "/tmp/" . $_GET['finishid'];
 
-        if ( file_exists( $temppath )
-                && preg_match( "/[^a-f0-9]/", $_GET['finishid'] ) === 0
-                && !is_dir( $temppath )) {
-            $result = file( $temppath );
-            unlink( $temppath ); // Remove the session file
+		if ( file_exists( $temppath )
+				&& preg_match( "/[^a-f0-9]/", $_GET['finishid'] ) === 0
+				&& !is_dir( $temppath )) {
+			$result = file( $temppath );
+			unlink( $temppath ); // Remove the session file
 
-            // Check for upload errors
-            if ( is_array( $result )) {
-                foreach( $result as $file ) {
-                    $file = explode( ':', $file );
-                    if ( isset( $file[2] ) &&
-                         trim( $file[2] ) == 'File exists' ) {
-                        if ( $uploadError == false ) {
-                            $errorMsg = "The file '" . $file[0] .
-                                    "' already exists."
-                                    . " The upload cannot continue.";
-                            $uploadError = true;
-                        }
-                    }
+			// Check for upload errors
+			if ( is_array( $result )) {
+				foreach( $result as $file ) {
+					$file = explode( ':', $file );
+					if ( isset( $file[2] ) &&
+						 trim( $file[2] ) == 'File exists' ) {
+						if ( $uploadError == false ) {
+							$errorMsg = "The file '" . $file[0] .
+									"' already exists."
+									. " The upload cannot continue.";
+							$uploadError = true;
+						}
+					}
 
-                    if ( isset( $file[2] ) &&
-                            trim( $file[2] ) == 'not successful' ) {
-                        if ( $uploadError == false ) {
-                            $errorMsg = "One or more files did not " .
-                                        "upload sucessfully";
-                            $uploadError = true;
-                        }
-                    }
-                }
+					if ( isset( $file[2] ) &&
+							trim( $file[2] ) == 'not successful' ) {
+						if ( $uploadError == false ) {
+							$errorMsg = "One or more files did not " .
+										"upload sucessfully";
+							$uploadError = true;
+						}
+					}
+				}
 
-                if ( ! $uploadError ) {
-                    $notifyMsg = "Successfully received file(s).";
-                }
-            }
-        }
-    }
+				if ( ! $uploadError ) {
+					$notifyMsg = "Successfully received file(s).";
+				}
+			}
+		}
+	}
 
-    return $uploadError;
+	return $uploadError;
 }
 
 /*
@@ -72,20 +72,20 @@ function process_upload(&$notifyMsg, &$errorMsg)
  */
 function browser_check( )
 {
-    global $stylesheets;
-    $platform_comps = array( );
-    $msie_major = 0;
-    $msie_minor = 0;
-    $mac = 0;
+	global $stylesheets;
+	$platform_comps = array( );
+	$msie_major = 0;
+	$msie_minor = 0;
+	$mac = 0;
 	$platform_str = '';
 	$b_id = $_SERVER['HTTP_USER_AGENT'];
 
 	# look into php's get_browser()
 
 	# not suitable for lynx
-    if ( preg_match( '/Lynx/i', $b_id )) {
-        header( "Location: /scriptversion.php" );
-    }
+	if ( preg_match( '/Lynx/i', $b_id )) {
+		header( "Location: /scriptversion.php" );
+	}
 
 	# Firefox, Mozilla, Netscape, and Camino 
 	# all need to be at least "rv:1.7.2" to pass
@@ -98,72 +98,72 @@ function browser_check( )
 	}
 
 	# Win Opera 7.5 is broken, but 8 works
-    if ( preg_match( '/Opera\/7/', $b_id )) {
-        header( "Location: /scriptversion.php" );
-    }
+	if ( preg_match( '/Opera\/7/', $b_id )) {
+		header( "Location: /scriptversion.php" );
+	}
 
-    # We currently don't support Omniweb 4.5, although 5.1.1 works
-    if ( preg_match( '/OmniWeb\/v496$/', $b_id )) {
-        header( "Location: /scriptversion.php" );
-    }
+	# We currently don't support Omniweb 4.5, although 5.1.1 works
+	if ( preg_match( '/OmniWeb\/v496$/', $b_id )) {
+		header( "Location: /scriptversion.php" );
+	}
 
 	# Check for Safari after Omniweb, since OW uses Safari's string
-    if ( preg_match( '/Safari\/(.*)$/', $b_id, $Rev ) &&
+	if ( preg_match( '/Safari\/(.*)$/', $b_id, $Rev ) &&
 		( !strlen( $Rev[1] )  || ( $Rev[1] < 2 ))) {
-        header( "Location: /scriptversion.php" );
+		header( "Location: /scriptversion.php" );
    } 
 
-    $regex = "/(.*) \((.*)\)/";
-    if( preg_match( $regex, $b_id, $matches )) {
-        $browser_str = $matches[1];
-        $platform_str = $matches[2];
-    }
+	$regex = "/(.*) \((.*)\)/";
+	if( preg_match( $regex, $b_id, $matches )) {
+		$browser_str = $matches[1];
+		$platform_str = $matches[2];
+	}
 
-    $l=strlen( $platform_str );
+	$l=strlen( $platform_str );
 
-    $token = "";
-    for( $i=0; $i<=$l; $i++ )
-    {
-        if(( $i == $l ) || (( $c=$platform_str[$i] ) == ";" )) {
-            $platform_comps[] = ltrim( rtrim( $token ));
-            $token = "";
-        } else {
-            $token .= $c;
-        }
-    }
+	$token = "";
+	for( $i=0; $i<=$l; $i++ )
+	{
+		if(( $i == $l ) || (( $c=$platform_str[$i] ) == ";" )) {
+			$platform_comps[] = ltrim( rtrim( $token ));
+			$token = "";
+		} else {
+			$token .= $c;
+		}
+	}
 
-    foreach( $platform_comps as $comp ) {
-        $regex = "/MSIE (\d+)\.(\d+)/";
-        if( preg_match( $regex, $comp, $matches )) {
-            $msie_major = $matches[1];
-            $msie_minor = $matches[2];
+	foreach( $platform_comps as $comp ) {
+		$regex = "/MSIE (\d+)\.(\d+)/";
+		if( preg_match( $regex, $comp, $matches )) {
+			$msie_major = $matches[1];
+			$msie_minor = $matches[2];
 
-        }
+		}
 
-        if ( preg_match( "/^Mac/i", $comp, $matches )) {
-            $mac = 1;
-        }
-    }
+		if ( preg_match( "/^Mac/i", $comp, $matches )) {
+			$mac = 1;
+		}
+	}
 
-    // We currently don't support MSIE on mac
+	// We currently don't support MSIE on mac
 	// This also catches Opera 7.5 and 8 for mac.
 	// Mac Opera 7.5 is broken, Opera 8 works, but they both have the
 	// same browser identification string. PUNT! Use a real browser!
-    if ( $msie_major && $mac ) {
-        header( "Location: /scriptversion.php" );
-    }
+	if ( $msie_major && $mac ) {
+		header( "Location: /scriptversion.php" );
+	}
 
-    // MSIE requires additional stylesheets
-    switch ( $msie_major ) {
-    case "5":
-        $stylesheets[] = "/css/ie5specific.css";
-        break;
-    case "6":
-        $stylesheets[] = "/css/ie6specific.css";
-        break;
-    default:
-        break;
-    }
+	// MSIE requires additional stylesheets
+	switch ( $msie_major ) {
+	case "5":
+		$stylesheets[] = "/css/ie5specific.css";
+		break;
+	case "6":
+		$stylesheets[] = "/css/ie6specific.css";
+		break;
+	default:
+		break;
+	}
 }
 
 /*
@@ -173,20 +173,17 @@ function browser_check( )
  */
 function getBasePath( $user )
 {
-    global $afsBase;
+	global $afsBase;
 
-    if ( !$user ) {
-	return false;
-    }
- 
-    $path = $afsBase . $user[0]
-      . "/" . $user[1] . "/" . $user;
+	if ( !$user ) {
+		return false;
+	}
 
-    $regEx = "/[^a-zA-z]/";
-    if ( preg_match( $regEx, $user )) {
-	return false;
-    } else {
-	return $path;
-    }
+	# does the username contain illegal characters?
+	if ( preg_match( "/[^a-zA-Z]/", $user )) {
+		return false;
+	}
+
+	return $afsBase . $user[0] . "/" . $user[1] . "/" . $user;
 }
 ?>

@@ -1,14 +1,19 @@
 <?php
-# Msu Modified file for Upload Progress Bar 
 
-echo "REQUEST filename = $_REQUEST[filename]\n";
+$fn = trim( $_REQUEST['filename_'] );
+if ( preg_match( "/[^a-f0-9]/", $fn )) {
+	echo "filename is not valid [$fn]\n";
+	exit();
+}
 
 /*
-if ( !preg_match( "/^[a-f0-9]+$/", $_REQUEST['filename'] )) {
-    echo "filename is not valid\n";
-    exit();
-}
-*/
-echo @file_get_contents( "/tmp/" . $_REQUEST['filename'] );
+ * Note: this may not work if mod_security is used with the
+ * SecRequestBodyAccess option turned on. This is because the file is uploaded
+ * to tmp using a different filename than the string generated for us. This
+ * file format looks like this:
+ * 20070419-163138-75.45.215.95-request_body-zutdsO where this script is
+ * looking for a tmp file that looks like this: 1ad60b47035b651643df9e712ec24ac7
+ */
+echo @file_get_contents( "/tmp/" . $fn );
 
 ?>

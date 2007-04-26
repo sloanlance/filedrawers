@@ -6,110 +6,89 @@
   have changes, instead of updating all timestamps
   (for ease of radmind transcript creation)
 
-- Remove the ability to delete "." and ".." directories from the file
-  manager.
-
-- Move filedwawers to sourceforge. CVS repository, mailing list, forum?
-
-- Fix user jport can't view the contents of his Private directory.
-  It's visible on mongolian, but not on japanese. What's wrong?
-
 - Fix the "rename" function
-    In file rename, fix it so that hitting the return key completes
-    the rename instead of having to hit the "rename" button.
+	In file rename, fix it so that hitting the return key completes
+	the rename instead of having to hit the "rename" button.
 
 - Fix cutting and pasting into the same folder.
 
-    Currently, this doesn't work. A possible solution would be to
-    create a copy, prefaced with "copy of" or simply numbered.
+	Currently, this doesn't work. A possible solution would be to
+	create a copy, prefaced with "copy of" or simply numbered.
 
 - Fix when a single item is selected, display the large mime icon for that item
-    under "selected item properties"
-
-- Add in support (under php 5.1) for is_readable and is_writable for AFS
-    * suppress download links when not readable
-    * suppress upload link when not writable
-
-- Actually verify after file upload that the file has been successfully
-    uploaded before announcing this. (currently, one can try uploading to
-    a directory they don't have permission to, and everything looks like
-    it worked)
+	under "selected item properties"
 
 (0.3) --- LS&A Permissions Feature
 
 - Feature Add handling for "current folder" operations.
 
-    We'll need cut, copy, rename, and set permissions for current folder.
+	We'll need cut, copy, rename, and set permissions for current folder.
 
-    Three ways of doing this:
+	Three ways of doing this:
 
-    1. Add 4 separate links to the the file menu:
+	1. Add 4 separate links to the the file menu:
 	Cut current folder
 	Copy current folder
 	Rename current folder
 	Set permissions for current folder
 
-    2. Add a checkbox next to the large folder icon at the
-       top of the menu items, and link this to the file operations when
-       selected.
+	2. Add a checkbox next to the large folder icon at the
+	   top of the menu items, and link this to the file operations when
+	   selected.
 
-       THIS IS PREFERRED.
+	   THIS IS PREFERRED.
 
-    3. Add a "this folder" entry to the existing checklist. Ensure
-       that it always remains on top when sorted.
+	3. Add a "this folder" entry to the existing checklist. Ensure
+	   that it always remains on top when sorted.
 
-- Feature Re-work permissions tab for usability
-    Permissions tab is currently very confusing unless you're
-    familiar with AFS "wildkar" rights and how those work.
+- Feature: Re-work permissions tab for usability
+	Permissions tab is currently very confusing unless you're
+	familiar with AFS "wildkar" rights and how those work.
 
-    Make the permissions tab a list of users/groups
-    with a simple drop-down menu selection. We'd like
-    to simplify folder and file rights to a few simple
-    choices. Advanced choices will still be available
-    in another tab.
+	Make the permissions tab a list of users/groups
+	with a simple drop-down menu selection. We'd like
+	to simplify folder and file rights to a few simple
+	choices. Advanced choices will still be available
+	in another tab.
 
-    something like below (subject to change):
+	something like below (subject to change):
 
-    Groups Blah may: "see this folder when browsing"
-                     "see the contents of this folder"
-                     "change and/or delete this folder"
+	Groups Blah may: "see this folder when browsing"
+					 "see the contents of this folder"
+					 "change and/or delete this folder"
 
-    User Blah may:  "see this folder when browsing"
-                    "see the contents of this folder"
-                    "change and/or delete this folder"
+	User Blah may:  "see this folder when browsing"
+					"see the contents of this folder"
+					"change and/or delete this folder"
 
-    In this display make abbreviations ike "Group system:anyuser" to Anyone,
-    to make permissions a little easier to understand.
+	In this display make abbreviations like "Group system:anyuser" to Anyone,
+	to make permissions a little easier to understand.
 
-    Possibly make current permission tab features available in an
-    "advanced" or "advanced AFS management" sub-tab.
+	Possibly make current permission tab features available in an
+	"advanced" or "advanced AFS management" sub-tab.
 
 --- Non-critical Fixes
 
 - Fix mfile header
-    Change mfile header so that it "lines up" exactly with
-    the non-ssl mfile login page. Right now it's looking a bit odd.
+	Change mfile header so that it "lines up" exactly with
+	the non-ssl mfile login page. Right now it's looking a bit odd.
 
 - Fix Sort files without regard to upper and lower case. (case insensitive)
 
-- Fix add secondary key (filename, alphabetical) to sort fields when
-    sorting by something else other than filename.
+- Fix add secondary sort key (filename, alphabetical) to sort fields when
+	sorting by something else other than filename.
 
 --- Web Stuff
 
 - Feature There should be some way in the "web sites" view to get
-    the web-url of any given document. Possibly add a url link into
-    the information bar of a given file/directory?
+	the web-url of any given document. Possibly add a url link into
+	the information bar of a given file/directory?
 
 - Feature: view/click/download links for documents
-    in webspace: display link, view inline, download
-    in non-webspace: view inline, download
+	in webspace: display link, view inline, download
+	in non-webspace: view inline, download
 
 --- Minor UI enhancements
-
-- Fix Files that mfile is unable to download (files with no read access)
-    these files should not have a download icon, and should not have
-    a clickable link for their filename.
 
 - Feature interact with ABS to display when an account has been disabled.
    We don't want users who have AFS access disabled poking around on
@@ -120,113 +99,93 @@
    either one was never created for you, or it's been disabled."
    Then provide a link to where they can get help.
 
-- Fix folders which contain only hidden files should display a message
-    that "this folder contains only hidden files", in the same way
-    that empty folders display "this folder is empty".
-
-- Fix behavior of download filename and icon.
-
-    The filename link should simply be a "normal" download link.
-
-    The icon should be the "force-download" header that's currently
-    in place.
-
-    Should these actions be sensitive to the files mime type?
-
-    Other button should just be an a-link to the object in question.
-    Open in new window? .mfile saved preferences?
-
 --- Major Features
 
 - Feature Possibly allow the creation/maintenance of a "friends" afs list?
-    and then allow the display of "My friends may:" etc?
+	and then allow the display of "My friends may:" etc?
 
 - Feature Integrate archive file access into mfile
 
-    There be an "open archive" file menu option that
-    lights up when an archive is selected. Clicking
-    on this option brings up a tab that will allow the following selections:
+	There be an "open archive" file menu option that
+	lights up when an archive is selected. Clicking
+	on this option brings up a tab that will allow the following selections:
 
-    expand contents in current folder
-    expand contents in folder named "Blah"
-    expand contents in arbitrary folder (entered by form below)
+	expand contents in current folder
+	expand contents in folder named "Blah"
+	expand contents in arbitrary folder (entered by form below)
 
-    when a folder is clicked on, the option should be added to the
-    context-sensitive menu to "turn this folder into an archive"
+	when a folder is clicked on, the option should be added to the
+	context-sensitive menu to "turn this folder into an archive"
 
-    "Create an archive out of selected items" would probably
-    be the better interface.
+	"Create an archive out of selected items" would probably
+	be the better interface.
 
 - Feature Add an AFS quota display button?
 
-    Display quota at all times.
-    Add a "buy more quota" link next to the displayed quota.
+	Display quota at all times.
+	Add a "buy more quota" link next to the displayed quota.
 
-    https://accounts.www.umich.edu/umce-bin/umce
+	https://accounts.www.umich.edu/umce-bin/umce
 
-    (current IFS quota display)
+	(current IFS quota display)
 
 - Feature Dropbox
 
-    Single button labeled sharing, or dropboxes.
+	Single button labeled sharing, or dropboxes.
 
-    Allow you to find anyplace that has sharing access for you.
+	Allow you to find anyplace that has sharing access for you.
 
-    Will make a list of all the folders that are set up to be deliberately
-    shared with you, or groups that you are a member of.
+	Will make a list of all the folders that are set up to be deliberately
+	shared with you, or groups that you are a member of.
 
-    This will be maintained by some form of database, which will keep
-    track of these relationships.
+	This will be maintained by some form of database, which will keep
+	track of these relationships.
 
-    It's OK for this database to lose consistency when the filespace
-    is editted manually.
+	It's OK for this database to lose consistency when the filespace
+	is editted manually.
 
-    Give each "dropbox" folder read access lookup permissions
-    for group
+	Give each "dropbox" folder read access lookup permissions
+	for group
 
-    the "difficult" part is coming up with a simple ui
+	the "difficult" part is coming up with a simple ui
 
-    browse as "mfile", with a friend user piece of text.
+	browse as "mfile", with a friend user piece of text.
 
-    "dropbox" directories will have permissions to an mfile group (or
-    user)
+	"dropbox" directories will have permissions to an mfile group (or
+	user)
 
 - Feature Create want to have a text-editing feature for MIME types
-    that would be editable in a web window.
+	that would be editable in a web window.
 
 --- Inter-Application Communication:
 
 - Feature Integration with mprint context sensitive "print this file"
 
 - Feature Integration with mail.umich.edu (imp)... context sensitive
-    "mail this file as an attachment"
+	"mail this file as an attachment"
 
 - Feature Integrate mail.umich.edu (imp?) to be able to save read
-    attachments as uploaded files.
+	attachments as uploaded files.
 
 --- Release
 
 - Feature find total # of users ever.
-    Look for how many new users we get every week.
-    (willn)
+	Look for how many new users we get every week.
+	(willn)
 
 - Feature: restructure Favorite Locations to "Shared Locations"
-    * make Favorites directory a special virtual directory (dotfile)
-    * store favorites, group spaces, dropboxes, and shared
-    * Get rid of the concept of having an actual "favorites" folder stored in
-    the user's AFS space. Create new, easily identified virtual folders that
-    may have additional, context-sensitive options that would be displayed in
-    the left-hand bar. These folders will eventually include favorites, groups,
-    shared and dropboxes
-    * Add an "add this folder as a favorite" link as a context-sensitive action.
-    * store list of places that someone else has permitted to a user in a database (both for umich users as well as friends)
-
-- Feature: restructure navigation bar to be more contextually sensitive
-    * integrate "show hidden files" into rest of nav list
-
-- Feature: showcase
+	* make Favorites directory a special virtual directory (dotfile)
+	* store favorites, group spaces, dropboxes, and shared
+	* Get rid of the concept of having an actual "favorites" folder stored in
+	the user's AFS space. Create new, easily identified virtual folders that
+	may have additional, context-sensitive options that would be displayed in
+	the left-hand bar. These folders will eventually include favorites, groups,
+	shared and dropboxes
+	* Add an "add this folder as a favorite" link as a context-sensitive action.
+	* store list of places that someone else has permitted to a user in a database (both for umich users as well as friends)
 
 - Feature: check to see the user's account has been disabled. This may
-    be listed in the itua:see_us, itd.login:suspension_x (x == first letter
-    of uniqname), or itd.umich:filesys.denied 
-    Please see: ~itd/fceiaa/project/disableuser/README
+	be listed in the itua:see_us, itd.login:suspension_x (x == first letter
+	of uniqname), or itd.umich:filesys.denied 
+	Please see: ~itd/fceiaa/project/disableuser/README
+

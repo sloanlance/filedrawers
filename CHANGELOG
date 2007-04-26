@@ -1,0 +1,70 @@
+CHANGELOG
+===============
+
+from 0.2.11 to 0.3.0 (2007/04/23)
+-----------------------------------
+* add getACLAccess which is a function that does a call to
+	"fs getcalleraccess" to find which permissions the user has been
+	granted. Track which privileges the user has been granted, and adjust
+	choices in display appropriately. Don't display checkbox column
+	if there are no appropriate choices for the current directory.
+
+	This replaces the old viewable, readable, writable privilege
+	checks with privilege-specific variables ( admin, delete,
+	insert, lookup, read, write ).
+
+	An interesting note to this: deleting a file or directory requires
+	lookup, delete, write and either read or insert privileges. However,
+	in order to move a file out of a directory, you only need read,
+	lookup and delete.
+
+* disable the checkboxes for current and parent directories, to avoid the
+	risk that the user may delete or cut one of those directories
+
+* remove link to file when it's empty
+
+* removed readOnlyPath and notIgnore, since AFS ACLs are properly obeyed
+
+* fix file upload progress bar
+
+* simplify construction of current path in php/libdrawers.php
+
+* remove mention of native openafs client on public "splash page"
+
+* change some if ( ! $variable ) statements to if ( empty( $variable ))
+
+* adjust whitespace indents in changed files to be more standardized
+
+* adjust wrap points for long lines in changed files to be more readable
+
+* adjust whitespace around parentheses to be more standard
+
+
+from 0.2.10 to 0.2.11 (2007/03/29)
+-----------------------------------
+js/filemanage.js:
+* more precise file sizes in formatBytes 
+
+* add features for image previews in list view. However, this code isn't
+	implemented the way we would like it, so it's commented out for now.
+
+* more consistent use of whitespace and formatting
+	(more needs to be done across the app)
+
+* add readOnlyPath for backup directories and other special cases
+
+libcgi/cgi.c:
+* change from read to fread to fix premature end of read when data is binary
+
+* clobber old file before copying new one into place when doing an overwrite.
+	This is a fix for the problem where small files doesn't
+	properly overwrite large ones
+
+smarty/sidebar.tpl:
+* change sidebar from class to id tag
+
+* alter presentation of file upload progress
+	The progress bar now appears, but still doesn't seem to update
+
+* add changelog
+
