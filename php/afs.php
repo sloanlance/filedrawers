@@ -386,7 +386,7 @@ class Afs
 	function readAcl( $path='' )
 	{
 		$path = ( $path ) ? $path : $this->path;
-		$cmd = "$this->afsUtils/fs listacl " . escapeshellarg($path);
+		$cmd = "$this->afsUtils/fs listacl " . escapeshellarg( $path );
 		$result = shell_exec( $cmd . " 2>&1" );
 		$rights = array( 'l', 'r', 'w', 'i', 'd', 'k', 'a' );
 
@@ -450,7 +450,7 @@ class Afs
 		$result = shell_exec( $cmd . " 2>&1" );
 
 		$acls = '';
-		if ( preg_match( "/^Callers access to \S+ is (\w{1,7})$/", 
+		if ( preg_match( "/^Callers access to .* is (\w{1,7})$/", 
 				$result, $Matches )) {
 			$acls = strtolower( $Matches[1] );
 
@@ -472,7 +472,6 @@ class Afs
 					$this->writePriv = 1;
 				}
 			}
-
 		}
 	}
 
