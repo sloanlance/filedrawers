@@ -75,7 +75,7 @@ $smarty->assign( 'javascripts', $javascripts);
 $smarty->assign( 'stylesheets', $stylesheets);
 
 $smarty->assign( 'js_vars', $afs->get_js_declarations());
-$smarty->assign( 'path_url', urlencode($afs->path));
+$smarty->assign( 'path_url', urlencode( $afs->path ));
 $smarty->assign( 'parentPath', urlencode( $afs->parPath ));
 $smarty->assign( 'location', $afs->pathDisplay());
 

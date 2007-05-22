@@ -33,7 +33,7 @@ SHTMLDIRTARGET= php/addfavorites.php php/deletefavorites.php \
                 php/renamefavorites.php php/viewfavorites.php \
                 php/blankpage.html php/scripterror.php php/help.php \
                 php/scriptversion.php php/view.php \
-				php/upload-info-server.php
+				php/upload-info-server.php php/missinghomedir.php
 
 HTMLDIRTARGET=  php/feedback.php
 
@@ -57,7 +57,7 @@ TEMPLATETARGET= smarty/fileman.tpl smarty/makewebspace.tpl \
                 smarty/banner.tpl smarty/infobar.tpl \
 				smarty/scripterror.tpl smarty/header.tpl \
 				smarty/help.tpl smarty/scriptversion.tpl \
-				smarty/viewfile.tpl
+				smarty/viewfile.tpl smarty/missinghomedir.tpl
 
 IMAGETARGET=    images/checkbox.gif images/doc_lg.gif \
                 images/doc_sm.gif images/download.gif \

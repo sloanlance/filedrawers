@@ -167,9 +167,48 @@ function browser_check( )
 }
 
 /*
- * This will probably be replaced with a function
- * that looks up a user's afs path
- * It calculates the root of a user's afs space based on his/her uniqname.
+ * Get the directory field out of the user's password entry.
+ *
+ * Returns 1 on success, and sets "dir" with the directory
+ *   field out of the user's password entry
+ * Returns 0 on failure and sets "error_msg" with a human-readable error.
+ * If getpwnam fails, then fall back to getBasePath to construct a directory
+ */
+function GetHomeDir( $name, &$dir, &$error_msg )
+{
+	$dir = "";
+
+	if ( empty( $name )) {
+		$error_msg .= 'No username supplied';
+		return false;
+	}
+
+	if ( !extension_loaded( 'posix' ) && !dl( 'posix.so' )) {
+		$error_msg .= "Couldn't load necessary posix function. ";
+	} else {
+		$Pwent = posix_getpwnam( $name );
+		if ( empty( $Pwent['dir'] ) || !is_dir( $Pwent['dir'] )) {
+			$error_msg .= "Couldn't retrieve $name home directory [" .
+				$Pwent['dir'] . ']. ';
+		} else {
+			$dir = $Pwent['dir'];
+		}
+	}
+
+	if ( empty( $dir ) || !is_dir( $dir )) {
+		$dir = getBasePath( $name );
+		if ( empty( $dir ) || !is_dir( $dir )) {
+			$error_msg .= 'Could not construct home directory. ';
+			$dir = '';
+			return false;
+		}
+	}
+
+	return true;
+}
+
+/*
+ * This constructs the root of a user's afs space based on his/her uniqname.
  */
 function getBasePath( $user )
 {

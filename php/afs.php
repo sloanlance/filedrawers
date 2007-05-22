@@ -20,9 +20,7 @@ class Afs
 {
 	protected $selectedItems;
 	protected $afsUtils	  = '/usr/bin';
-	protected $folderLocs = array( 'site' => 'public/html/' );
 	public	$confirmMsg	  = '';
-	public	$override	  = 0;
 	public	$errorMsg	  = '';
 	public	$notifyMsg	  = '';
 	public	$parPath;	  // Path to the parent of current path
@@ -34,7 +32,7 @@ class Afs
 	public	$readPriv	  = 0;
 	public	$writePriv	  = 0;
 	public	$path		  = '';
-	public	$sid;
+	public	$sid          = '';
 	public	$type		  = '';
 	public	$mimetype	  = '';
 	private $uniqname	  = '';
@@ -42,16 +40,22 @@ class Afs
 
 	public function __construct( $path="" )
 	{
-		$this->sid = md5( uniqid( rand(), true ));
 		$this->uniqname = $_SERVER['REMOTE_USER'];
 		$this->setPath( $path );
-		$this->type = $this->getType( );
 
 		// Generate the path of the folder one level above the current
-		preg_match( "/(.*\/)([^\/]+)\/?$/", $this->path, $Matches );
+		if ( !preg_match( "/(.*\/)([^\/]+)\/?$/", $this->path, $Matches )) {
+			error_log( "missing homedir: [$this->path] $this->uniqname, " .
+				"$this->errorMsg " . __FILE__ );
+			header( 'Location: /missinghomedir.php' );
+			$this->errorMsg = 'Missing home directory.';
+			return false;
+		}
 		$this->parPath = $Matches[1];
 		$this->filename = $Matches[2];
 
+		$this->sid = md5( uniqid( rand(), true ));
+		$this->type = $this->getType( );
 		$this->processCommand();
 		$this->getACLAccess( $this->path );
 	}
@@ -147,15 +151,14 @@ class Afs
 		if ( $this->selectedItems !=
 		'Please enter a name for your new folder.' ) {
 			if ( file_exists( $this->path . '/' . $this->selectedItems )) {
-				$this->errorMsg =
-			"The folder \'$this->selectedItems\' already exists." .
-						" Please select a different name.";
+				$this->errorMsg = "The folder \'$this->selectedItems\' " .
+					"already exists. Please select a different name.";
 				  return false;
 			}
 
-			if ( ! mkdir($this->path . '/' .
-			$this->selectedItems, 0644, true )) {
-				$this->errorMsg = "Unable to create folder.";
+			if ( ! mkdir( $this->path . '/' . $this->selectedItems, 
+					0644, true )) {
+				$this->errorMsg = 'Unable to create folder.';
 				return false;
 			}
 
@@ -171,12 +174,12 @@ class Afs
 		$dir = ( $path ) ? $path . '/' . $name : $this->path . '/' . $name;
 
 		if ( !$dir = $this->pathSecurity( $dir )) {
-			$this->errorMsg = "Unable to remove the folder.";
+			$this->errorMsg = 'Unable to remove the folder.';
 			return false;
 		}
 		if ( !$handle = @opendir( $dir )) {
-			$this->errorMsg = "Unable to remove the folder because " .
-			"it no longer exists.";
+			$this->errorMsg = 'Unable to remove the folder because ' .
+				'it no longer exists.';
 			return false;
 		}
 
@@ -200,7 +203,7 @@ class Afs
 			return true;
 		}
 			
-		$this->errorMsg = "Unable to remove the folder.";
+		$this->errorMsg = 'Unable to remove the folder.';
 		return false;
 	}
 
@@ -240,13 +243,13 @@ class Afs
 
 		if ( file_exists( $this->path . '/' . $this->newName )) {
 			$this->errorMsg = "The file or folder '" . $this->newName .
-			"' already exists. Please select a different name.";
+				"' already exists. Please select a different name.";
 			return false;
 		}
 
 		if ( !@rename( $this->path . '/' . $this->selectedItems, $this->path .
 		'/' . $this->newName )) {
-			$this->errorMsg = "Unable to rename this file or folder.";
+			$this->errorMsg = 'Unable to rename this file or folder.';
 			return false;
 		}
 	}
@@ -536,37 +539,37 @@ class Afs
 	}
 
 	/*
-	 * Return a string escaped for a javascript string literal.
-	 */
+	* Return a string escaped for a javascript string literal.
+	*/
 	function escape_js( $string )
 	{
-	$o="";
+		$output = "";
 
-	$l=strlen($string);
-	for($i=0;$i<$l;$i++)
-	{
-		$c=$string[$i];
-		switch($c)
+		$length = strlen( $string );
+		for( $i=0; $i<$length; $i++ )
 		{
-		case '\'':
-		$o.='\\\'';
-		break;
-		case '\\':
-		$o.='\\\\';
-		break;
-		case "\n":
-		$o.='\\n';
-		break;
-		case "\r":
-		$o.='\\r';
-		break;
-		default:
-		$o.=$c;
-		break;
+			$c = $string[$i];
+			switch( $c )
+			{
+				case '\'':
+					$output .= '\\\'';
+					break;
+				case '\\':
+					$output .= '\\\\';
+					break;
+				case "\n":
+					$output .= '\\n';
+					break;
+				case "\r":
+					$output .= '\\r';
+					break;
+				default:
+					$output .= $c;
+					break;
+			}
 		}
-	}
 
-	return $o;
+		return $output;
 	}
 
 	// Prevent users from breaking outside of afs on the web server
@@ -576,22 +579,20 @@ class Afs
 		$tail = '';
 		$decrement = 0;
 
-		if ( !$path ) {
+		if ( empty( $path ) || strpos( $path, '/afs/' ) !== 0 ) {
 			return false;
 		}
-		if ( strpos( $path, '/afs/' ) !== 0 ) {
-			return false;
-		}
+
 		# if parent reference exists, trim path accordingly
 		if ( strpos( $path, '..' ) !== false ) {
 			$Split = explode( '/', $path );
-			$path = '';
 
+			$path = '';
 			foreach( $Split as $segment ) {
 				if ( $segment == '..' ) {
 					$decrement++;
-				} else if ( strlen( $segment )) {
-					$path .= '/'.$segment;
+				} else if ( !empty( $segment )) {
+					$path .= '/' . $segment;
 				}
 			}
 
@@ -602,19 +603,14 @@ class Afs
 
 		if ( is_link( $path )) {
 			$target = readlink( $path );
-			if ( strpos( $target, '/afs/' ) !== 0 || strpos( $target, '..' )
-			  !== false ) {
+			if ( strpos( $target, '/afs/' ) !== 0 || 
+					strpos( $target, '..' ) !== false ) {
 				return false;
 			}
 		}
 
-		$pos = strrpos( $path, '/' );
-		if ( $pos == strlen( $path ) - 1 ) {
-			// Remove the final / in the target path if it exists
-			return substr_replace( $path, '', $pos );
-		}
-
-		return $path;
+		# Remove the final / in the target path if it exists
+		return preg_replace( '/\/$/', '', $path );
 	}
 
 	// Checks to see if there is a folder at the current path
@@ -635,8 +631,10 @@ class Afs
 			}
 		}
 
+		# check again, after pathSecurity
 		if ( empty( $this->path )) {
-			$this->path = getBasePath( $this->uniqname );
+			getHomeDir( $this->uniqname, $this->path, $this->errorMsg );
+			$this->path = $this->pathSecurity( $this->path );
 		}
 	}
 
@@ -700,7 +698,7 @@ class Afs
 		$retstr .= $this->js_var( "path", $this->path );
 		$retstr .= $this->js_var( "foldername", $this->get_foldername( ));
 		$retstr .= $this->js_var( "folderIcon", "" );
-		$retstr .= $this->js_var( "homepath", getBasePath( $this->uniqname ));
+		$retstr .= $this->js_var( "homepath", $this->path );
 		$retstr .= $this->js_var( "sid", $this->sid );
 		$retstr .= $this->js_var( "returnToURI", $this->get_returnToURI( ));
 		$retstr .= $this->js_var( "adminPriv", $this->adminPriv);

@@ -1,6 +1,25 @@
 CHANGELOG
 ===============
 
+0.4.0 (2007/05/23)
+--------------------
+* change home directory detection from a constructed path to
+	relying on ouput from posix_getpwnam(). This centralizes the GetDir
+	function and renames it to GetHomeDir, replacing most instances of
+	getBasePath. If getpwnam fails, or returns a path which isn't a
+	directory, then we call getBasePath which constructs the home
+	directory in a pattern we expect. If this directory doesn't
+	exist, then we redirect.
+
+* Removed redundant calls to find the home directory when it was set in the constructor.
+
+* redirect to new "missing home directory" warning page when user logs in
+	without a home directory.
+
+* Cleanup: remove some unused variables, cleanup whitespace and wrapping, and change
+	some "" strings to ''. Aler php/afs.php: function escape_js() to be more readable.
+	Also, change some if( strlen()) to if( !empty()).
+
 0.3.2 (2007/05/03)
 -----------------------
 * made pattern match for result of 'fs getcalleraccess path' more permissive,

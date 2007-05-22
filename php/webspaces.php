@@ -62,30 +62,24 @@ class Webspaces {
 	$pts_output = shell_exec( $pts_command );
 	$Pts_groups = explode( "\n", $pts_output );
 
-	/*
-	 * Create a list of potential webspaces for this user.
-	 */
+	// Create a list of potential webspaces for this user.
+	getHomeDir( $this->uniqname, $dir, $error_msg );
 
-
-	$dir = getBasePath($this->uniqname);
-
-        // Add Private and Public webspaces
-	$this->init_webspace($this->uniqname, $dir);
+    // Add Private and Public webspaces
+	$this->init_webspace( $this->uniqname, $dir );
 
 	/*
 	 * Check each PTS group to see if it has an associated
 	 * AFS directory space. If it does, add both Public and
 	 * private versions to the list of of possible webspaces.
 	 */
-
 	foreach ( $Pts_groups as $g ) {
-	    $g = trim( $g );
-	    if ( !preg_match( "/:/", $g )) {
-		$this->GetDir( $g, $dir, $error_msg );
-		if ($this->GetDir( $g, $dir, $error_msg )) {
-		    $this->init_webspace($g, $dir);
+		$g = trim( $g );
+		if ( !preg_match( "/:/", $g )) {
+			if ( GetHomeDir( $g, $dir, $error_msg )) {
+				$this->init_webspace( $g, $dir );
+			}
 		}
-	    }
 	}
 
 	ksort( $this->spaces );
@@ -444,37 +438,6 @@ class Webspaces {
 	    $error_msg .= "Could not set privileges: $directory.";
 	    return 0;
 	}
-
-	return 1;
-    }
-
-    /*
-     * Get the directory field out of the user's password entry.
-     *
-     * Returns 1 on success, and sets "dir" with the directory
-     * field out of the user's password entry
-     *
-     * Returns 0 on failure and sets "error_msg" with a human-readable error.
-     */
-    private function GetDir( $name, &$dir, &$error_msg )
-    {
-	$dir = "";
-
-	if (!extension_loaded('posix')) {
-	    if (!dl('posix.so')) {
-		$error_msg .= "Couldn't load necessary posix function.";
-		return 0;
-	    }
-	}
-
-	$Pwent = posix_getpwnam( $name );
-
-	if ( !is_dir( $Pwent["dir"] )) {
-	    $error_msg .= "Couldn't retrieve users home directory "
-	    . $Pwent["dir"] . ".";
-	    return 0;
-	}
-	$dir = $Pwent["dir"];
 
 	return 1;
     }
