@@ -9,6 +9,6 @@ require_once( 'smarty.custom.php' );
 $smarty = new Smarty_Template;
 $smarty->assign( 'filedrawers_title', 'missing home directory');
 $smarty->assign( 'redirect', true );
-$smarty->assign( 'stylesheets', $stylesheets);
+$smarty->assign( 'stylesheets', array( '/css/fileman.css'));
 $smarty->display( 'missinghomedir.tpl' );
 ?>
