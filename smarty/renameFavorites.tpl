@@ -24,6 +24,7 @@ body {
     <p class="instruct">You have not stored any favorite locations.</p>
     {/foreach}
     <p align="center">
+		<input type="hidden" name="formKey" value="{$formKey}" />
         <input type="submit" name="command" value="Rename" />
     </p>
 </form>

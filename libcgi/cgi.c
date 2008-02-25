@@ -276,9 +276,8 @@ DEBUG( fprintf( stderr, "DB: in mp_read\n" ));
 	    cgi->ci_cur = cgi->ci_buf;
 	}
 
-	/* use "fread" to fix premature end of read when data is binary */ 
-	if (( rc = fread( cgi->ci_end, 1, cgi->ci_buflen - 
-		( cgi->ci_end - cgi->ci_buf ), stdin )) <= 0 ) { 	
+	if (( rc = read( 0, cgi->ci_end,
+		    cgi->ci_buflen - ( cgi->ci_end - cgi->ci_buf ))) <= 0 ) {
 	    CGI_PARSERR( cgi, "mp_read: did not get any characters" );
 	    CGI_LOGERR( cgi );
 	    return( -1 );
@@ -333,22 +332,22 @@ mp_get_file( struct cgi_file *upfile, CGIHANDLE *cgi, char *boundary, struct fun
 {
     int			file_content;
     char		file_buffer[ CGI_BUFLEN ];
-    int			returned = 0;
+    int			rr = 0;
 
 DEBUG( fprintf( stderr, "DB: in mp_get_file\n" ));
 
     upfile->cf_size = 0;
 
-	/* fix: small file doesn't properly overwrite large */
-	if( cgi_file_clobber ) {
-		unlink( upfile->cf_tmp );
-	}
-
-    // write the file out directly 
-    if (( file_content = open( upfile->cf_tmp, O_WRONLY|O_CREAT|
-                               ((cgi_file_clobber) ? 0 : O_EXCL),
-                               0666 ))
-		== -1 ) {
+    /*
+     * O_TRUNC in case of clobber. we probably shouldn't trust
+     * that upfile->cf_tmp is safe, but it's not unreasonable
+     * to expect the f_init function to have validated the
+     * destination beforehand. if we don't truncate the file, we
+     * can end up with a small file overwriting the beginning of
+     * a large file, but leaving the rest of its data in place.
+     */
+    if (( file_content = open( upfile->cf_tmp, O_WRONLY | O_CREAT |
+		   ((cgi_file_clobber) ? O_TRUNC : O_EXCL ), 0666 )) == -1 ) {
 	CGI_SYSERR( cgi, "open" );
 	CGI_LOGERR( cgi );
 	/* if file exists we abort - how do we report it */
@@ -357,8 +356,8 @@ DEBUG( fprintf( stderr, "DB: in mp_get_file\n" ));
 	goto error2;
     }
 
-    while(( returned = mp_read( cgi, file_buffer, CGI_BUFLEN, boundary )) > 0 ) {
-	if (( write( file_content, file_buffer, returned )) != returned ) {
+    while(( rr = mp_read( cgi, file_buffer, CGI_BUFLEN, boundary )) > 0 ) {
+	if (( write( file_content, file_buffer, rr )) != rr ) {
 	    CGI_SYSERR( cgi, "write" );
 	    CGI_LOGERR( cgi );
 	    upfile->cf_status =  malloc(strlen (strerror( cgi->ci_errno)) + 1 );
@@ -366,9 +365,9 @@ DEBUG( fprintf( stderr, "DB: in mp_get_file\n" ));
 	    close( file_content );
 	    goto error1;
 	}
-	upfile->cf_size += returned;
+	upfile->cf_size += rr;
 	if ( func != NULL ) {
-	    if ((func->f_progress( upfile->cf_name, returned ) != 0)) {
+	    if ((func->f_progress( upfile->cf_name, rr ) != 0)) {
 		DEBUG( fprintf( stderr, "DB: f_progress failed\n" ));
 		upfile->cf_status = strdup("not successful");
 		goto error1;
@@ -379,7 +378,7 @@ DEBUG( fprintf( stderr, "DB: in mp_get_file\n" ));
 
     close( file_content );
 
-    if ( returned != 0 ) {
+    if ( rr != 0 ) {
 	goto error1;
     }
 
@@ -543,6 +542,7 @@ DEBUG( fprintf( stderr, "DB key is %s\n", key ));
 
 	    // function initialize 
 	    if ( func != NULL ) {
+		/* f_init should call realpath on dir before returning it. */
 		if (( func->f_init( &dir, cl )) != 0 ) {
 		    DEBUG( fprintf( stderr, "DB: f_init failed\n" ));
 		    return( -1 );

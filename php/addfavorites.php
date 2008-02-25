@@ -1,6 +1,6 @@
 <?php
 /*
- * Copyright (c) 2005 Regents of The University of Michigan.
+ * Copyright (c) 2008 Regents of The University of Michigan.
  * All Rights Reserved.  See COPYRIGHT.
  */
 
@@ -18,6 +18,7 @@ if ( ! empty ( $fav->errorMsg )) {
 
 $smarty->assign( 'favorites', $favorites );
 $smarty->assign( 'usedFavs', sizeof( $favorites ));
+$smarty->assign( 'formKey', $fav->formKey );
 $smarty->assign( 'target', $fav->favoriteTarget );
 $smarty->assign( 'maxFavs', 5 ); // The maximum number of favorite locations
 $smarty->assign( 'cmd', ( isset( $_POST['cmd'] )) ? $_POST['cmd'] : '' );

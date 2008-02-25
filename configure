@@ -312,7 +312,7 @@ ac_includes_default="\
 #endif"
 
 ac_subdirs_all="$ac_subdirs_all libcgi"
-ac_subst_vars='SHELL PATH_SEPARATOR PACKAGE_NAME PACKAGE_TARNAME PACKAGE_VERSION PACKAGE_STRING PACKAGE_BUGREPORT exec_prefix prefix program_transform_name bindir sbindir libexecdir datadir sysconfdir sharedstatedir localstatedir libdir includedir oldincludedir infodir mandir build_alias host_alias target_alias DEFS ECHO_C ECHO_N ECHO_T LIBS project_name shtml_dir_name html_dir_name object_dir_name smarty_dir_name cgi_dir_name lib_dir_name js_dir_name css_dir_name install_group service_name service_url secure_service_url error_url sdb_host sdb_name sdb_ro_user sdb_ro_password allow_support_logging CC CFLAGS LDFLAGS CPPFLAGS ac_ct_CC EXEEXT OBJEXT INSTALL_PROGRAM INSTALL_SCRIPT INSTALL_DATA SET_MAKE CPP EGREP LIBOBJS subdirs LTLIBOBJS'
+ac_subst_vars='SHELL PATH_SEPARATOR PACKAGE_NAME PACKAGE_TARNAME PACKAGE_VERSION PACKAGE_STRING PACKAGE_BUGREPORT exec_prefix prefix program_transform_name bindir sbindir libexecdir datadir sysconfdir sharedstatedir localstatedir libdir includedir oldincludedir infodir mandir build_alias host_alias target_alias DEFS ECHO_C ECHO_N ECHO_T LIBS project_name shtml_dir_name html_dir_name object_dir_name smarty_dir_name cgi_dir_name lib_dir_name js_dir_name css_dir_name custom_sess_path install_group service_name service_url secure_service_url error_url sdb_host sdb_name sdb_ro_user sdb_ro_password allow_support_logging CC CFLAGS LDFLAGS CPPFLAGS ac_ct_CC EXEEXT OBJEXT INSTALL_PROGRAM INSTALL_SCRIPT INSTALL_DATA SET_MAKE CPP EGREP LIBOBJS subdirs LTLIBOBJS'
 ac_subst_files=''
 
 # Initialize some variables set by options.
@@ -869,6 +869,8 @@ Optional Packages:
                           name of sub-directory to contain javascript
   --with-css_dir_name=css_dir_name
                           name of sub-directory to contain style sheets
+  --with-custom_sess_path=custom_sess_path
+                          a custom path to store upload session files
   --with-install_group=cgi_dir_name
                           name of group to have installed file ownership
   --with-service_name=service_name
@@ -1435,6 +1437,16 @@ if test "${with_css_dir_name+set}" = set; then
   css_dir_name="$withval"
 else
   css_dir_name="css"
+fi;
+
+
+
+# Check whether --with-custom_sess_path or --without-custom_sess_path was given.
+if test "${with_custom_sess_path+set}" = set; then
+  withval="$with_custom_sess_path"
+  custom_sess_path="$withval"
+else
+  custom_sess_path=""
 fi;
 
 
@@ -4468,6 +4480,7 @@ s,@cgi_dir_name@,$cgi_dir_name,;t t
 s,@lib_dir_name@,$lib_dir_name,;t t
 s,@js_dir_name@,$js_dir_name,;t t
 s,@css_dir_name@,$css_dir_name,;t t
+s,@custom_sess_path@,$custom_sess_path,;t t
 s,@install_group@,$install_group,;t t
 s,@service_name@,$service_name,;t t
 s,@service_url@,$service_url,;t t

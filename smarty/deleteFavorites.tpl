@@ -31,6 +31,7 @@ body {
         {/foreach}
     </table>
     <p align="center">
+		<input type="hidden" name="formKey" value="{$formKey}" />
         <input type="submit" name="command" value="Delete" />
     </p>
 </form>

@@ -4,11 +4,13 @@
  * All Rights Reserved.  See COPYRIGHT.
  */
 
+require_once( 'config.php' );
+
 if ( preg_match( "/[^a-f0-9]/", $_GET['sessionid'] ) !== 0 ) {
     exit();
 }
 
-$rawUpload      = @file_get_contents( "/tmp/" . $_GET['sessionid'] );
+$rawUpload      = @file_get_contents( $upload_session_tmp . $_GET['sessionid'] );
 $upload         = explode( ':', $rawUpload );
 $totalBytes     = ( isset( $upload[1] )) ? (int) $upload[1] : 0;
 $bytesUploaded  = ( isset( $upload[2] )) ? (int) $upload[2] : 0;

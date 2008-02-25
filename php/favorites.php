@@ -1,6 +1,6 @@
 <?php
 /*
- * Copyright (c) 2005 Regents of The University of Michigan.
+ * Copyright (c) 2005 - 2008 Regents of The University of Michigan.
  * All Rights Reserved.  See COPYRIGHT.
  */
 
@@ -22,6 +22,15 @@ class Favorites extends Afs
     public function __construct( $target="" )
     {
         $this->uniqname = $_SERVER['REMOTE_USER'];
+        $this->startCWD = getcwd();
+        $this->afsStat  = stat('/afs/');
+
+        session_start();
+        if ( !$_SESSION['formKey'] ) {
+            $_SESSION['formKey'] = md5( uniqid( rand(), true ));
+        }
+
+        $this->formKey = $_SESSION['formKey'];
         $this->setFavoritesStore();
         $this->setFavoriteTarget( $target );
         $this->processFavoritesCommand();
@@ -30,7 +39,7 @@ class Favorites extends Afs
 
     public function processFavoritesCommand()
     {
-        if ( ! isset( $_POST['command'] )) {
+        if ( !isset( $_POST['command'] ) || $this->formKey != $_POST['formKey'] ) {
             return false;
         }
 
@@ -56,51 +65,94 @@ class Favorites extends Afs
     private function setFavoritesStore()
     {
         $this->setPath( getBasePath( $this->uniqname ));
-        if ( ! $this->folderExists( $this->path . '/Favorites' )) {
+
+        if ( ! $this->makePathAFSlocal( $this->path )) {
+            $this->errorMsg - 'Unable to set your Favorites store.';
+            return false;
+        }
+
+        if ( ! $this->linkSafeFileExists( 'Favorites' )) {
             $this->selectedItems = 'Favorites';
             $this->createFolder();
         }
 
-        $this->setPath( getBasePath( $this->uniqname )
-          . '/Favorites' );
+        $this->setPath( getBasePath( $this->uniqname ) . '/Favorites' );
+
+        @chdir( $this->startCWD );
+        return true;
     }
+
 
     private function addFavorite()
     {
-        if ( ! symlink( $this->favoriteTarget, $this->path . '/'
-          . $this->selectedItems )) {
-            $fav->errorMsg = "That Favorite Location name is not valid.";
+        if ( ! $this->makePathAFSlocal( $this->path )) {
+            return false;
         }
+
+        if ( ! symlink( $this->favoriteTarget,
+                basename( $this->selectedItems ))) {
+            $this->errorMsg = "Unable to add the favorite location.";
+            @chdir( $this->startCWD );
+            return false;
+        }
+
+        @chdir( $this->startCWD );
+        return true;
     }
+
 
     private function renameFavorite()
     {
+        if ( ! $this->makePathAFSlocal( $this->path )) {
+            return false;
+        }
+
         $renames = $this->selectedItems;
 
         foreach ( $renames as $oldName => $newName ) {
-            $this->selectedItems = $oldName;
-            $this->newName = $newName;
-            $this->afsRename();
+            $oldName = basename( $oldName );
+            $newName = basename( $newName );
+
+            if ( ! $target = @readlink( $oldName )) {
+                continue;
+            }
+
+            if ( ! unlink( $oldName )) {
+                $this->errorMsg = 'Unable to rename the favorite(s).';
+                @chdir( $this->startCWD );
+                return false;
+            }
+
+            if ( ! symlink( $target, $newName )) {
+                $this->errorMsg = 'Unable to rename the favorite(s).';
+                @chdir( $this->startCWD );
+                return false;
+            }
         }
+
+        @chdir( $this->startCWD );
+        return true;
     }
+
 
     // Sets the location that a Favorites symlink points to
     public function setFavoriteTarget( $target='' )
     {
         $target = html_entity_decode( urldecode( $target ), ENT_QUOTES );
-
-        if ( $target ) {
-            if ( ! file_exists( $target )) {
-                $this->errorMsg = "The specified path does not exist. ($target)";
-            } else {
-                $this->favoriteTarget = $this->pathSecurity( $target );
-            }
+        
+        if ( empty( $target ) || ! $this->makePathAFSlocal( $target )) {
+            $this->errorMsg       = '';
+            $this->favoriteTarget = getBasePath( $this->uniqname );
+            @chdir( $this->startCWD );
+            return false;
+        } else {
+            $this->favoriteTarget = $target;
         }
 
-        if ( ! $this->favoriteTarget ) {
-            $this->favoriteTarget = getBasePath($this->uniqname);
-        }
+        @chdir( $this->startCWD );
+        return true;
     }
+
 
     public function getFavorites()
     {
@@ -112,19 +164,27 @@ class Favorites extends Afs
             return false;
         }
 
-        if ( !$dh = @opendir( $this->path )) {
+        if ( !$this->makePathAFSlocal( $this->path )) {
+            $this->errorMsg = "Unable to view: $this->path.";
+            return false;
+        }
+
+        if ( !$dh = @opendir( '.' )) {
             $this->errorMsg = "Unable to view $this->path.";
+            @chdir( $this->startCWD );
             return false;
         }
 
         while ( $filename = readdir( $dh )) {
             if ( strpos( $filename, '.' ) !== 0 ) {
-                $link = @readlink( $this->path . '/' . $filename );
+                $link = @readlink( $filename );
                 $favorites[$filename] = $link;
             }
         }
 
         closedir( $dh );
+
+        @chdir( $this->startCWD );
 
         if ( $favorites ) {
             return $favorites;
@@ -138,13 +198,22 @@ class Favorites extends Afs
             return false;
         }
 
+        if ( !$this->makePathAFSlocal( $this->path )) {
+            return false;
+        }
+
         foreach ( $this->selectedItems as $link ) {
-            if ( ! is_link( $this->path . '/' . $link ) ||
-              ! @unlink( $this->path . '/' . $link )) {
-                $this->errorMsg = "Unable to delete $link.";
-                                return false;
+            $link = basename( $link );
+
+            if ( ! is_link( $link ) || ! unlink( $link )) {
+                $this->errorMsg = "Unable to remove: $link.";
+                @chdir( $this->startCWD );
+                return false;
             }
         }
+
+        @chdir( $this->startCWD );
+        return true;
     }
 }
 ?>

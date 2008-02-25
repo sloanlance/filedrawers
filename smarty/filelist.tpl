@@ -31,6 +31,7 @@
 	</tbody>
 </table>
 <form name="cmd" id="cmd" method="post" action="">
+	<input type="hidden" name="formKey" value="{$formKey}" />
 	<input type="hidden" name="command" value="" />
 	<input type="hidden" name="selectedItems" value="" />
 	<input type="hidden" name="newName" value="" />

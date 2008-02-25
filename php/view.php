@@ -26,7 +26,7 @@ switch( $mimetype )
 		header( 'Content-Length: ' . filesize( $download->path )); 
 		header( 'Content-disposition: inline; filename="'.
 			$download->filename.'"' );
-		@readfile( $download->path );
+		$download->readfile();
 		break;
 	default:
 		break;

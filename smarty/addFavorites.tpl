@@ -19,6 +19,7 @@ body {
 {if $usedFavs < $maxFavs}
 <form method="post" name="fav_editor" action="/viewfavorites.php?target={$target}">
     <p>Enter a name and click 'Add' to add the current location to your favorites.</p>
+	<input type="hidden" name="formKey" value="{$formKey}" />
     <input type="text" name="selectedItems" size="18" />
 	<input type="submit" name="command" value="Add" />
 </form>

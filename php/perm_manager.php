@@ -1,6 +1,6 @@
 <?php
 /*
- * Copyright (c) 2005 Regents of The University of Michigan.
+ * Copyright (c) 2008 Regents of The University of Michigan.
  * All Rights Reserved.  See COPYRIGHT.
  */
 
@@ -11,7 +11,7 @@ require_once( 'smarty.custom.php' );
 $afs = new Afs( $_GET['target'] );
 $perms = array( 'l', 'r', 'w', 'i', 'd', 'k', 'a' );
 
-if ( isset( $_POST['nrm'] )) {
+if ( isset( $_POST['nrm'] ) && $afs->formKey == $_POST['formKey']) {
     foreach ( $_POST['nrm'] as $group => $rights ) {
         $rights = implode( $rights );
         $rights = ( $rights == ' ' ) ? 'none' : $rights;
@@ -24,7 +24,7 @@ if ( isset( $_POST['nrm'] )) {
     }
 }
 
-if ( isset( $_POST['neg'] )) {
+if ( isset( $_POST['neg'] ) && $afs->formKey == $_POST['formKey']) {
     foreach ( $_POST['neg'] as $group => $rights ) {
         $rights = implode( $rights );
         $rights = ( $rights == ' ' ) ? 'none' : $rights;
@@ -43,6 +43,7 @@ $pathParts = pathinfo( $afs->path );
 $smarty = new Smarty_Template;
 $smarty->assign( 'target', $afs->path );
 $smarty->assign( 'folder', $pathParts['basename'] );
+$smarty->assign( 'formKey', $afs->formKey );
 
 if ( isset( $rights['normal'] )) {
     $smarty->assign( 'normal', $rights['normal'] );

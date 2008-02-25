@@ -38,6 +38,7 @@
 	    <h2>Create a New Folder</h2>
 	</div>
 	<img src="/images/mime/small/folder.gif" width="16" height="16" />
+	<input type="hidden" name="formKey" value="{$formKey}" />
 	<input type="hidden" name="command" value="newfolder" />
 	<input type="text" name="selectedItems" id="newFold" size="34" value="Please enter a name for your new folder." onfocus="this.value=''" />
 	<input type="submit" name="save" value="Create" />

@@ -4,6 +4,8 @@
  * All Rights Reserved.  See COPYRIGHT.
  */
 
+require_once( 'config.php' );
+
 // Standard javascripts
 $javascripts 	= array( "/js/filemanage.js" );
 
@@ -19,12 +21,13 @@ $afsBase	   	= '/afs/umich.edu/user/';
 // Take care of file uploads.
 function process_upload( &$notifyMsg, &$errorMsg )
 {
+    global $upload_session_tmp; // XXX Change this to constant in next version
 
 	$uploadError = false;
 	$errorMsg	 = '';
 
 	if ( isset( $_GET['finishid'] )) {
-		$temppath = "/tmp/" . $_GET['finishid'];
+		$temppath = $upload_session_tmp . '/' . $_GET['finishid'];
 
 		if ( file_exists( $temppath )
 				&& preg_match( "/[^a-f0-9]/", $_GET['finishid'] ) === 0

@@ -14,6 +14,6 @@ header( 'Content-Description: File Transfer' );
 header( 'Content-Type: application/force-download' ); 
 header( 'Content-Length: ' . filesize( $download->path )); 
 header( "Content-Disposition: attachment; filename=$basepath;");
-@readfile( $download->path );
+$download->readfile();
 ?>
 

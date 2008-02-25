@@ -16,6 +16,7 @@ body {
 </head>
 <body onload="">
 <form name="acl" id="acl" method="post" action="">
+    <input type="hidden" name="formKey" value="{$formKey}">
     <div id="permissionsBox">
         <table>
             <thead>

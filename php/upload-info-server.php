@@ -1,8 +1,10 @@
 <?php
 
+require_once( 'config.php' );
+
 $fn = trim( $_REQUEST['filename_'] );
 if ( preg_match( "/[^a-f0-9]/", $fn )) {
-	echo "filename is not valid [$fn]\n";
+	echo htmlentities( "filename is not valid [$fn]\n" );
 	exit();
 }
 
@@ -14,6 +16,6 @@ if ( preg_match( "/[^a-f0-9]/", $fn )) {
  * 20070419-163138-75.45.215.95-request_body-zutdsO where this script is
  * looking for a tmp file that looks like this: 1ad60b47035b651643df9e712ec24ac7
  */
-echo @file_get_contents( "/tmp/" . $fn );
+echo @file_get_contents( $upload_session_tmp . '/' . $fn );
 
 ?>

@@ -5,7 +5,6 @@
  */
 
 define( "DIRMIMETYPE", "0000000dir" );
-define( "PATHTOIMGS", "/images/mime/small/" );
 
 if ( !extension_loaded( 'fileinfo' )) {
     dl( 'fileinfo.' . PHP_SHLIB_SUFFIX );
@@ -39,7 +38,10 @@ class Mime
     // Returns the name of an appropriate mime icon
     function mimeIcon( $path )
     {
-        // This is a folder
+        if ( @is_link( $path )) {
+            return 'application';
+        }
+
         if ( @is_dir( $path )) {
             return DIRMIMETYPE;
         }
@@ -59,9 +61,9 @@ class Mime
 		$mClass = $Matches[1];
 		$mType = $Matches[2];
 
-        if ( file_exists( '../'.PATHTOIMGS . $mType . '.gif' )) {
+        if ( file_exists( PATHTOIMGS . $mType . '.gif' )) {
             return $mType;  // It's a file and we have a mime type icon for it
-        } else if ( file_exists( '../'.PATHTOIMGS . $mClass . '.gif' )) {
+        } else if ( file_exists( PATHTOIMGS . $mClass . '.gif' )) {
             return $mClass;  // It's a file and we have a mime class icon for it
         }
 

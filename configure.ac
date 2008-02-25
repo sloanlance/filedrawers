@@ -65,6 +65,13 @@ AC_ARG_WITH(css_dir_name,
             [css_dir_name="css"])
 AC_SUBST(css_dir_name)
 
+AC_ARG_WITH(custom_sess_path,
+            AC_HELP_STRING([--with-custom_sess_path=custom_sess_path],
+                           [a custom path to store upload session files]),
+            custom_sess_path="$withval",
+            [custom_sess_path=""])
+AC_SUBST(custom_sess_path)
+
 AC_ARG_WITH(install_group,
             AC_HELP_STRING([--with-install_group=cgi_dir_name],
                            [name of group to have installed file ownership]),

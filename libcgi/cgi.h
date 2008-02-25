@@ -37,17 +37,14 @@ struct function {
     int  (*f_progress)( char *, int );
 };
 
-static char * post_getline( CGIHANDLE * );
 CGIHANDLE * cgi_init( void );
 void cgi_free( CGIHANDLE * );
 int cf_free( struct cgi_file * );
 int cgi_cl_free( struct cgi_list * );
 int cgi_cl_print( struct cgi_list * );
-static int mp_read( CGIHANDLE *, char *, int, char * );
 int mp_get_file( struct cgi_file *, CGIHANDLE *, char *, struct function * );
 int cgi_multipart(CGIHANDLE *, struct cgi_list *, char *, struct function * );
 char * cgi_unescape( char * );
-static int cgi_querystring( char *, struct cgi_list * );
 int cgi_get( CGIHANDLE *, struct cgi_list * );
 int cgi_post( CGIHANDLE *, struct cgi_list * );
 

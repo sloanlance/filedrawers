@@ -1,9 +1,9 @@
 <?php
 /*
- * Copyright (c) 2005 Regents of The University of Michigan.
+ * Copyright (c) 2008 Regents of The University of Michigan.
  * All Rights Reserved.  See COPYRIGHT.
  */
-
+error_reporting(E_ALL);
 require_once( 'version.php' );
 require_once( 'config.php' );
 require_once( 'libdrawers.php' );
@@ -60,6 +60,8 @@ $smarty->assign( 'js_displayfileman', $displayfileman);
 $smarty->assign( 'filedrawers_version', $filedrawers_version);
 
 $smarty->assign( 'type', $afs->type );
+$smarty->assign( 'formKey', $afs->formKey );
+
 if ( $afs->type == 'file' ) {
 	$smarty->assign( 'js_displayfileman', 0 );
 	$smarty->assign( 'mimetype', $afs->mimetype );
