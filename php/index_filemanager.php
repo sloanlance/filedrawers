@@ -3,7 +3,6 @@
  * Copyright (c) 2008 Regents of The University of Michigan.
  * All Rights Reserved.  See COPYRIGHT.
  */
-error_reporting(E_ALL);
 require_once( 'version.php' );
 require_once( 'config.php' );
 require_once( 'libdrawers.php' );

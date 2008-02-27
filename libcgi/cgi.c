@@ -12,6 +12,7 @@
  */
 
 #include <sys/types.h>
+#include <sys/param.h>
 #include <errno.h>
 #include <fcntl.h>
 #include <unistd.h>
@@ -332,27 +333,46 @@ mp_get_file( struct cgi_file *upfile, CGIHANDLE *cgi, char *boundary, struct fun
 {
     int			file_content;
     char		file_buffer[ CGI_BUFLEN ];
+    char		clobber_tmp[ MAXPATHLEN ];
+    char		*suf = "XXXXXXX";
     int			rr = 0;
 
 DEBUG( fprintf( stderr, "DB: in mp_get_file\n" ));
 
     upfile->cf_size = 0;
 
-    /*
-     * O_TRUNC in case of clobber. we probably shouldn't trust
-     * that upfile->cf_tmp is safe, but it's not unreasonable
-     * to expect the f_init function to have validated the
-     * destination beforehand. if we don't truncate the file, we
-     * can end up with a small file overwriting the beginning of
-     * a large file, but leaving the rest of its data in place.
-     */
-    if (( file_content = open( upfile->cf_tmp, O_WRONLY | O_CREAT |
-		   ((cgi_file_clobber) ? O_TRUNC : O_EXCL ), 0666 )) == -1 ) {
+    if ( cgi_file_clobber ) {
+	/* upload to a temporary file in the same dir, then link to it */
+
+DEBUG( fprintf( stderr, "DB: clobber\n" ));
+	/* +2 for '.' and NUL-termination */
+	if (( strlen( upfile->cf_tmp )
+		+ strlen( suf ) + 2 ) >= sizeof( clobber_tmp )) {
+	    fprintf( stderr, "%s: path too long\n", upfile->cf_tmp );
+	    goto error2;
+	}
+	strcpy( clobber_tmp, upfile->cf_tmp );
+	strcat( clobber_tmp, "." );
+	strcat( clobber_tmp, suf );
+
+DEBUG( fprintf( stderr, "DB: template: %s\n", clobber_tmp ));
+	if (( file_content = mkstemp( clobber_tmp )) < 0 ) {
+	    CGI_SYSERR( cgi, "mkstemp" );
+	    CGI_LOGERR( cgi );
+	    goto error2;
+	}
+DEBUG( fprintf( stderr, "DB: tmp file: %s\n", clobber_tmp ));
+
+	/* unlink original to give us space for the new data */
+	unlink( upfile->cf_tmp );
+    } else if (( file_content = open( upfile->cf_tmp,
+		O_WRONLY | O_CREAT | O_EXCL, 0666 )) == -1 ) {
+	if (( upfile->cf_status = strdup( strerror( errno ))) == NULL ) {
+	    CGI_SYSERR( cgi, "strdup" );
+	    CGI_LOGERR( cgi );
+	}
 	CGI_SYSERR( cgi, "open" );
 	CGI_LOGERR( cgi );
-	/* if file exists we abort - how do we report it */
-	upfile->cf_status =  malloc(strlen (strerror( cgi->ci_errno)) + 1 );
-	strcpy( upfile->cf_status, strerror(cgi->ci_errno) );
 	goto error2;
     }
 
@@ -382,12 +402,31 @@ DEBUG( fprintf( stderr, "DB: in mp_get_file\n" ));
 	goto error1;
     }
 
-    /* went well */
+    if ( cgi_file_clobber ) {
+	if ( link( clobber_tmp, upfile->cf_tmp ) != 0 ) {
+	    /* try a racy rename if link isn't supported */
+	    if ( errno == EOPNOTSUPP &&
+		    rename( clobber_tmp, upfile->cf_tmp ) != 0 ) {
+		CGI_SYSERR( cgi, "rename" );
+		CGI_LOGERR( cgi );
+		goto error1;
+	    } else {
+		CGI_SYSERR( cgi, "link" );
+		CGI_LOGERR( cgi );
+		goto error1;
+	    }
+	}
+	unlink( clobber_tmp );
+    }
     upfile->cf_status = strdup("successful" );
     return( 0 );
 
 error1:
-    unlink( upfile->cf_tmp );
+    if ( cgi_file_clobber ) {
+	unlink( clobber_tmp );
+    } else {
+	unlink( upfile->cf_tmp );
+    }
 
 error2:
     upfile->cf_size = 0;
@@ -531,6 +570,10 @@ DEBUG( fprintf( stderr, "DB key is %s\n", key ));
 	    // make sure we have a clean filename 
 	    if ( strstr( filename, ".." ) != NULL ) {
 		fprintf( stderr, "found ..\n" );
+		return( -1 );
+	    }
+	    if ( strchr( filename, '/' ) != NULL ) {
+		fprintf( stderr, "found \"/\"\n" );
 		return( -1 );
 	    }
 	    ptr = strdup( filename );

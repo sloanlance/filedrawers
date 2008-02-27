@@ -69,7 +69,7 @@ class Afs
         $this->filename = $Matches[2];
 
         session_start();
-        if ( !$_SESSION['formKey'] ) {
+        if ( !isset( $_SESSION['formKey'] )) {
             $_SESSION['formKey'] = md5( uniqid( rand(), true ));
         }
 
@@ -290,7 +290,7 @@ class Afs
                     return false;
                 }
 
-                if ( !unlink( basename( $file ))) {
+                if ( !@unlink( basename( $file ))) {
                     @chdir( $this->startCWD );
                     $this->errorMsg = "Unable to delete $file.";
                     return false;

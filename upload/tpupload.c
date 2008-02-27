@@ -61,7 +61,7 @@ char            	*user = NULL;
 char			*fdtmpdir;
 char			*validpath;
 
-/* #define FILEDRAWERS_UPLOAD_CGI_DEBUG */
+/* #undef FILEDRAWERS_UPLOAD_CGI_DEBUG */
 #ifdef FILEDRAWERS_UPLOAD_CGI_DEBUG
 #include <stdarg.h>
 
@@ -316,6 +316,9 @@ main( int ac, char *av[] )
     st->s_fp = NULL;
     st->s_sid = NULL;
     st->s_uri = NULL;
+
+    /* WebKit browsers seem to need this */
+    printf( "Connection: close\r\n" );
 
     debug( "%s: calling cgi_multipart\n", prog );
     if ( cgi_multipart( cgi, cl, dir, &func ) != 0 ) {
