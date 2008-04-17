@@ -16,6 +16,24 @@ if ( preg_match( "/[^a-f0-9]/", $fn )) {
  * 20070419-163138-75.45.215.95-request_body-zutdsO where this script is
  * looking for a tmp file that looks like this: 1ad60b47035b651643df9e712ec24ac7
  */
-echo @file_get_contents( $upload_session_tmp . '/' . $fn );
+ 
+$db = new mysqli( DB_HOST, DB_USER, DB_PASS, DB_NAME );
 
+if ( mysqli_connect_errno()) {
+    exit();
+}
+
+if ( ! $stmt = $db->prepare( "SELECT filename, size, received FROM " .
+        "filedrawers_progress WHERE session_id = ?" )) {
+    exit();
+}
+
+$stmt->bind_param( 's', $fn );
+$stmt->execute();
+$stmt->bind_result( $filename, $size, $received );
+$stmt->fetch();
+
+echo "$filename:$size:$received";
+$stmt->close();
+$db->close();
 ?>

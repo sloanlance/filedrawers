@@ -312,7 +312,7 @@ ac_includes_default="\
 #endif"
 
 ac_subdirs_all="$ac_subdirs_all libcgi"
-ac_subst_vars='SHELL PATH_SEPARATOR PACKAGE_NAME PACKAGE_TARNAME PACKAGE_VERSION PACKAGE_STRING PACKAGE_BUGREPORT exec_prefix prefix program_transform_name bindir sbindir libexecdir datadir sysconfdir sharedstatedir localstatedir libdir includedir oldincludedir infodir mandir build_alias host_alias target_alias DEFS ECHO_C ECHO_N ECHO_T LIBS project_name shtml_dir_name html_dir_name object_dir_name smarty_dir_name cgi_dir_name lib_dir_name js_dir_name css_dir_name custom_sess_path install_group service_name service_url secure_service_url error_url sdb_host sdb_name sdb_ro_user sdb_ro_password allow_support_logging CC CFLAGS LDFLAGS CPPFLAGS ac_ct_CC EXEEXT OBJEXT INSTALL_PROGRAM INSTALL_SCRIPT INSTALL_DATA SET_MAKE CPP EGREP LIBOBJS subdirs LTLIBOBJS'
+ac_subst_vars='SHELL PATH_SEPARATOR PACKAGE_NAME PACKAGE_TARNAME PACKAGE_VERSION PACKAGE_STRING PACKAGE_BUGREPORT exec_prefix prefix program_transform_name bindir sbindir libexecdir datadir sysconfdir sharedstatedir localstatedir libdir includedir oldincludedir infodir mandir build_alias host_alias target_alias DEFS ECHO_C ECHO_N ECHO_T LIBS project_name shtml_dir_name html_dir_name object_dir_name smarty_dir_name cgi_dir_name lib_dir_name js_dir_name css_dir_name install_group service_name service_url secure_service_url error_url valid_fs_path db_host db_name db_ro_user db_ro_password db_user db_password progressdbtable allow_support_logging CC CFLAGS LDFLAGS CPPFLAGS ac_ct_CC EXEEXT OBJEXT INSTALL_PROGRAM INSTALL_SCRIPT INSTALL_DATA SET_MAKE mysql_cflags mysql_libs CPP EGREP LIBOBJS subdirs phpize LTLIBOBJS'
 ac_subst_files=''
 
 # Initialize some variables set by options.
@@ -869,8 +869,6 @@ Optional Packages:
                           name of sub-directory to contain javascript
   --with-css_dir_name=css_dir_name
                           name of sub-directory to contain style sheets
-  --with-custom_sess_path=custom_sess_path
-                          a custom path to store upload session files
   --with-install_group=cgi_dir_name
                           name of group to have installed file ownership
   --with-service_name=service_name
@@ -881,14 +879,22 @@ Optional Packages:
                           secure url for the filedrawers service
   --with-error_url=error_url
                           default URL to redirect back to in case of error
-  --with-sdb_host=sdb_host
-                          hostname for supportgroups database
-  --with-sdb_name=sdb_name
-                          database name for supportgroups database
-  --with-sdb_ro_user=sdb_ro_user
-                          username for supportgroups database
-  --with-sdb_ro_password=sdb_ro_password
-                          read-only password for supportgroups database
+  --with-valid_fs_path=valid_fs_path
+                          Only uploads to subdirectories of this path are
+                          valid
+  --with-db_host=db_host  hostname for filedrawers database
+  --with-db_name=db_name  database name for filedrawers database
+  --with-db_ro_user=db_ro_user
+                          filedrawers database read-only username
+  --with-db_ro_password=db_ro_password
+                          password for filedrawers read-only DB user
+  --with-db_user=db_user  filedrawers database read and write username
+  --with-db_password=db_password
+                          password for filedrawers read and write DB user
+  --with-progressdbtable=progressdbtable
+                          DB table to store upload progress information
+  --with-mysql=DIR        path to mysql
+  --with-phpize=PATH      path to phpize
 
 Some influential environment variables:
   CC          C compiler command
@@ -1441,16 +1447,6 @@ fi;
 
 
 
-# Check whether --with-custom_sess_path or --without-custom_sess_path was given.
-if test "${with_custom_sess_path+set}" = set; then
-  withval="$with_custom_sess_path"
-  custom_sess_path="$withval"
-else
-  custom_sess_path=""
-fi;
-
-
-
 # Check whether --with-install_group or --without-install_group was given.
 if test "${with_install_group+set}" = set; then
   withval="$with_install_group"
@@ -1501,42 +1497,82 @@ fi;
 
 
 
-# Check whether --with-sdb_host or --without-sdb_host was given.
-if test "${with_sdb_host+set}" = set; then
-  withval="$with_sdb_host"
-  sdb_host="$withval"
+# Check whether --with-valid_fs_path or --without-valid_fs_path was given.
+if test "${with_valid_fs_path+set}" = set; then
+  withval="$with_valid_fs_path"
+  valid_fs_path="$withval"
 else
-  sdb_host=""
+  valid_fs_path="/afs"
 fi;
 
 
 
-# Check whether --with-sdb_name or --without-sdb_name was given.
-if test "${with_sdb_name+set}" = set; then
-  withval="$with_sdb_name"
-  sdb_name="$withval"
+# Check whether --with-db_host or --without-db_host was given.
+if test "${with_db_host+set}" = set; then
+  withval="$with_db_host"
+  db_host="$withval"
 else
-  sdb_name=""
+  db_host=""
 fi;
 
 
 
-# Check whether --with-sdb_ro_user or --without-sdb_ro_user was given.
-if test "${with_sdb_ro_user+set}" = set; then
-  withval="$with_sdb_ro_user"
-  sdb_ro_user="$withval"
+# Check whether --with-db_name or --without-db_name was given.
+if test "${with_db_name+set}" = set; then
+  withval="$with_db_name"
+  db_name="$withval"
 else
-  sdb_ro_user=""
+  db_name=""
 fi;
 
 
 
-# Check whether --with-sdb_ro_password or --without-sdb_ro_password was given.
-if test "${with_sdb_ro_password+set}" = set; then
-  withval="$with_sdb_ro_password"
-  sdb_ro_password="$withval"
+# Check whether --with-db_ro_user or --without-db_ro_user was given.
+if test "${with_db_ro_user+set}" = set; then
+  withval="$with_db_ro_user"
+  db_ro_user="$withval"
 else
-  sdb_ro_password=""
+  db_ro_user=""
+fi;
+
+
+
+# Check whether --with-db_ro_password or --without-db_ro_password was given.
+if test "${with_db_ro_password+set}" = set; then
+  withval="$with_db_ro_password"
+  db_ro_password="$withval"
+else
+  db_ro_password=""
+fi;
+
+
+
+# Check whether --with-db_user or --without-db_user was given.
+if test "${with_db_user+set}" = set; then
+  withval="$with_db_user"
+  db_user="$withval"
+else
+  db_user=""
+fi;
+
+
+
+# Check whether --with-db_password or --without-db_password was given.
+if test "${with_db_password+set}" = set; then
+  withval="$with_db_password"
+  db_password="$withval"
+else
+  db_password=""
+fi;
+
+
+
+# Check whether --with-progressdbtable or --without-progressdbtable was given.
+if test "${with_progressdbtable+set}" = set; then
+  withval="$with_progressdbtable"
+  progressdbtable="$withval"
+else
+  progressdbtable="filedrawers_progress"
 fi;
 
 
@@ -2691,6 +2727,37 @@ _ACEOF
 fi
 
 
+
+    echo "$as_me:$LINENO: checking for mysql" >&5
+echo $ECHO_N "checking for mysql... $ECHO_C" >&6
+    mysqldirs="/usr /usr/mysql /usr/local /usr/local/mysql"
+
+# Check whether --with-mysql or --without-mysql was given.
+if test "${with_mysql+set}" = set; then
+  withval="$with_mysql"
+  mysqldirs="$withval"
+fi;
+    for dir in $mysqldirs; do
+	mysqldir="$dir"
+	if test -f "$dir/bin/mysql_config"; then
+	    found_mysql=yes
+	    break
+	fi
+    done
+    if test x_$found_mysql != x_yes; then
+	{ { echo "$as_me:$LINENO: error: cannot find mysql" >&5
+echo "$as_me: error: cannot find mysql" >&2;}
+   { (exit 1); exit 1; }; }
+    fi
+
+    mysql_cflags="`$mysqldir/bin/mysql_config --cflags`"
+    mysql_libs="`$mysqldir/bin/mysql_config --libs`"
+    echo "$as_me:$LINENO: result: yes" >&5
+echo "${ECHO_T}yes" >&6
+
+
+
+
 # Checks for header files.
 ac_ext=c
 ac_cpp='$CPP $CPPFLAGS'
@@ -3833,7 +3900,39 @@ done
 subdirs="$subdirs libcgi"
 
 
-          ac_config_files="$ac_config_files Makefile"
+
+    echo "$as_me:$LINENO: checking for phpize" >&5
+echo $ECHO_N "checking for phpize... $ECHO_C" >&6
+    phpize_path="phpize"
+
+# Check whether --with-phpize or --without-phpize was given.
+if test "${with_phpize+set}" = set; then
+  withval="$with_phpize"
+  phpize_path="$withval"
+else
+  phpize_path="/usr/bin/phpize"
+fi;
+    if test -f "$phpize_path"; then
+	found_phpize="yes"
+    fi
+    if test x_$found_phpize != x_yes; then
+	{ { echo "$as_me:$LINENO: error: cannot find phpize" >&5
+echo "$as_me: error: cannot find phpize" >&2;}
+   { (exit 1); exit 1; }; }
+    else
+	phpize="$phpize_path"
+    fi
+    echo "$as_me:$LINENO: result: yes" >&5
+echo "${ECHO_T}yes" >&6
+
+
+
+    { echo "$as_me:$LINENO: Configuring filedrawers PECL module..." >&5
+echo "$as_me: Configuring filedrawers PECL module..." >&6;}
+    (cd pecl; "$phpize"; ./configure)
+
+
+                    ac_config_files="$ac_config_files Makefile upload/Makefile"
 
 
 cat >confcache <<\_ACEOF
@@ -4388,6 +4487,7 @@ do
   case "$ac_config_target" in
   # Handling of arguments.
   "Makefile" ) CONFIG_FILES="$CONFIG_FILES Makefile" ;;
+  "upload/Makefile" ) CONFIG_FILES="$CONFIG_FILES upload/Makefile" ;;
   *) { { echo "$as_me:$LINENO: error: invalid argument: $ac_config_target" >&5
 echo "$as_me: error: invalid argument: $ac_config_target" >&2;}
    { (exit 1); exit 1; }; };;
@@ -4480,16 +4580,19 @@ s,@cgi_dir_name@,$cgi_dir_name,;t t
 s,@lib_dir_name@,$lib_dir_name,;t t
 s,@js_dir_name@,$js_dir_name,;t t
 s,@css_dir_name@,$css_dir_name,;t t
-s,@custom_sess_path@,$custom_sess_path,;t t
 s,@install_group@,$install_group,;t t
 s,@service_name@,$service_name,;t t
 s,@service_url@,$service_url,;t t
 s,@secure_service_url@,$secure_service_url,;t t
 s,@error_url@,$error_url,;t t
-s,@sdb_host@,$sdb_host,;t t
-s,@sdb_name@,$sdb_name,;t t
-s,@sdb_ro_user@,$sdb_ro_user,;t t
-s,@sdb_ro_password@,$sdb_ro_password,;t t
+s,@valid_fs_path@,$valid_fs_path,;t t
+s,@db_host@,$db_host,;t t
+s,@db_name@,$db_name,;t t
+s,@db_ro_user@,$db_ro_user,;t t
+s,@db_ro_password@,$db_ro_password,;t t
+s,@db_user@,$db_user,;t t
+s,@db_password@,$db_password,;t t
+s,@progressdbtable@,$progressdbtable,;t t
 s,@allow_support_logging@,$allow_support_logging,;t t
 s,@CC@,$CC,;t t
 s,@CFLAGS@,$CFLAGS,;t t
@@ -4502,10 +4605,13 @@ s,@INSTALL_PROGRAM@,$INSTALL_PROGRAM,;t t
 s,@INSTALL_SCRIPT@,$INSTALL_SCRIPT,;t t
 s,@INSTALL_DATA@,$INSTALL_DATA,;t t
 s,@SET_MAKE@,$SET_MAKE,;t t
+s,@mysql_cflags@,$mysql_cflags,;t t
+s,@mysql_libs@,$mysql_libs,;t t
 s,@CPP@,$CPP,;t t
 s,@EGREP@,$EGREP,;t t
 s,@LIBOBJS@,$LIBOBJS,;t t
 s,@subdirs@,$subdirs,;t t
+s,@phpize@,$phpize,;t t
 s,@LTLIBOBJS@,$LTLIBOBJS,;t t
 CEOF
 

@@ -65,13 +65,6 @@ AC_ARG_WITH(css_dir_name,
             [css_dir_name="css"])
 AC_SUBST(css_dir_name)
 
-AC_ARG_WITH(custom_sess_path,
-            AC_HELP_STRING([--with-custom_sess_path=custom_sess_path],
-                           [a custom path to store upload session files]),
-            custom_sess_path="$withval",
-            [custom_sess_path=""])
-AC_SUBST(custom_sess_path)
-
 AC_ARG_WITH(install_group,
             AC_HELP_STRING([--with-install_group=cgi_dir_name],
                            [name of group to have installed file ownership]),
@@ -107,33 +100,61 @@ AC_ARG_WITH(error_url,
             [error_url="https://mfile.umich.edu/?error=true"])
 AC_SUBST(error_url)
 
-AC_ARG_WITH(sdb_host,
-            AC_HELP_STRING([--with-sdb_host=sdb_host],
-                           [hostname for supportgroups database]),
-            sdb_host="$withval",
-            [sdb_host=""])
-AC_SUBST(sdb_host)
+AC_ARG_WITH(valid_fs_path,
+            AC_HELP_STRING([--with-valid_fs_path=valid_fs_path],
+                           [Only uploads to subdirectories of this path are valid]),
+            valid_fs_path="$withval",
+            [valid_fs_path="/afs"])
+AC_SUBST(valid_fs_path)
 
-AC_ARG_WITH(sdb_name,
-            AC_HELP_STRING([--with-sdb_name=sdb_name],
-                           [database name for supportgroups database]),
-            sdb_name="$withval",
-            [sdb_name=""])
-AC_SUBST(sdb_name)
+AC_ARG_WITH(db_host,
+            AC_HELP_STRING([--with-db_host=db_host],
+                           [hostname for filedrawers database]),
+            db_host="$withval",
+            [db_host=""])
+AC_SUBST(db_host)
 
-AC_ARG_WITH(sdb_ro_user,
-            AC_HELP_STRING([--with-sdb_ro_user=sdb_ro_user],
-                           [username for supportgroups database]),
-            sdb_ro_user="$withval",
-            [sdb_ro_user=""])
-AC_SUBST(sdb_ro_user)
+AC_ARG_WITH(db_name,
+            AC_HELP_STRING([--with-db_name=db_name],
+                           [database name for filedrawers database]),
+            db_name="$withval",
+            [db_name=""])
+AC_SUBST(db_name)
 
-AC_ARG_WITH(sdb_ro_password,
-            AC_HELP_STRING([--with-sdb_ro_password=sdb_ro_password],
-                           [read-only password for supportgroups database]),
-            sdb_ro_password="$withval",
-            [sdb_ro_password=""])
-AC_SUBST(sdb_ro_password)
+AC_ARG_WITH(db_ro_user,
+            AC_HELP_STRING([--with-db_ro_user=db_ro_user],
+                           [filedrawers database read-only username]),
+            db_ro_user="$withval",
+            [db_ro_user=""])
+AC_SUBST(db_ro_user)
+
+AC_ARG_WITH(db_ro_password,
+            AC_HELP_STRING([--with-db_ro_password=db_ro_password],
+                           [password for filedrawers read-only DB user]),
+            db_ro_password="$withval",
+            [db_ro_password=""])
+AC_SUBST(db_ro_password)
+
+AC_ARG_WITH(db_user,
+            AC_HELP_STRING([--with-db_user=db_user],
+                           [filedrawers database read and write username]),
+            db_user="$withval",
+            [db_user=""])
+AC_SUBST(db_user)
+
+AC_ARG_WITH(db_password,
+            AC_HELP_STRING([--with-db_password=db_password],
+                           [password for filedrawers read and write DB user]),
+            db_password="$withval",
+            [db_password=""])
+AC_SUBST(db_password)
+
+AC_ARG_WITH(progressdbtable,
+            AC_HELP_STRING([--with-progressdbtable=progressdbtable],
+                           [DB table to store upload progress information]),
+            progressdbtable="$withval",
+            [progressdbtable="filedrawers_progress"])
+AC_SUBST(progressdbtable)
 
 AC_ARG_ENABLE(allow_support_logging, AC_HELP_STRING([--enable-allow_support_logging], [enables the creation of logs for allow-support]), allow_support_logging="yes", allow_support_logging="" )
 AC_SUBST(allow_support_logging)
@@ -145,6 +166,10 @@ AC_PROG_MAKE_SET
 
 # Checks for libraries.
 AC_CHECK_LIB([cgi], [cf_free])
+
+FILEDRAWERS_CHECK_MYSQL
+AC_SUBST(mysql_cflags)
+AC_SUBST(mysql_libs)
 
 # Checks for header files.
 AC_HEADER_STDC
@@ -160,6 +185,11 @@ AC_CHECK_FUNCS([memchr memmove memset strcasecmp strdup strerror strncasecmp str
 
 AC_CONFIG_SUBDIRS(libcgi)
 
-AC_CONFIG_FILES(Makefile)
+FILEDRAWERS_CHECK_PHPIZE
+AC_SUBST(phpize)
+FILEDRAWERS_CONFIG_MODULE
+
+AC_CONFIG_FILES([Makefile
+		 upload/Makefile])
 
 AC_OUTPUT

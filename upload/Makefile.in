@@ -1,0 +1,32 @@
+SHELL = /bin/sh
+
+srcdir =        @srcdir@
+
+OPTOPTS=        -Wall -Wmissing-prototypes
+CC=             @CC@
+INSTALL=        @INSTALL@
+CFLAGS=         ${OPTOPTS} @CFLAGS@ -I../libcgi @mysql_cflags@
+LIBS=		-lcgi @LIBS@
+LDFLAGS=	-L../libcgi @LDFLAGS@ @mysql_libs@ ${LIBS}
+
+TARGETS=	upload.cgi
+
+CGI_OBJ=	tpupload.o conf.o
+
+all : ${TARGETS}
+
+tpupload.o: tpupload.c
+	${CC} ${CFLAGS} ${OPTOPTS} \
+		-D_URL_ERROR_PAGE=\"@error_url@\" \
+		-D_FILEDRAWERS_CONFIG_PATH=\"@sysconfdir@/filedrawers.conf\" \
+		-c tpupload.c
+
+conf.o : conf.c
+	${CC} ${CFLAGS} ${OPTOPTS} \
+		-c conf.c
+
+upload.cgi: ${CGI_OBJ} Makefile
+	${CC} ${CFLAGS} -o upload.cgi ${CGI_OBJ} ${LDFLAGS}
+
+clean :
+	rm -f *.o upload.cgi core a.out

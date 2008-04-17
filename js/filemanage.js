@@ -64,7 +64,7 @@ function ajaxupload() {
 						formatBytes( total );
 				}
 			}
-			ajaxtimerid = setTimeout( 'ajaxupload()', 10 );
+			ajaxtimerid = setTimeout( 'ajaxupload()', 2000 );
 			uploadloopcnt++;
 		}
 	}

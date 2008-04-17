@@ -5,6 +5,7 @@
  */
 
 require_once( 'mime.php' );
+require_once( 'session.php' );
 define( "CLIPSEPARATOR", "*#~!@@@" );
 
 if ( !extension_loaded( 'posix' )) {
@@ -68,7 +69,9 @@ class Afs
         $this->parPath  = $Matches[1];
         $this->filename = $Matches[2];
 
+        $session = new Session();
         session_start();
+
         if ( !isset( $_SESSION['formKey'] )) {
             $_SESSION['formKey'] = md5( uniqid( rand(), true ));
         }

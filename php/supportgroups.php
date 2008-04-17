@@ -13,11 +13,6 @@ class Supportgroups {
     private $supportgroups = null;
     private $mappings = null;
 
-    private $db_host;
-    private $db_name;
-    private $db_ro_user;
-    private $db_ro_password;
-
     private $db = null;
     private $conn = null;
 
@@ -48,16 +43,7 @@ class Supportgroups {
         $error_msg = null;
         $dir = null;
 
-        global $sdb_host;
-        global $sdb_name;
-        global $sdb_ro_user;
-        global $sdb_ro_password;
         global $allow_support_logging;
-
-        $this->db_host = $sdb_host;
-        $this->db_name = $sdb_name;
-        $this->db_ro_user = $sdb_ro_user;
-        $this->db_ro_password = $sdb_ro_password;
 
         $this->uniqname = $_SERVER['REMOTE_USER'];
         $this->homedir = $this->get_homedir();
@@ -610,16 +596,16 @@ class Supportgroups {
 
     private function db_connect_ro()
     {
-        $this->db_connect($this->db_ro_user, $this->db_ro_password);
+        $this->db_connect(DB_RO_USER, DB_RO_PASS);
     }
 
     private function db_connect($username, $password)
     {
-        $this->conn = mysql_connect($this->db_host, $username, $password)
+        $this->conn = mysql_connect(DB_HOST, $username, $password)
                 or die ("Could not connect to Database");
 
-        $this->db = mysql_select_db($this->db_name) or
-              die ("Could not select database $db_name");
+        $this->db = mysql_select_db(DB_NAME) or
+              die ("Could not select database " . DB_NAME);
     }
 
     /*

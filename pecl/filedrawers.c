@@ -56,31 +56,31 @@ ZEND_FUNCTION( filedrawers_rename )
     }
 
     if ( VCWD_STAT( fs, &st ) != 0 ) {
-	zend_error( E_WARNING, "%s: VCWD_STAT %s: %s\n",
-			__FUNCTION__, fs, strerror( errno ));
+	zend_error( E_WARNING, "filedrawers_rename: VCWD_STAT %s: %s\n",
+			fs, strerror( errno ));
 	RETURN_FALSE;
     }
     fsdev = st.st_dev;
 
     if ( realpath( src, rsrc ) == NULL ) {
-	zend_error( E_WARNING, "%s: realpath %s: %s\n",
-			__FUNCTION__, src, strerror( errno ));
+	zend_error( E_WARNING, "filedrawers_rename: realpath %s: %s\n",
+			src, strerror( errno ));
 	RETURN_FALSE;
     }
     if (( srcfile = strrchr( rsrc, '/' )) == NULL ) {
-	zend_error( E_WARNING, "%s: no / in path after realpath!\n",
-			__FUNCTION__ );
+	zend_error( E_WARNING, "filedrawers_rename: "
+			"no / in path after realpath!\n" );
 	RETURN_FALSE;
     }
     *srcfile++ = '\0';
     if ( *srcfile == '\0' ) {
-	zend_error( E_WARNING, "%s: invalid source path\n" );
+	zend_error( E_WARNING, "filedrawers_rename: invalid source path\n" );
 	RETURN_FALSE;
     }
 
     if (( dfd = open( ".", O_RDONLY )) < 0 ) {
-	zend_error( E_WARNING, "%s: open .: %s\n",
-			__FUNCTION__, strerror( errno ));
+	zend_error( E_WARNING, "filedrawers_rename: open .: %s\n",
+			strerror( errno ));
 	RETURN_FALSE;
     }
 
@@ -92,25 +92,25 @@ ZEND_FUNCTION( filedrawers_rename )
      * back to the original working directory.
      */
     if ( chdir( rsrc ) != 0 ) {
-	zend_error( E_WARNING, "%s: chdir %s: %s\n",
-			__FUNCTION__, rsrc, strerror( errno ));
+	zend_error( E_WARNING, "filedrawers_rename: chdir %s: %s\n",
+			rsrc, strerror( errno ));
 	goto rename_cleanup;
     }
     if ( VCWD_STAT( ".", &st ) != 0 ) {
-	zend_error( E_WARNING, "%s: VCWD_STAT .: %s\n",
-			__FUNCTION__, strerror( errno ));
+	zend_error( E_WARNING, "filedrawers_rename: VCWD_STAT .: %s\n",
+			strerror( errno ));
 	goto rename_cleanup;
     }
     if ( st.st_dev != fsdev ) {
-	zend_error( E_WARNING, "%s: %s/%s is not on %s\n",
-			__FUNCTION__, rsrc, srcfile, fs );
+	zend_error( E_WARNING, "filedrawers_rename: %s/%s is not on %s\n",
+			rsrc, srcfile, fs );
 	goto rename_cleanup;
     }
 
     if ( VCWD_STAT( dst, &st ) != 0 ) {
 	if ( errno != ENOENT ) {
-	    zend_error( E_WARNING, "%s: VCWD_STAT %s: %s\n",
-			__FUNCTION__, dst, strerror( errno ));
+	    zend_error( E_WARNING, "filedrawers_rename: VCWD_STAT %s: %s\n",
+			dst, strerror( errno ));
 	    goto rename_cleanup;
 	}
 
@@ -133,13 +133,13 @@ ZEND_FUNCTION( filedrawers_rename )
 	    }
 	}
 	if ( realpath( dstdir, rdst ) == NULL ) {
-	    zend_error( E_WARNING, "%s: realpath %s: %s\n",
-			    __FUNCTION__, dstdir, strerror( errno ));
+	    zend_error( E_WARNING, "filedrawers_rename: realpath %s: %s\n",
+			    dstdir, strerror( errno ));
 	    goto rename_cleanup;
 	}
 	if ( VCWD_STAT( rdst, &st ) != 0 ) {
-	    zend_error( E_WARNING, "%s: VCWD_STAT %s: %s\n",
-			    __FUNCTION__, rdst, strerror( errno ));
+	    zend_error( E_WARNING, "filedrawers_rename: VCWD_STAT %s: %s\n",
+			    rdst, strerror( errno ));
 	    goto rename_cleanup;
 	}
 	/* +2 for '/' and NUL-termination */
@@ -157,14 +157,14 @@ ZEND_FUNCTION( filedrawers_rename )
 	    goto rename_cleanup;
 	}
     } else if ( realpath( dst, rdst ) == NULL ) {
-	zend_error( E_WARNING, "%s: realpath %s: %s\n",
-			__FUNCTION__, dst, strerror( errno ));
+	zend_error( E_WARNING, "filedrawers_rename: realpath %s: %s\n",
+			dst, strerror( errno ));
 	goto rename_cleanup;
     }
 
     if ( st.st_dev != fsdev ) {
-	zend_error( E_WARNING, "%s: %s is not on %s\n",
-			__FUNCTION__, dst, fs );
+	zend_error( E_WARNING, "filedrawers_rename: %s is not on %s\n",
+			dst, fs );
 	goto rename_cleanup;
     }
 
@@ -174,8 +174,8 @@ ZEND_FUNCTION( filedrawers_rename )
      * against local-to-net and net-to-local race conditions.
      */
     if ( rename( srcfile, rdst ) != 0 ) {
-	zend_error( E_WARNING, "%s: rename %s to %s: %s\n",
-			__FUNCTION__, rsrc, rdst, strerror( errno ));
+	zend_error( E_WARNING, "filedrawers_rename: rename %s to %s: %s\n",
+			rsrc, rdst, strerror( errno ));
 	goto rename_cleanup;
     }
     success = 1;
@@ -185,12 +185,12 @@ rename_cleanup:
 	efree( dstdir );
     }
     if ( fchdir( dfd ) != 0 ) {
-	zend_error( E_WARNING, "%s: fchdir: %s\n",
-			__FUNCTION__, strerror( errno ));
+	zend_error( E_WARNING, "filedrawers_rename: fchdir: %s\n",
+			strerror( errno ));
     }
     if ( close( dfd ) != 0 ) {
-	zend_error( E_WARNING, "%s: close: %s\n",
-			__FUNCTION__, strerror( errno ));
+	zend_error( E_WARNING, "filedrawers_rename: close: %s\n",
+			strerror( errno ));
     }
     if ( success == 1 ) {
 	RETURN_TRUE;
@@ -215,57 +215,57 @@ ZEND_FUNCTION( filedrawers_unlink )
     }
 
     if ( VCWD_STAT( fs, &st ) != 0 ) {
-	zend_error( E_WARNING, "%s: VCWD_STAT %s: %s\n",
-			__FUNCTION__, fs, strerror( errno ));
+	zend_error( E_WARNING, "filedrawers_unlink: VCWD_STAT %s: %s\n",
+			fs, strerror( errno ));
 	RETURN_FALSE;
     }
     fsdev = st.st_dev;
 
     if (( dfd = open( ".", O_RDONLY )) < 0 ) {
-	zend_error( E_WARNING, "%s: open .: %s\n",
-			__FUNCTION__, strerror( errno ));
+	zend_error( E_WARNING, "filedrawers_unlink: open .: %s\n",
+			strerror( errno ));
 	RETURN_FALSE;
     }
 
     if (( udir = estrndup( ufile, uflen )) == NULL ) {
-	zend_error( E_WARNING, "%s: estrndup %s: %s\n",
-			__FUNCTION__, ufile, strerror( errno ));
+	zend_error( E_WARNING, "filedrawers_unlink: estrndup %s: %s\n",
+			ufile, strerror( errno ));
 	goto unlink_cleanup;
     }
     if (( p = strrchr( udir, '/' )) == NULL ) {
 	efree( udir );
 	if (( udir = estrndup( ".", 1 )) == NULL ) {
-	    zend_error( E_WARNING, "%s: estrndup . failed\n", __FUNCTION__ );
+	    zend_error( E_WARNING, "filedrawers_unlink: estrndup . failed\n" );
 	    goto unlink_cleanup;
 	}
 	p = ufile;
     } else {
 	*p++ = '\0';
 	if ( *p == '\0' ) {
-	    zend_error( E_WARNING, "%s: invalid unlink path\n", __FUNCTION__ );
+	    zend_error( E_WARNING, "filedrawers_unlink: invalid unlink path\n");
 	    goto unlink_cleanup;
 	}
     }
 
     if ( chdir( udir ) != 0 ) {
-	zend_error( E_WARNING, "%s: chdir %s: %s\n",
-			__FUNCTION__, udir, strerror( errno ));
+	zend_error( E_WARNING, "filedrawers_unlink: chdir %s: %s\n",
+			udir, strerror( errno ));
 	goto unlink_cleanup;
     }
     if ( VCWD_STAT( ".", &st ) != 0 ) {
-	zend_error( E_WARNING, "%s: VCWD_STAT .: %s\n",
-			__FUNCTION__, strerror( errno ));
+	zend_error( E_WARNING, "filedrawers_unlink: VCWD_STAT .: %s\n",
+			strerror( errno ));
 	goto unlink_cleanup;
     }
     if ( st.st_dev != fsdev ) {
-	zend_error( E_WARNING, "%s: %s is not on %s\n",
-			__FUNCTION__, ufile, fs );
+	zend_error( E_WARNING, "filedrawers_unlink: %s is not on %s\n",
+			ufile, fs );
 	goto unlink_cleanup;
     }
 
     if ( unlink( p ) != 0 ) {
-	zend_error( E_WARNING, "%s: unlink %s: %s\n",
-			__FUNCTION__, p, strerror( errno ));
+	zend_error( E_WARNING, "filedrawers_unlink: unlink %s: %s\n",
+			p, strerror( errno ));
 	goto unlink_cleanup;
     }
     success = 1;
@@ -275,12 +275,12 @@ unlink_cleanup:
 	efree( udir );
     }
     if ( fchdir( dfd ) != 0 ) {
-	zend_error( E_WARNING, "%s: fchdir: %s\n",
-			__FUNCTION__, strerror( errno ));
+	zend_error( E_WARNING, "filedrawers_unlink: fchdir: %s\n",
+			strerror( errno ));
     }
     if ( close( dfd ) != 0 ) {
-	zend_error( E_WARNING, "%s: close: %s\n",
-			__FUNCTION__, strerror( errno ));
+	zend_error( E_WARNING, "filedrawers_unlink: close: %s\n",
+			strerror( errno ));
     }
 
     if ( success ) {

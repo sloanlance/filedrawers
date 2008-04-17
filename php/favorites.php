@@ -25,7 +25,9 @@ class Favorites extends Afs
         $this->startCWD = getcwd();
         $this->afsStat  = stat('/afs/');
 
+        $session = new Session();
         session_start();
+
         if ( !isset( $_SESSION['formKey'] )) {
             $_SESSION['formKey'] = md5( uniqid( rand(), true ));
         }

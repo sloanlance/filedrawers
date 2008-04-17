@@ -1,5 +1,36 @@
 CHANGELOG
 ===============
+0.4.2 (2008/04/17)
+--------------------
+* Prevents CSRF protection code from triggering when filedrawers is hosted on
+	filedrawers is hosted on multiple servers
+
+* Added MySQL database storage so that the upload progress indicator will
+	continue to update even when filedrawers is hosted on multiple servers
+
+* Fixed filedrawers/PECL extension so that it will build on Solaris
+
+0.4.1 (2008/02/28)
+--------------------
+* To protect against moving or renaming a file from AFS to the local  
+	file system (or vice versa) we have included a PECL module with a more  
+	secure version of PHP's rename() function.  You will need to build and  
+	install the Filedrawers PECL module before you install the 0.4.1  
+	update (please see the above URL for instructions).
+
+* To make file upload information sessions more secure, we moved the  
+	Filedrawers session store from /tmp to a dedicated directory.  By  
+	default, sessions are stored in a directory inside the Filedrawers  
+	install directory.  However, you can specify a different location  
+	using a configure option (see the above URL for instructions).   
+	Wherever you choose to store the session files, remember to chown that  
+	directory to your web server user.
+
+* While testing the 0.4.1 update, we noticed that Safari frequently hung  
+	during uploads.  We noticed the behavior in 0.4.0 as well.  Our  
+	solution is to add "BrowserMatch Safari nokeepalive" to the Apache  
+	configuration file.  An updated example configuration is at:
+	http://filedrawers.org/mfile.conf.txt
 
 0.4.0 (2007/05/23)
 --------------------

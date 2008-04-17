@@ -21,52 +21,66 @@ $afsBase	   	= '/afs/umich.edu/user/';
 // Take care of file uploads.
 function process_upload( &$notifyMsg, &$errorMsg )
 {
-    global $upload_session_tmp; // XXX Change this to constant in next version
-
 	$uploadError = false;
 	$errorMsg	 = '';
 
-	if ( isset( $_GET['finishid'] )) {
-		$temppath = $upload_session_tmp . '/' . $_GET['finishid'];
+	if ( ! isset( $_GET['finishid'] ) ||
+            preg_match( "/[^a-f0-9]/", $_GET['finishid'] )) {
+        return false;
+    }
 
-		if ( file_exists( $temppath )
-				&& preg_match( "/[^a-f0-9]/", $_GET['finishid'] ) === 0
-				&& !is_dir( $temppath )) {
-			$result = file( $temppath );
-			unlink( $temppath ); // Remove the session file
+    $db = new mysqli( DB_HOST, DB_USER, DB_PASS, DB_NAME );
 
-			// Check for upload errors
-			if ( is_array( $result )) {
-				foreach( $result as $file ) {
-					$file = explode( ':', $file );
-					if ( isset( $file[2] ) &&
-						 trim( $file[2] ) == 'File exists' ) {
-						if ( $uploadError == false ) {
-							$errorMsg = "The file '" . $file[0] .
-									"' already exists."
-									. " The upload cannot continue.";
-							$uploadError = true;
-						}
-					}
+    if ( mysqli_connect_errno()) {
+        return false;
+    }
 
-					if ( isset( $file[2] ) &&
-							trim( $file[2] ) == 'not successful' ) {
-						if ( $uploadError == false ) {
-							$errorMsg = "One or more files did not " .
-										"upload sucessfully";
-							$uploadError = true;
-						}
-					}
-				}
+    if ( ! $stmt = $db->prepare( "SELECT filename FROM " .
+            "filedrawers_progress WHERE session_id = ?" )) {
+        return false;
+    }
 
-				if ( ! $uploadError ) {
-					$notifyMsg = "Successfully received file(s).";
-				}
-			}
-		}
-	}
+    $stmt->bind_param( 's', $_GET['finishid'] );
+    $stmt->execute();
+    $stmt->bind_result( $filename );
+    $stmt->fetch();
+    $stmt->close();
 
-	return $uploadError;
+    // Check for upload errors
+    while ( $stmt->fetch()) {
+        if ( trim( $filename ) == 'File exists' ) {
+            if ( $uploadError == false ) {
+                $errorMsg = "The file '$filename' already exists. " .
+                        "The upload cannot continue.";
+                $uploadError = true;
+            }
+        }
+
+        if ( trim( $filename ) == 'not successful' ) {
+            if ( $uploadError == false ) {
+                $errorMsg = "One or more files did not upload sucessfully";
+                $uploadError = true;
+            }
+        }
+
+        if ( ! $uploadError ) {
+            $notifyMsg = "Successfully received file(s).";
+        }
+    }
+
+    if ( ! $stmt = $db->prepare( "DELETE FROM filedrawers_progress "
+            . "WHERE session_id = ?" )) {
+        return false;
+    }
+
+    $stmt->bind_param( 's', $_GET['finishid'] );
+    $stmt->execute();
+    $stmt->fetch();
+    $stmt->close();
+
+    $db->close();
+
+    return $uploadError;
 }
 
 /*
