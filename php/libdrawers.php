@@ -242,4 +242,4 @@ function getBasePath( $user )
 
 	return $afsBase . $user[0] . "/" . $user[1] . "/" . $user;
 }
-?>
+

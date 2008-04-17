@@ -10,6 +10,9 @@ CHANGELOG
 
 * Fixed filedrawers/PECL extension so that it will build on Solaris
 
+* Removed php tag and new line at the end of index_download to prevent any
+	possiblity of binary file corruption
+
 0.4.1 (2008/02/28)
 --------------------
 * To protect against moving or renaming a file from AFS to the local  

@@ -7,7 +7,7 @@
  *
  * @copyright  2008 Regents of the University of Michigan
  * @license    http://filedrawers.org/license.php
- * @version    $Revision: 1.1 $
+ * @version    $Revision: 1.2 $
  * @link       http://filedrawers.org
  * @since      File available since Release 0.4.2
  */
@@ -162,5 +162,4 @@ class Session
         $this->db->close();
     }
 }
-?>
 
