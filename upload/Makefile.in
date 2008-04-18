@@ -13,12 +13,14 @@ TARGETS=	upload.cgi
 
 CGI_OBJ=	tpupload.o conf.o
 
+ROOTDIR=@prefix@/@project_name@
+
 all : ${TARGETS}
 
 tpupload.o: tpupload.c
 	${CC} ${CFLAGS} ${OPTOPTS} \
 		-D_URL_ERROR_PAGE=\"@error_url@\" \
-		-D_FILEDRAWERS_CONFIG_PATH=\"@sysconfdir@/filedrawers.conf\" \
+		-D_FILEDRAWERS_CONFIG_PATH=\"${ROOTDIR}/@lib_dir_name@/filedrawers.conf\" \
 		-c tpupload.c
 
 conf.o : conf.c

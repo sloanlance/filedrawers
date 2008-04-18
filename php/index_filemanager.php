@@ -4,7 +4,6 @@
  * All Rights Reserved.  See COPYRIGHT.
  */
  
- error_reporting(E_STRICT | E_ALL);
 require_once( 'version.php' );
 require_once( 'config.php' );
 require_once( 'libdrawers.php' );

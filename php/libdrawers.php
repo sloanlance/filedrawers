@@ -43,11 +43,9 @@ function process_upload( &$notifyMsg, &$errorMsg )
     $stmt->bind_param( 's', $_GET['finishid'] );
     $stmt->execute();
     $stmt->bind_result( $filename );
-    $stmt->fetch();
-    $stmt->close();
 
     // Check for upload errors
-    while ( $stmt->fetch()) {
+    while( $stmt->fetch()) {
         if ( trim( $filename ) == 'File exists' ) {
             if ( $uploadError == false ) {
                 $errorMsg = "The file '$filename' already exists. " .
@@ -68,8 +66,10 @@ function process_upload( &$notifyMsg, &$errorMsg )
         }
     }
 
-    if ( ! $stmt = $db->prepare( "DELETE FROM filedrawers_progress "
-            . "WHERE session_id = ?" )) {
+    $stmt->close();
+
+    if ( ! $stmt = $db->prepare( "DELETE FROM filedrawers_progress " .
+            "WHERE session_id = ? OR (datediff(NOW(), last_update)) > 5" )) {
         return false;
     }
 

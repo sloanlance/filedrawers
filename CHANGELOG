@@ -2,8 +2,8 @@ CHANGELOG
 ===============
 0.4.2 (2008/04/17)
 --------------------
-* Prevents CSRF protection code from triggering when filedrawers is hosted on
-	filedrawers is hosted on multiple servers
+* Added MySQL database sessions to prevent CSRF protection code from triggering
+	 when filedrawers is hosted on filedrawers is hosted on multiple servers
 
 * Added MySQL database storage so that the upload progress indicator will
 	continue to update even when filedrawers is hosted on multiple servers

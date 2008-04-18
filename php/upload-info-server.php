@@ -36,4 +36,4 @@ $stmt->fetch();
 echo "$filename:$size:$received";
 $stmt->close();
 $db->close();
-?>
+
