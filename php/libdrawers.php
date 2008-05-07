@@ -46,22 +46,16 @@ function process_upload( &$notifyMsg, &$errorMsg )
 
     // Check for upload errors
     while( $stmt->fetch()) {
-        if ( trim( $filename ) == 'File exists' ) {
-            if ( $uploadError == false ) {
+        $filename = trim( $filename );
+
+        if ( strpos( $filename, 'ERROR:' ) === 0 ) {
+            if ( strpos( $filename, 'File exists' )) {
                 $errorMsg = "The file '$filename' already exists. " .
                         "The upload cannot continue.";
-                $uploadError = true;
-            }
-        }
-
-        if ( trim( $filename ) == 'not successful' ) {
-            if ( $uploadError == false ) {
+            } else {
                 $errorMsg = "One or more files did not upload sucessfully";
-                $uploadError = true;
             }
-        }
-
-        if ( ! $uploadError ) {
+        } else {
             $notifyMsg = "Successfully received file(s).";
         }
     }

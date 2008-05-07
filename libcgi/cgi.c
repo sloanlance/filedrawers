@@ -357,6 +357,10 @@ DEBUG( fprintf( stderr, "DB: clobber\n" ));
 
 DEBUG( fprintf( stderr, "DB: template: %s\n", clobber_tmp ));
 	if (( file_content = mkstemp( clobber_tmp )) < 0 ) {
+	    if (( upfile->cf_status = strdup( strerror( errno ))) == NULL ) {
+		CGI_SYSERR( cgi, "strdup" );
+		CGI_LOGERR( cgi );
+	    }
 	    CGI_SYSERR( cgi, "mkstemp" );
 	    CGI_LOGERR( cgi );
 	    goto error2;
@@ -380,8 +384,10 @@ DEBUG( fprintf( stderr, "DB: tmp file: %s\n", clobber_tmp ));
 	if (( write( file_content, file_buffer, rr )) != rr ) {
 	    CGI_SYSERR( cgi, "write" );
 	    CGI_LOGERR( cgi );
-	    upfile->cf_status =  malloc(strlen (strerror( cgi->ci_errno)) + 1 );
-	    strcpy( upfile->cf_status, strerror(cgi->ci_errno) );
+	    if (( upfile->cf_status = strdup( strerror( errno ))) == NULL ) {
+		CGI_SYSERR( cgi, "strdup" );
+		CGI_LOGERR( cgi );
+	    }
 	    close( file_content );
 	    goto error1;
 	}
@@ -389,7 +395,11 @@ DEBUG( fprintf( stderr, "DB: tmp file: %s\n", clobber_tmp ));
 	if ( func != NULL ) {
 	    if ((func->f_progress( upfile->cf_name, rr ) != 0)) {
 		DEBUG( fprintf( stderr, "DB: f_progress failed\n" ));
-		upfile->cf_status = strdup("not successful");
+		if (( upfile->cf_status = strdup( "progress update failed" ))
+			== NULL ) {
+		    CGI_SYSERR( cgi, "strdup" );
+		    CGI_LOGERR( cgi );
+		}
 		goto error1;
 	    }
 	}
@@ -418,7 +428,6 @@ DEBUG( fprintf( stderr, "DB: tmp file: %s\n", clobber_tmp ));
 	}
 	unlink( clobber_tmp );
     }
-    upfile->cf_status = strdup("successful" );
     return( 0 );
 
 error1:
@@ -436,7 +445,8 @@ error2:
     int
 cgi_multipart( CGIHANDLE *cgi, struct cgi_list cl[], char *dir, struct function *func )
 {
-    char 	*line, *filename, *filetype, *ptr;
+    char 	*line, *filename, *ptr;
+    char	*filetype = NULL;
     char	*request_method;
     char	key[CGI_LINLEN];
     char	boundary[CGI_LINLEN];
@@ -525,7 +535,11 @@ DEBUG( fprintf( stderr, "DB: found end boundary\n" ));
 		    filename = strdup( line );
 		}
 	    } else if (( strncasecmp( line, "Content-Type:", 13 )) == 0 ) {
-		filetype = strdup( line );
+		if (( filetype = strdup( line )) == NULL ) {
+		    CGI_SYSERR( cgi, "strdup" );
+		    CGI_LOGERR( cgi );
+		    return( -1 );
+		}
 	    }
 	    //skipping the blank line for non-file data
 	    if (( line = post_getline( cgi )) == NULL ||
@@ -567,11 +581,15 @@ DEBUG( fprintf( stderr, "DB key is %s\n", key ));
 		}
 		continue;
 	    }
-	    // make sure we have a clean filename 
-	    if ( strstr( filename, ".." ) != NULL ) {
-		fprintf( stderr, "found ..\n" );
-		return( -1 );
-	    }
+
+	    /*
+	     * sanity check of filename. previous versions checked
+	     * for ".." in the name, but that's a valid string in
+	     * a filename. what we're concerned about is a filename
+	     * that looks like "somedir/../../../../../../passwd".
+	     * checking for a slash in the filename handles that 
+	     * case and an attack using symlinks.
+	     */
 	    if ( strchr( filename, '/' ) != NULL ) {
 		fprintf( stderr, "found \"/\"\n" );
 		return( -1 );
@@ -598,7 +616,11 @@ DEBUG( fprintf( stderr, "DB key is %s\n", key ));
 		return( -1 );
 	    }
 	    upfile->cf_name = strdup( filename );
-	    upfile->cf_ctype = strdup( filetype );
+	    if ( filetype != NULL ) {
+		upfile->cf_ctype = strdup( filetype );
+	    } else {
+		upfile->cf_ctype = NULL;
+	    }
 	    upfile->cf_status = NULL;
 
 	    if (( upfile->cf_tmp = malloc((strlen(dir)) + (strlen(upfile->cf_name)) + 2 )) == NULL ) {

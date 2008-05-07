@@ -23,7 +23,8 @@
 # define AFS_VALID_PATH		"/afs/"
 #endif /* AFS_VALID_PATH */
 
-int		upload_progress_db_insert( char *, char *, long long, long long );
+int		upload_progress_db_insert( char *, char *,
+					   long long, long long );
 int		upload_progress_db_update( char *, char *, long long, char );
 int		upload_init( char **, struct cgi_list * );
 int		upload_progress( char *, int );
@@ -76,7 +77,6 @@ int			db_update = 0;
 }
 
 /* #undef FILEDRAWERS_UPLOAD_CGI_DEBUG */
-/* #define FILEDRAWERS_UPLOAD_CGI_DEBUG 	1 */
 #ifdef FILEDRAWERS_UPLOAD_CGI_DEBUG
 #include <stdarg.h>
 
@@ -98,7 +98,7 @@ debug( char *fmt, ... )
 #endif /* FILEDRAWERS_UPLOAD_CGI_DEBUG */
 
     int
-upload_progress_db_insert( char *sid, char *fname, long long sz, long long rcvd )
+upload_progress_db_insert( char *sid, char *fname, long long sz, long long rcvd)
 {
     MYSQL_BIND		bind[ 5 ];
     my_bool		is_null = 0;
@@ -344,16 +344,48 @@ upload_progress( char *filename, int bytes_uploaded )
 }
 
     static void
-upload_complete( void )
+upload_complete( int rc )
 {
+    struct cgi_file	*cf;
+    char		*buf;
+
     if ( mysql == NULL ) {
 	return;
     }
 
-debug( "total uploaded: %d\n", st->s_total_bytes_uploaded );
-    /* don't really care about return value here. */
-    upload_progress_db_update( "upload complete", st->s_sid,
-	    st->s_total_bytes_uploaded, 1 );
+    if ( rc != 0 ) {
+	/*
+	 * update progress db with error message so
+	 * PHP frontend can detect and display it.
+	 */
+
+	for ( cf = cl[ CL_FILE ].cl_data; cf != NULL; cf = cf->cf_next ) {
+	    /* a non-NULL cf_status holds the error message. */
+	    if ( cf->cf_status != NULL ) {
+		break;
+	    }
+	}
+
+	if ( cf != NULL && cf->cf_status != NULL ) {
+	    if (( buf = (char *)malloc( strlen( "ERROR: " ) +
+				strlen( cf->cf_status ) + 1 )) == NULL ) {
+		perror( "upload_complete: malloc" );
+		return;
+	    }
+	    strcpy( buf, "ERROR: " );
+	    strcat( buf, cf->cf_status );
+	} else {
+	    if (( buf = strdup( "ERROR: internal error" )) == NULL ) {
+		perror( "upload_complete: strdup" );
+		return;
+	    }
+	}
+
+	upload_progress_db_update( buf, st->s_sid, -1, 1 );
+    } else {
+	upload_progress_db_update( "upload complete", st->s_sid,
+		st->s_total_bytes_uploaded, 1 );
+    }
 }
 
 /* free the status struct */
@@ -423,7 +455,7 @@ read_conf( void )
 
 read_conf_failed:
     printf( "Location: %s\n\n", ref_error ); 
-    exit( 2 );
+    exit( 0 );
 }
 
     int
@@ -434,6 +466,7 @@ main( int ac, char *av[] )
     char        	*agent_string = "did not get browser string";
     char		*dir = NULL;
     char		*prog;
+    int			rc;
 
     func.f_init = upload_init;
     func.f_progress = upload_progress;
@@ -479,10 +512,8 @@ main( int ac, char *av[] )
 	exit( 2 );
     }
 
-    printf( "Connection: close\r\n" );
-
     debug( "%s: calling cgi_multipart\n", prog );
-    if ( cgi_multipart( cgi, cl, dir, &func ) != 0 ) {
+    if (( rc = cgi_multipart( cgi, cl, dir, &func )) != 0 ) {
 	fprintf( stderr, "ERROR: cgi_multipart failed\n" );
 	printf( "Location: %s\n\n", ref_error );
     } else {
@@ -493,7 +524,7 @@ main( int ac, char *av[] )
 	printf( "Location: %s\n\n", ref_error );
         debug( "redirect to: %s\n", ref_error );
     } else {
-	upload_complete();
+	upload_complete( rc );
         printf( "Location: %s\n\n", st->s_uri );
         debug( "redirect to: %s\n", st->s_uri );
     }
@@ -515,14 +546,3 @@ main( int ac, char *av[] )
 
     return( 0 );
 }
-
-/*
- * Format of progress (sid) file
- *
- * during upload there is one line, format is -
- * filename:content-length:# of bytes uploaded thus far
- *
- * on completion, list format is -
- * filename:finished:upload-status
- * filename:finished:upload-status
- */
