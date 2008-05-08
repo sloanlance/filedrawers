@@ -35,29 +35,31 @@ function process_upload( &$notifyMsg, &$errorMsg )
         return false;
     }
 
+    // There should only ever be one result row
     if ( ! $stmt = $db->prepare( "SELECT filename FROM " .
-            "filedrawers_progress WHERE session_id = ?" )) {
+            "filedrawers_progress WHERE session_id = ? LIMIT 1" )) {
         return false;
     }
 
     $stmt->bind_param( 's', $_GET['finishid'] );
     $stmt->execute();
     $stmt->bind_result( $filename );
+    $stmt->fetch();
 
     // Check for upload errors
-    while( $stmt->fetch()) {
-        $filename = trim( $filename );
+    $filename = trim( $filename );
 
-        if ( strpos( $filename, 'ERROR:' ) === 0 ) {
-            if ( strpos( $filename, 'File exists' )) {
-                $errorMsg = "The file '$filename' already exists. " .
-                        "The upload cannot continue.";
-            } else {
-                $errorMsg = "One or more files did not upload sucessfully";
-            }
+    if ( strpos( $filename, 'ERROR:' ) === 0 ) {
+        if ( strpos( $filename, 'File exists' )) {
+            $errorMsg = "One or more files already exist. " .
+                    "The upload cannot continue.";
+            $uploadError = true;
         } else {
-            $notifyMsg = "Successfully received file(s).";
+            $errorMsg = "One or more files did not upload sucessfully";
+            $uploadError = true;
         }
+    } else {
+        $notifyMsg = "Successfully received file(s).";
     }
 
     $stmt->close();
@@ -69,7 +71,6 @@ function process_upload( &$notifyMsg, &$errorMsg )
 
     $stmt->bind_param( 's', $_GET['finishid'] );
     $stmt->execute();
-    $stmt->fetch();
     $stmt->close();
 
     $db->close();

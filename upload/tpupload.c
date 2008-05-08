@@ -515,7 +515,6 @@ main( int ac, char *av[] )
     debug( "%s: calling cgi_multipart\n", prog );
     if (( rc = cgi_multipart( cgi, cl, dir, &func )) != 0 ) {
 	fprintf( stderr, "ERROR: cgi_multipart failed\n" );
-	printf( "Location: %s\n\n", ref_error );
     } else {
 	debug( "%s: cgi_multipart successful\n", prog );
     }
