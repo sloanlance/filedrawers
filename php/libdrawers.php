@@ -50,9 +50,11 @@ function process_upload( &$notifyMsg, &$errorMsg )
     $filename = trim( $filename );
 
     if ( strpos( $filename, 'ERROR:' ) === 0 ) {
+        $msgParts = explode( ':', $filename );
+
         if ( strpos( $filename, 'File exists' )) {
-            $errorMsg = "One or more files already exist. " .
-                    "The upload cannot continue.";
+            $errorMsg = "The file '" . trim( $msgParts[1] ) .
+                    "' already exists. " . "The upload cannot continue.";
             $uploadError = true;
         } else {
             $errorMsg = "One or more files did not upload sucessfully";

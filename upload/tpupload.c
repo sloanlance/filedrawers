@@ -224,6 +224,11 @@ upload_init( char **dir, struct cgi_list *cl )
 	return( -1 );
     }
 
+    if ( init_done ) {
+	/* libcgi calls f_init for every file. we only need it once. */
+	return( 0 );
+    }
+
     if (( st->s_uri = strdup( cl[ CL_RETURNURI ].cl_data )) == NULL ) {
 	perror( "strdup" );
 	return( -1 );
@@ -348,6 +353,7 @@ upload_complete( int rc )
 {
     struct cgi_file	*cf;
     char		*buf;
+    int			len;
 
     if ( mysql == NULL ) {
 	return;
@@ -367,13 +373,13 @@ upload_complete( int rc )
 	}
 
 	if ( cf != NULL && cf->cf_status != NULL ) {
-	    if (( buf = (char *)malloc( strlen( "ERROR: " ) +
-				strlen( cf->cf_status ) + 1 )) == NULL ) {
+	    len = strlen( "ERROR: " ) + strlen( cf->cf_name ) +
+				strlen( ": " ) + strlen( cf->cf_status ) + 1;
+	    if (( buf = (char *)malloc( len )) == NULL ) {
 		perror( "upload_complete: malloc" );
 		return;
 	    }
-	    strcpy( buf, "ERROR: " );
-	    strcat( buf, cf->cf_status );
+	    snprintf( buf, len, "ERROR: %s: %s", cf->cf_name, cf->cf_status );
 	} else {
 	    if (( buf = strdup( "ERROR: internal error" )) == NULL ) {
 		perror( "upload_complete: strdup" );
