@@ -32,7 +32,8 @@ function process_upload( &$notifyMsg, &$errorMsg )
     $db = new mysqli( DB_HOST, DB_USER, DB_PASS, DB_NAME );
 
     if ( mysqli_connect_errno()) {
-        return false;
+        error_log( "Couldn't connect to Filedrawers session database" );
+        exit( "<p>Couldn't connect to Filedrawers database</p>\n" );
     }
 
     // There should only ever be one result row

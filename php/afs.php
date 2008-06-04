@@ -56,7 +56,8 @@ class Afs
         $this->startCWD = getcwd();
         $this->afsStat  = stat('/afs/');
 
-        $this->setPath( trim( $path ));
+        // Bug 1975875 Fixed: Don't trim whitespaces from path
+        $this->setPath( $path );
 
         // Generate the path of the folder one level above the current
         if ( !preg_match( "/(.*\/)([^\/]+)\/?$/", $this->path, $Matches )) {
@@ -199,7 +200,7 @@ class Afs
                   return false;
             }
 
-            if ( !mkdir( basename( $this->selectedItems ), 0644, true )) {
+            if ( !mkdir( trim( basename( $this->selectedItems )), 0644, true )) {
                 $this->errorMsg = 'Unable to create folder.';
                 @chdir( $this->startCWD );
                 return false;
@@ -276,11 +277,17 @@ class Afs
             return false;
         }
 
-        $files = explode( "\n", trim( $this->selectedItems ));
+        // XXX 0.5.0 should use a data structure that doesn't require splitting
+        // on a whitespace character
+        $files = explode( "\n", $this->selectedItems );
 
         foreach ( $files as $file ) {
-            $file = trim( $file );
-            
+            $file = preg_replace( "/[\r\n]/", '', $file );
+
+            if ( empty( $file )) {
+                continue;
+            }
+
             // Security checks are in Afs::removeFolder()
             $itemPath = $this->path . '/' . $file;
 
@@ -326,15 +333,17 @@ class Afs
             return false;
         }
 
-        if ( $this->linkSafeFileExists( basename( $this->newName ))) {
-            $this->errorMsg = "The file or folder '" . $this->newName .
+        $newName = trim( basename( $this->newName ));
+
+        if ( $this->linkSafeFileExists( $newName )) {
+            $this->errorMsg = "The file or folder '" . $newName .
                 "' already exists. Please select a different name.";
             @chdir( $this->startCWD );
             return false;
         }
 
         if ( !@filedrawers_rename( basename( $this->selectedItems ),
-                basename( $this->newName ), '/afs' )) {
+                $newName, '/afs' )) {
             $this->errorMsg = 'Unable to rename this file or folder.';
             @chdir( $this->startCWD );
             return false;
@@ -353,6 +362,10 @@ class Afs
         $files = explode( CLIPSEPARATOR, $this->selectedItems );
 
         foreach ( $files as $file ) {
+            if ( empty( $file )) {
+                continue;
+            }
+
             // Security checks are in filedrawers_rename
             $sourcePath = $this->originPath . '/' . $file;
             $destPath   = $this->path . '/' . $file;
@@ -374,6 +387,10 @@ class Afs
         $files = explode( CLIPSEPARATOR, $this->selectedItems );
 
         foreach ( $files as $file ) {
+            if ( empty( $file )) {
+                continue;
+            }
+
             // Security checks are in Afs::copy() and Afs::copy_dirs
             $sourcePath = $this->originPath . '/'. $file;
             $destPath   = $this->path . '/' . $file;
@@ -463,7 +480,7 @@ class Afs
                 return false;
             }
 
-            $name   = trim( basename( $source ));
+            $name   = basename( $source );
             $target = readlink( $name );
 
             if ( !$this->makePathAFSlocal( dirname( $dest ))) {
@@ -844,11 +861,17 @@ class Afs
     // Set the afs path used inside the class
     function setPath( $path='' )
     {
+        if ( $path == '/afs' || $path == '/afs/' ) {
+            $path = null;
+        }
+
         if ( !empty( $path )) {
             if ( !( $this->path = $this->pathSecurity( $path ))) {
                 // Can't give this warning due to the current filedrawers
                 // design. This should be fixed in the next release.
-                //$this->errorMsg = "The specified path does not exist. ($path)";
+                // If a user navigates to a path that doesn't exist, they will
+                // continue to get the warning until the url changes
+                //$this->errorMsg = "The specified path does not exist. ($path)"
                 $this->path = null;
             }
         }
@@ -868,7 +891,7 @@ class Afs
             return '';
         }
 
-        $path     = preg_replace( '/^\/afs\//', '', trim( $this->path ));
+        $path     = preg_replace( '/^\/afs\//', '', $this->path );
         $path     = explode( '/', $path );
         $lastItem = array_pop( $path );
         $pathDisp = '/afs';

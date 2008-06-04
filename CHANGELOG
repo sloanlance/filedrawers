@@ -1,6 +1,6 @@
 CHANGELOG
 ===============
-0.4.2 (2008/04/17)
+0.4.2 (2008/05/15)
 --------------------
 * Added MySQL database sessions to prevent CSRF protection code from triggering
 	 when filedrawers is hosted on filedrawers is hosted on multiple servers
@@ -12,6 +12,14 @@ CHANGELOG
 
 * Removed php tag and new line at the end of index_download to prevent any
 	possiblity of binary file corruption
+
+* Fixed file download problem when using PHP sessions over SSL in Internet
+        Explorer. For more information, see: http://support.microsoft.com/kb/323308
+
+* Increased time between file upload progress checks by JavaScript
+
+* Relaxed whitespace trimming added in 0.4.1 to allow navigation to directories
+       with whitespace characters before or after name
 
 0.4.1 (2008/02/28)
 --------------------
