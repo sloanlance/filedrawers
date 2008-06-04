@@ -7,7 +7,7 @@
  *
  * @copyright  2008 Regents of the University of Michigan
  * @license    http://filedrawers.org/license.php
- * @version    $Revision: 1.2 $
+ * @version    $Revision: 1.3 $
  * @link       http://filedrawers.org
  * @since      File available since Release 0.4.2
  */
@@ -87,7 +87,7 @@ class Session
 
         if ( !$stmt = $this->db->prepare( "UPDATE sessions SET " .
                 "session_data=?, expires=? WHERE session_id=?" )) {
-            error_log( 'Filedrawers: ' . $this->db->error );
+            error_log( 'Filedrawers session DB: ' . $this->db->error );
             return false;
         }
 
@@ -102,7 +102,7 @@ class Session
         if ( !$stmt = $this->db->prepare( "INSERT INTO sessions"
                 . " (session_id, session_data, expires)"
                 . " VALUES (?, ?, ?)" )) {
-            error_log( 'Filedrawers: ' . $this->db->error );
+            error_log( 'Filedrawers session DB: ' . $this->db->error );
             return false;
         }
         
