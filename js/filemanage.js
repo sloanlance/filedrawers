@@ -1177,3 +1177,15 @@ function urlescape( str )
 	str = str.replace( /\+/g, "%2B" );
 	return str;
 }
+
+// Adds ability to show/hide sidebar sections
+function switchMenu(obj) {
+        var el = document.getElementById(obj);
+        if ( el.style.display != "none" ) {
+                el.style.display = 'none';
+        }
+        else {
+                el.style.display = '';
+        }
+}
+
