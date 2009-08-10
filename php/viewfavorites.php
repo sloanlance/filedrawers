@@ -4,6 +4,7 @@
  * All Rights Reserved.  See COPYRIGHT.
  */
 
+require_once( 'config.php' );
 require_once( 'afs.php' );
 require_once( 'favorites.php' );
 require_once( 'smarty.custom.php' );

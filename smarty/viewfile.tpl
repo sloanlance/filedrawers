@@ -3,48 +3,19 @@
 <div id="viewfile">
 {php}
 	global $afs;
-	preg_match( '/^([^\/]+)\/?([^; ]*).*$/', $afs->mimetype, $Matches );
-	$mType = $Matches[1];
-	$mSubtype = $Matches[2];
-	$supported = 1;
+    $previewType = Mime::getPreviewType( $afs->mimetype );
 
-	echo "<!-- MIME: [$afs->mimetype] -->\n";
-	switch( $mType ) {
-		case 'image': 
-			if ( $mSubtype == 'bmp' ) {
-				$supported = 0;
-				break;
-			}
-			echo '<img src="/download/view.php?path='.
+    echo "<!-- MIME: [$afs->mimetype] -->\n";
+
+    if ( $previewType == 'image' ) {
+        echo '<img src="/download/view.php?path='.
 				urlencode( $afs->path ).'" />';
-			break;
-		case 'audio': 
-		case 'video': 
-			echo '<embed src="/download/view.php?path='.
+    } else if ( $previewType == 'embed' ) {
+        echo '<embed src="/download/view.php?path='.
 				urlencode( $afs->path ).'" type="'.$afs->mimetype.'"/>';
-			break;
-		case 'html': 
-		case 'text': 
-			if ( $mSubtype == 'rtf' ) {
-				$supported = 0;
-			} else {
-				highlight_file( $afs->path );
-			}
-			break;
-		case 'application':
-			if ( $mSubtype == 'x-shockwave-flash' ) {
-				echo '<embed src="/download/view.php?path='.
-					urlencode( $afs->path ).'" type="'.$afs->mimetype.'"/>';
-				break;
-			}
-			$supported = 0;
-			break;
-		default:
-			$supported = 0;
-			break;
-		}
-
-	if ( !$supported ) {
+    } else if ( $previewType == 'text' ) {
+        highlight_file( $afs->path );
+    } else {
 		$dl_link = '<a href="/download/?path='.urlencode( $afs->path ).'">';
 		echo '<div id="error">'.
 			"<h2>Unsupported MIME type</h2>\n".
@@ -56,8 +27,7 @@
 			'this file, or <a href="/?path='.$afs->parPath.'">return '.
 			'to the parent directory</a>.</p>'.
 			'</div>';
-	}
-
+    }
 {/php}
 </div>
 

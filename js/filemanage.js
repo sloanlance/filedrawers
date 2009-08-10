@@ -193,7 +193,11 @@ function createListIcon( id )
 	// only add link if this is a folder, or readable and not empty
 	if ( files[id].type == folderMime || 
 			( readPriv && files[id].size != 0 )) {
-		l.setAttribute( 'href', './?path=' + getFilenameUrl( id ));
+		if ( files[id].viewable ) {
+			l.setAttribute( 'href', './?path=' + getFilenameUrl( id ));
+		} else {
+			l.setAttribute( 'href', downloadURI + '/?path=' + getFilenameUrl( id ));
+		}
 	}
 	l.appendChild( i );
 
@@ -216,7 +220,12 @@ function createFileName( id )
 	if ( files[id].type == folderMime || 
 			( readPriv && files[id].size != 0 )) {
 		var l = document.createElement( 'a' );
-		l.setAttribute( 'href', './?path=' + getFilenameUrl( id ));
+
+		if ( files[id].viewable ) {
+			l.setAttribute( 'href', './?path=' + getFilenameUrl( id ));
+		} else {
+			l.setAttribute( 'href', 'download/?path=' + getFilenameUrl( id ));
+		}
 		l.appendChild( document.createTextNode( title ));
 		return l;
 	} else {
@@ -625,14 +634,15 @@ function formatDate( rawDate )
 }
 
 // File Object - All files and folders displayed are objects of this type
-function File( title, date, size, selected, type )
+function File( title, date, size, selected, type, viewable )
 {
-	this.title	 = title;	// The title of the item
-	this.date	  = date * 1; // The modify date of the item
+	this.title = title;	// The title of the item
+	this.date = date * 1; // The modify date of the item
 				// multiply by 1 to cast to an int
-	this.size	  = size;	 // The size of the item
-	this.selected  = selected; // Is the item selected?
-	this.type	  = type;	 // The file type of the item
+	this.size = size;	 // The size of the item
+	this.selected = selected; // Is the item selected?
+	this.type = type;	 // The file type of the item
+	this.viewable = viewable;	 // Can we display without download?
 	this.className = false;	// The original class style of the file's row
 }
 

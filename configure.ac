@@ -107,6 +107,13 @@ AC_ARG_WITH(valid_fs_path,
             [valid_fs_path="/afs"])
 AC_SUBST(valid_fs_path)
 
+AC_ARG_WITH(fs_base_path,
+            AC_HELP_STRING([--with-fs_base_path=fs_base_path],
+                           [AFS homedir default location]),
+            fs_base_path="$withval",
+            [fs_base_path="/afs/umich.edu/user/"])
+AC_SUBST(fs_base_path)
+
 AC_ARG_WITH(db_host,
             AC_HELP_STRING([--with-db_host=db_host],
                            [hostname for filedrawers database]),
@@ -158,6 +165,9 @@ AC_SUBST(progressdbtable)
 
 AC_ARG_ENABLE(allow_support_logging, AC_HELP_STRING([--enable-allow_support_logging], [enables the creation of logs for allow-support]), allow_support_logging="yes", allow_support_logging="" )
 AC_SUBST(allow_support_logging)
+
+AC_ARG_ENABLE(ignore_passwd_entries, AC_HELP_STRING([--enable-ignore_passwd_entries], [ignore passwd file when determining home directory]), ignore_passwd_entries="false", ignore_passwd_entries="true" )
+AC_SUBST(ignore_passwd_entries)
 
 # Checks for programs.
 AC_PROG_CC

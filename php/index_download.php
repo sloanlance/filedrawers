@@ -1,6 +1,6 @@
 <?php
 /*
- * Copyright (c) 2005 Regents of The University of Michigan.
+ * Copyright (c) 2005 - 2009 Regents of The University of Michigan.
  * All Rights Reserved.  See COPYRIGHT.
  */
 
@@ -9,6 +9,7 @@
  * private_no_expire prevents filedrawers from sending the headers
  */
 session_cache_limiter( 'private_no_expire' );
+require_once( 'config.php' );
 require_once( 'afs.php' );
 
 $download = new Afs( $_GET['path'] );

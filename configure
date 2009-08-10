@@ -312,7 +312,7 @@ ac_includes_default="\
 #endif"
 
 ac_subdirs_all="$ac_subdirs_all libcgi"
-ac_subst_vars='SHELL PATH_SEPARATOR PACKAGE_NAME PACKAGE_TARNAME PACKAGE_VERSION PACKAGE_STRING PACKAGE_BUGREPORT exec_prefix prefix program_transform_name bindir sbindir libexecdir datadir sysconfdir sharedstatedir localstatedir libdir includedir oldincludedir infodir mandir build_alias host_alias target_alias DEFS ECHO_C ECHO_N ECHO_T LIBS project_name shtml_dir_name html_dir_name object_dir_name smarty_dir_name cgi_dir_name lib_dir_name js_dir_name css_dir_name install_group service_name service_url secure_service_url error_url valid_fs_path db_host db_name db_ro_user db_ro_password db_user db_password progressdbtable allow_support_logging CC CFLAGS LDFLAGS CPPFLAGS ac_ct_CC EXEEXT OBJEXT INSTALL_PROGRAM INSTALL_SCRIPT INSTALL_DATA SET_MAKE mysql_cflags mysql_libs CPP EGREP LIBOBJS subdirs phpize LTLIBOBJS'
+ac_subst_vars='SHELL PATH_SEPARATOR PACKAGE_NAME PACKAGE_TARNAME PACKAGE_VERSION PACKAGE_STRING PACKAGE_BUGREPORT exec_prefix prefix program_transform_name bindir sbindir libexecdir datadir sysconfdir sharedstatedir localstatedir libdir includedir oldincludedir infodir mandir build_alias host_alias target_alias DEFS ECHO_C ECHO_N ECHO_T LIBS project_name shtml_dir_name html_dir_name object_dir_name smarty_dir_name cgi_dir_name lib_dir_name js_dir_name css_dir_name install_group service_name service_url secure_service_url error_url valid_fs_path fs_base_path db_host db_name db_ro_user db_ro_password db_user db_password progressdbtable allow_support_logging ignore_passwd_entries CC CFLAGS LDFLAGS CPPFLAGS ac_ct_CC EXEEXT OBJEXT INSTALL_PROGRAM INSTALL_SCRIPT INSTALL_DATA SET_MAKE mysql_cflags mysql_libs CPP EGREP LIBOBJS subdirs phpize LTLIBOBJS'
 ac_subst_files=''
 
 # Initialize some variables set by options.
@@ -847,6 +847,8 @@ Optional Features:
   --enable-FEATURE[=ARG]  include FEATURE [ARG=yes]
   --enable-allow_support_logging
                           enables the creation of logs for allow-support
+  --enable-ignore_passwd_entries
+                          ignore passwd file when determining home directory
 
 Optional Packages:
   --with-PACKAGE[=ARG]    use PACKAGE [ARG=yes]
@@ -882,6 +884,8 @@ Optional Packages:
   --with-valid_fs_path=valid_fs_path
                           Only uploads to subdirectories of this path are
                           valid
+  --with-fs_base_path=fs_base_path
+                          AFS homedir default location
   --with-db_host=db_host  hostname for filedrawers database
   --with-db_name=db_name  database name for filedrawers database
   --with-db_ro_user=db_ro_user
@@ -1507,6 +1511,16 @@ fi;
 
 
 
+# Check whether --with-fs_base_path or --without-fs_base_path was given.
+if test "${with_fs_base_path+set}" = set; then
+  withval="$with_fs_base_path"
+  fs_base_path="$withval"
+else
+  fs_base_path="/afs/umich.edu/user/"
+fi;
+
+
+
 # Check whether --with-db_host or --without-db_host was given.
 if test "${with_db_host+set}" = set; then
   withval="$with_db_host"
@@ -1582,6 +1596,15 @@ if test "${enable_allow_support_logging+set}" = set; then
   allow_support_logging="yes"
 else
   allow_support_logging=""
+fi;
+
+
+# Check whether --enable-ignore_passwd_entries or --disable-ignore_passwd_entries was given.
+if test "${enable_ignore_passwd_entries+set}" = set; then
+  enableval="$enable_ignore_passwd_entries"
+  ignore_passwd_entries="false"
+else
+  ignore_passwd_entries="true"
 fi;
 
 
@@ -4586,6 +4609,7 @@ s,@service_url@,$service_url,;t t
 s,@secure_service_url@,$secure_service_url,;t t
 s,@error_url@,$error_url,;t t
 s,@valid_fs_path@,$valid_fs_path,;t t
+s,@fs_base_path@,$fs_base_path,;t t
 s,@db_host@,$db_host,;t t
 s,@db_name@,$db_name,;t t
 s,@db_ro_user@,$db_ro_user,;t t
@@ -4594,6 +4618,7 @@ s,@db_user@,$db_user,;t t
 s,@db_password@,$db_password,;t t
 s,@progressdbtable@,$progressdbtable,;t t
 s,@allow_support_logging@,$allow_support_logging,;t t
+s,@ignore_passwd_entries@,$ignore_passwd_entries,;t t
 s,@CC@,$CC,;t t
 s,@CFLAGS@,$CFLAGS,;t t
 s,@LDFLAGS@,$LDFLAGS,;t t

@@ -1,9 +1,10 @@
 <?php
 /*
- * Copyright (c) 2005 - 2008 Regents of The University of Michigan.
+ * Copyright (c) 2005 - 2009 Regents of The University of Michigan.
  * All Rights Reserved.  See COPYRIGHT.
  */
 
+require_once( 'config.php' );
 require_once( 'mime.php' );
 require_once( 'session.php' );
 define( "CLIPSEPARATOR", "*#~!@@@" );
@@ -709,8 +710,6 @@ class Afs
         }
 
         while ( $filename = readdir( $dh )) {
-            $fullpath = "$this->path/$filename";
-
             clearstatcache();
             if ( !$fileStats = @lstat( $filename )) {
                 $modTime = '';
@@ -720,15 +719,19 @@ class Afs
                 $size = $fileStats['size'];
             }
 
-            $mime     = Mime::mimeIcon( $filename );
+            $mimeType = Mime::getMimeType( $filename );
+            $mimeIcon = Mime::getIcon( $mimeType, $filename );
             $filename = $this->escape_js( $filename );
 
-            if ( $showHidden ) {
+            $viewable = 0;
+
+            if ( Mime::getPreviewType( $mimeType ) || @is_dir( $filename )) {
+                $viewable = 1;
+            }
+
+            if ( $showHidden || strpos( $filename, '.' ) !== 0 ) {
                 $files .= "files[$id]=new File('$filename', '$modTime', $size, "
-                  . "'', '$mime');\n";
-            } else if ( strpos( $filename, '.' ) !== 0 ) {
-                $files .= "files[$id]=new File('$filename', '$modTime', $size, "
-                  . "'', '$mime');\n";
+                  . "'', '$mimeIcon', $viewable);\n";
             }
 
             $id++;
@@ -792,7 +795,7 @@ class Afs
 
     /* An initial check to make sure the path is in AFS.  This is an initial
      * check only.  To avoid race conditions, other precaustions must be used.
-     * CAUTION: This method will be removed in the next release.
+     * CAUTION: This method will be removed in the next major release.
      */
     private function pathSecurity( $path='' )
     {

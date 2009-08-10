@@ -1,6 +1,6 @@
 <?php
 /*
- * Copyright (c) 2005 Regents of The University of Michigan.
+ * Copyright (c) 2005 - 2009 Regents of The University of Michigan.
  * All Rights Reserved.  See COPYRIGHT.
  */
 
@@ -17,7 +17,7 @@ if ( !extension_loaded( 'fileinfo' )) {
 class Mime
 {
     // Returns the mime type for the file identified in path
-    function getMimeType( $path )
+    public function getMimeType( $path )
     {
         $res = finfo_open( FILEINFO_MIME );
         $mimetype = finfo_file( $res, $path );
@@ -36,7 +36,7 @@ class Mime
     }
 
     // Returns the name of an appropriate mime icon
-    function mimeIcon( $path )
+    public function getIcon( $mimeType, $path )
     {
         if ( @is_link( $path )) {
             return 'application';
@@ -51,15 +51,12 @@ class Mime
             return $ext;
         }
 
-        // Determine mime class and type
-        $mimetype = Mime::getMimeType( $path );
-
-        if ( !strlen( $mimetype )) {
+        if ( !strlen( $mimeType )) {
             return 'application';
         }
-		preg_match( '/^([^\/]+)\/?([^; ]*).*$/', $mimetype, $Matches );
-		$mClass = $Matches[1];
-		$mType = $Matches[2];
+		preg_match( '/^([^\/]+)\/?([^; ]*).*$/', $mimeType, $matches );
+		$mClass = $matches[1];
+		$mType = $matches[2];
 
         if ( file_exists( PATHTOIMGS . $mType . '.gif' )) {
             return $mType;  // It's a file and we have a mime type icon for it
@@ -71,4 +68,29 @@ class Mime
 		// (finfo probably didn't have permission to examine its type)
         return 'application';
     }
+
+
+    public function getPreviewType( $mimeType )
+    {
+        preg_match( '/^([^\/]+)\/?([^; ]*).*$/', $mimeType, $matches );
+        $mType     = $matches[1];
+        $mSubtype  = $matches[2];
+
+        if ( $mType == 'image' && $mSubtype != 'bmp'
+                && $mSubtype != 'vnd.adobe.photoshop' ) {
+            return 'image';
+        }
+
+        if ( $mType == 'audio' || $mType == 'video' ||
+                ( $mType == 'application' && $mSubtype == 'x-shockwave-flash' )) {
+            return 'embed';
+        }
+
+        if ( $mType == 'html' || ( $mType == 'text' && $mSubtype != 'rtf' )) {
+            return 'text';
+        }
+
+        return false;
+    }
 }
+

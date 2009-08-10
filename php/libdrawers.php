@@ -1,6 +1,6 @@
 <?php
 /*
- * Copyright (c) 2005 Regents of The University of Michigan.
+ * Copyright (c) 2005 - 2009 Regents of The University of Michigan.
  * All Rights Reserved.  See COPYRIGHT.
  */
 
@@ -14,9 +14,6 @@ $stylesheets 	= array( "/css/fileman.css" );
 
 // Default value for $displayfileman
 $displayfileman	= 1;
-
-// AFS homedir default location.
-$afsBase	   	= '/afs/umich.edu/user/';
 
 // Take care of file uploads.
 function process_upload( &$notifyMsg, &$errorMsg )
@@ -198,15 +195,18 @@ function GetHomeDir( $name, &$dir, &$error_msg )
 		return false;
 	}
 
-	if ( !extension_loaded( 'posix' ) && !dl( 'posix.so' )) {
-		$error_msg .= "Couldn't load necessary posix function. ";
-	} else {
-		$Pwent = posix_getpwnam( $name );
-		if ( empty( $Pwent['dir'] ) || !is_dir( $Pwent['dir'] )) {
-			$error_msg .= "Couldn't retrieve $name home directory [" .
-				$Pwent['dir'] . ']. ';
+	// Only check password entry if the users are have password entries.
+	if ( USE_PASSWD_ENTRIES ) {
+		if ( !extension_loaded( 'posix' ) && !dl( 'posix.so' )) {
+			$error_msg .= "Couldn't load necessary posix function. ";
 		} else {
-			$dir = $Pwent['dir'];
+			$Pwent = posix_getpwnam( $name );
+			if ( empty( $Pwent['dir'] ) || !is_dir( $Pwent['dir'] )) {
+				$error_msg .= "Couldn't retrieve $name home directory [" .
+					$Pwent['dir'] . ']. ';
+			} else {
+				$dir = $Pwent['dir'];
+			}
 		}
 	}
 
@@ -227,17 +227,15 @@ function GetHomeDir( $name, &$dir, &$error_msg )
  */
 function getBasePath( $user )
 {
-	global $afsBase;
-
 	if ( !$user ) {
 		return false;
 	}
 
-	# does the username contain illegal characters?
+	// does the username contain illegal characters?
 	if ( preg_match( "/[^a-zA-Z]/", $user )) {
 		return false;
 	}
 
-	return $afsBase . $user[0] . "/" . $user[1] . "/" . $user;
+	return AFS_BASE . $user[0] . "/" . $user[1] . "/" . $user;
 }
 

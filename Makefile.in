@@ -129,6 +129,12 @@ php/config.php: Makefile
 	     php/config.php
 	echo "define( \"PATHTOIMGS\", \"${ROOTDIR}/images/mime/small/\" );" >> \
 	     php/config.php
+	echo "// AFS homedir default location." >> php/config.php
+	echo "define( \"AFS_BASE\", \"@fs_base_path@\" );" >> \
+	     php/config.php
+	echo "// Use password entries to find homedirs?" >> php/config.php
+	echo "define( \"USE_PASSWD_ENTRIES\", @ignore_passwd_entries@ );" >> \
+	     php/config.php
 	echo '?>' >> php/config.php
 
 upload/filedrawers.conf: Makefile
