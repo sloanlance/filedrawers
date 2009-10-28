@@ -76,21 +76,21 @@ class Model_Mime
     // Also, if user does not have read permission, file is not viewable
     public function setIcon(&$row)
     {
-        $config = Config::getInstance();
+        $imagesPath = Config::getInstance()->mime['imagesPath'];
         $filename = $row['filename'];
 
-        if ( @is_link( $filename )) {
+        if ( is_link( $filename )) {
             $row['mimeImage'] = 'application';
             return true;
         }
 
-        if ( @is_dir( $filename )) {
+        if ( is_dir( $filename )) {
             $row['mimeImage'] = DIRMIMETYPE;
             return true;
         }
 
         $ext = strtolower( pathinfo( $filename, PATHINFO_EXTENSION ));
-        if (file_exists($config->imagesPath . '/' . $ext . '.gif' )) {
+        if (file_exists($imagesPath . '/' . $ext . '.gif' )) {
             $row['mimeImage'] = $ext;
             return true;
         }
@@ -106,10 +106,10 @@ class Model_Mime
 		$mClass = $matches[1];
 		$mType = $matches[2];
 
-        if ( file_exists( $config->imagesPath . $mType . '.gif' )) {
+        if ( file_exists( $imagesPath . $mType . '.gif' )) {
             $row['mimeImage'] =  $mType; // It's a file and we have a mime type icon for it
             return true;  
-        } else if ( file_exists( $config->imagesPath . $mClass . '.gif' )) {
+        } else if ( file_exists( $imagesPath . $mClass . '.gif' )) {
             $row['mimeImage'] =  $mClass; // It's a file and we have a mime class icon for it
             return true;
         }

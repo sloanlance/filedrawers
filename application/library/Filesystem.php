@@ -410,7 +410,7 @@ abstract class Filesystem {
 
         while ( $filename = readdir( $dh )) {
             clearstatcache();
-            if ( !$fileStats = @lstat( $filename )) {
+            if ( !$fileStats = lstat( $filename )) {
                 $modTime = '';
                 $size = 0;
             } else {
@@ -430,6 +430,12 @@ abstract class Filesystem {
 
             $files['contents'][] = $row;
         }
+
+        function naturalSortByName($a, $b) {
+            return strnatcasecmp($a['filename'], $b['filename']);
+        }
+
+        usort($files['contents'], 'naturalSortByName');
 
         closedir( $dh );
         @chdir( $this->startCWD );
