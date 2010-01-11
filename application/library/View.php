@@ -30,6 +30,15 @@ class View
     }
 
 
+    public function __call($helperName, $arguments) {
+        $helperNameCap = ucfirst($helperName);
+        require_once APPLICATION_PATH . "/views/helpers/$helperNameCap.php";
+        $helperClass = 'Helper_' . $helperNameCap;
+        $helper = new $helperClass($this);
+        return call_user_func_array(array($helper, $helperName), array('test'));
+    }
+
+
     public function setNoRender()
     {
         $this->renderView = false;

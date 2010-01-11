@@ -29,16 +29,24 @@ class FiledrawersController extends Controller_Core {
             }
         }
 
-         $this->view->files = $this->filesystem->listDirectory($homedir);
+        $this->view->path  = $homedir;
+        $this->view->files = $this->filesystem->listDirectory($homedir);
     }
 
 
     public function listAction()
     {
-        $this->view->files =
-                $this->filesystem->listDirectory(Router::getInstance()->getFSpath());
+        $path = Router::getInstance()->getFSpath();
+        $this->view->path  = $path;
+        $this->view->files = $this->filesystem->listDirectory($path);
     }
 
+    public function ajaxlistAction()
+    {
+        $path = Router::getInstance()->getFSpath();
+        $this->view->path  = $path;
+        $this->view->files = $this->filesystem->listDirectory($path);
+    }
 
     public function downloadAction()
     {
@@ -57,7 +65,18 @@ class FiledrawersController extends Controller_Core {
 
     public function renameAction()
     {
-        //
+        $path = Router::getInstance()->getFSpath();
+
+        $oldPath = $path . '/' . $_POST['oldName'];
+        $newPath = $path . '/' . $_POST['newName'];
+
+        $this->view->setNoRender();
+
+        if ($this->filesystem->rename($oldPath, $newPath)) {
+            echo json_encode(array('status' => 'success', 'message' => $this->filesystem->notifyMsg));
+        } else {
+            echo json_encode(array('status' => 'fail', 'message' => $this->filesystem->errorMsg));
+        }
     }
     
     public function moveAction()
@@ -69,10 +88,28 @@ class FiledrawersController extends Controller_Core {
     {
         //
     }
-    
+
     public function deleteAction()
     {
-        //
+        $path = Router::getInstance()->getFSpath();
+
+        if ($this->filesystem->deleteFiles($path, $_POST['files'])) {
+            $this->view->response = array('status' => 'success', 'message' => $this->filesystem->notifyMsg);
+        } else {
+            $this->view->response = array('status' => 'fail', 'message' => $this->filesystem->errorMsg);
+        }
+    }
+
+    public function mkdirAction()
+    {
+        $this->view->setNoRender();
+        $path = Router::getInstance()->getFSpath();
+
+        if ($this->filesystem->createDirectory($path, $_POST['folderName'])) {
+            echo json_encode(array('status' => 'success', 'message' => $this->filesystem->notifyMsg));
+        } else {
+            echo json_encode(array('status' => 'fail', 'message' => $this->filesystem->errorMsg));
+        }
     }
 
     public function setPermissionsAction()
@@ -84,5 +121,8 @@ class FiledrawersController extends Controller_Core {
     {
         //
     }
+    
+    public function testAction()
+    {}
 }
 

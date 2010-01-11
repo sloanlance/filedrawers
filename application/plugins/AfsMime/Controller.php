@@ -12,6 +12,7 @@ class Plugin_AfsMime extends Controller_Plugin {
         Registry::getInstance()->filesystem = $afs;
 
         $afs->addListHelper(array('Model_Mime', 'setIcon'));
+        $afs->addListHelper(array('Model_Afs', 'setPermissions'));
     }
 }
 

@@ -6,8 +6,6 @@
  */
 class Model_Afs extends Filesystem
 {
-    protected $afsUtils = '/usr/bin';
-
     // Change the ACL for a given path
     public function changeAcl($entity,
                        $rights,
@@ -95,10 +93,23 @@ class Model_Afs extends Filesystem
         return $result;
     }
 
-    public function getCallerAccess($path)
+
+    public static function setPermissions(&$row)
     {
-        $cmd = "$this->afsUtils/fs getcalleraccess "
-                . escapeshellarg( $path );
+        if ($row['filename'] == '.') {
+            $row['perms'] = Model_Afs::getCallerAccess($row['filename']);
+        } else {
+            return;
+        }
+    }
+
+
+    protected static function getCallerAccess($path)
+    {
+        $utilsPath = Config::getInstance()->afs['utilitiesPath'];
+
+        $cmd = "$utilsPath/fs getcalleraccess "
+                . escapeshellarg( '/afs/umich.edu/user/j/o/joshfiel');
         $result = shell_exec( $cmd . " 2>&1" );
 
         $acls = '';

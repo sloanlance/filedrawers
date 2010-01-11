@@ -51,7 +51,15 @@ class Router
         $path = trim(str_replace(self::$baseUrl, '', $path), '/');
 
         $parts = explode('/', $path);
-        $action = (empty($parts[0])) ? $action : strtolower($parts[0]);
+
+        if ( ! empty($parts[0]) && in_array(strtolower($parts[0]),
+                Config::getInstance()->router['secondaryControllers'])) {
+            $controller = ucfirst(strtolower($parts[0]));
+            $action = (empty($parts[1])) ? $action : strtolower($parts[1]);
+        }
+        else {
+            $action = (empty($parts[0])) ? $action : strtolower($parts[0]);
+        }
 
         self::$fsPath = str_replace($action, '', $path);
 

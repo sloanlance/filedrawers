@@ -6,10 +6,11 @@
  */
 
 abstract class Filesystem {
-    protected $fsStat   = null;
-    protected $startCWD = null;
-    protected $helpers  = array();
-    public    $errorMsg = '';
+    protected $fsStat    = null;
+    protected $startCWD  = null;
+    protected $helpers   = array();
+    public    $errorMsg  = null;
+    public    $notifyMsg = null;
 
 
     public function __construct()
@@ -106,7 +107,7 @@ abstract class Filesystem {
 
     public function deleteFiles($path, $files)
     {
-        $files = (array) $files;
+        $files = (array)$files;
 
         foreach ($files as $file) {
             // Security checks are in Filesystem::removeDirectory()
@@ -117,7 +118,7 @@ abstract class Filesystem {
                     return false;
                 }
             } else {
-                if ( !$this->localizePath( $path )) {
+                if ( ! $this->localizePath( $path )) {
                     return false;
                 }
 
@@ -147,18 +148,20 @@ abstract class Filesystem {
         }
 
         if ($this->linkSafeFileExists($newPath)) {
-            $this->errorMsg = "The file or folder '" . $newName .
+            $this->errorMsg = "The file or folder '" . basename($newPath) .
                 "' already exists.";
             @chdir($this->startCWD);
             return false;
         }
 
-        if ( ! @filedrawers_rename($oldname, $newName,
+        if ( ! @filedrawers_rename($oldPath, $newPath,
                     Config::getInstance()->filesystem['root'])) {
             $this->errorMsg = 'Unable to rename this file or folder.';
             @chdir( $this->startCWD );
             return false;
         }
+        
+        $this->notifyMsg = "Successfully renamed the file or folder.";
 
         @chdir( $this->startCWD );
         return true;

@@ -17,20 +17,22 @@ class Request
             $_SESSION['formKey'] = md5( uniqid( rand(), true ));
         }
 
-        if ( ! empty( $_POST )) {
+        /*if ( ! empty( $_POST )) {
             if ( ! isset( $_POST['formKey'] ) || $_SESSION['formKey'] !=
                     $_POST['formKey'] ) {
                 // throw exception CSRF protection error
                 exit( 'throw exception CSRF protection error' );
             }
-        }
+        }*/
 
         $this->get  = $_GET;
         $this->post = $_POST;
+    }
 
-        unset( $_REQUEST );
-        unset( $_POST );
-        unset( $_GET );
+
+    public function fetchCSRFvalue()
+    {
+        return $this->checkValue( $this->post[$name], $regEx );
     }
 
 
@@ -56,6 +58,19 @@ class Request
     {
         return $this->checkValue( $this->post[$name], $regEx );
     }
+
+
+    public function fetchRawPostVal($name)
+    {
+        return $this->post[$name];
+    }
+    
+    
+    public function test()
+    {
+        return $this->post;
+    }
+
 
     private function checkValue( $name, $regEx, $source )
     {

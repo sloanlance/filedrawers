@@ -1,7 +1,7 @@
 <?php
 error_reporting(E_ALL);
-ini_set('display_errors', 1); 
-ini_set('log_errors', 0);
+//ini_set('display_errors', 1); 
+//ini_set('log_errors', 0);
 
 $execTimeStart = microtime(true);
 if ( ! extension_loaded( 'posix' )) {
@@ -35,4 +35,4 @@ $front->dispatch();
 
 unset($config, $front);
 $execTimeEnd = microtime(true);
-error_log('Process time1: ' . ($execTimeEnd - $execTimeStart));
+//error_log('Process time1: ' . ($execTimeEnd - $execTimeStart));

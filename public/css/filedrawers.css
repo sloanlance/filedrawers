@@ -300,17 +300,17 @@ body {
 	border: 1px solid #cccccc;
 }
 
-div.titlebar {
+.hd {
 	clear: both;
     padding: 5px;
 }
 
-div.titlebar h2 {
+.hd h2 {
 	margin: 0 15% 0 0;
 	padding: 0;
 }
 
-div.titlebar a {
+.hd a {
 	float: right;
 	width: 15%;
 	padding: 0;
@@ -320,13 +320,6 @@ div.titlebar a {
 div.expandItem h2, form.expandItem h2 {
 	color: #336699;
 	font-size: 12px;
-}
-
-#favorites iframe {
-	margin: 0px;
-	padding: 0px;
-	height: 230px;
-	width: 100%;
 }
 
 #newFolder {
@@ -417,8 +410,24 @@ div.expandItem h2, form.expandItem h2 {
 }
 
 #inspector li a,
-#inspector li a:visited {
+#inspector li a:visited,
+#inspector li a:hover {
+	color: #999999;
+	text-decoration: none;
+	cursor: default;
+}
+
+#inspector li a.global,
+#inspector li a.global:visited,
+#inspector li a.enabled,
+#inspector li a.enabled:visited {
 	color: #0033CC;
+	cursor: pointer;
+}
+
+#inspector li a.global:hover,
+#inspector li a.enabled:hover {
+	text-decoration: underline;
 }
 
 #selectedItem {
@@ -511,4 +520,8 @@ div.expandItem h2, form.expandItem h2 {
 	height: 20px;
 	background-color: #336699;
 	border: 1px solid #000000;
+}
+
+#changeDirForm {
+	display: inline;
 }
