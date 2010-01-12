@@ -71,6 +71,14 @@ class Model_Mime
         return 'application';
     }
 
+    // Also, if user does not have read permission, file is not viewable
+    public function setMimeType(&$row)
+    {
+        $filename = $row['filename'];
+        $mimeType = self::getMimeType($filename);
+        $row['mimeType'] = $mimeType;
+        return true;
+    }
 
     // TODO: Set viewability flag. If filesize is empty, file is not viewable
     // Also, if user does not have read permission, file is not viewable
