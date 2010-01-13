@@ -1,7 +1,7 @@
 <?php
 /* $Revision: $
  *
- * Copyright (c) 2009 Regents of the University of Michigan.
+ * Copyright (c) 2010 Regents of the University of Michigan.
  * All rights reserved.
  */
 require_once "AdapterCosign.php";
