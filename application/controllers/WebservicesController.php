@@ -155,18 +155,36 @@ class WebservicesController extends Controller_Core {
 
     public function renameAction()
     {
-        $path = Router::getInstance()->getFSpath();
+        //$path = Router::getInstance()->getFSpath();
+        $path = $this->getArg('path','');
 
         $oldPath = $path . '/' . $_POST['oldName'];
         $newPath = $path . '/' . $_POST['newName'];
 
         $this->view->setNoRender();
 
-        if ($this->filesystem->rename($oldPath, $newPath)) {
-            echo json_encode(array('status' => 'success', 'message' => $this->filesystem->notifyMsg));
-        } else {
-            echo json_encode(array('status' => 'fail', 'message' => $this->filesystem->errorMsg));
+        $output_mode = "xml";
+        if($this->hasArg('json')){
+            $output_mode = "json";
         }
+
+        if ($this->filesystem->rename($oldPath, $newPath)) {
+            $this->view->response = array('status' => 'success', 'message' => $this->filesystem->notifyMsg);
+        } else {
+            $this->view->response = array('status' => 'fail', 'message' => $this->filesystem->errorMsg);
+        }
+            if($output_mode == "json"){
+                $this->view->response = json_encode($this->view->response);
+            }
+            else if($output_mode == "xml"){
+                $doc = new DOMDocument();
+                $doc->formatOutput = true;
+                $el = $doc->createElement('results');
+                $doc->appendChild($el);
+                $this->arrayToXML($doc, $el, $this->view->response);
+                $this->view->response =  $doc->saveXML();
+            }
+        echo $this->view->response;
     }
     
     public function moveAction()
