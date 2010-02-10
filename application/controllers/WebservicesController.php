@@ -142,14 +142,15 @@ class WebservicesController extends Controller_Core {
     {
         $this->view->setNoRender();
 
+        $path = $this->getArg('path','');
         $name = '"' . str_replace('"', '\"',
-                basename(Router::getInstance()->getFSpath())) . '"';
+                basename($path)) . '"';
 
         header( 'Content-Description: File Transfer' );
         header( 'Content-Type: application/force-download' );
-        header( 'Content-Length: ' . $this->filesystem->getSize(Router::getInstance()->getFSpath()));
+        header( 'Content-Length: ' . $this->filesystem->getSize($path));
         header( "Content-Disposition: attachment; filename=$name;");
-        $this->filesystem->readfile(Router::getInstance()->getFSpath());
+        $this->filesystem->readfile($path);
     }
 
 
