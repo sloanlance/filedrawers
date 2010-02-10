@@ -175,7 +175,7 @@ ZEND_FUNCTION( filedrawers_rename )
      */
     if ( rename( srcfile, rdst ) != 0 ) {
 	zend_error( E_WARNING, "filedrawers_rename: rename %s to %s: %s\n",
-			rsrc, rdst, strerror( errno ));
+			srcfile, rdst, strerror( errno ));
 	goto rename_cleanup;
     }
     success = 1;
