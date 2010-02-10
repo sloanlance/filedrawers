@@ -179,13 +179,31 @@ class WebservicesController extends Controller_Core {
 
     public function deleteAction()
     {
-        $path = Router::getInstance()->getFSpath();
+        //$path = Router::getInstance()->getFSpath();
 
+        $path = $this->getArg('path','');
+
+        $output_mode = "xml";
+        if($this->hasArg('json')){
+            $output_mode = "json";
+        }
         if ($this->filesystem->deleteFiles($path, $_POST['files'])) {
             $this->view->response = array('status' => 'success', 'message' => $this->filesystem->notifyMsg);
         } else {
             $this->view->response = array('status' => 'fail', 'message' => $this->filesystem->errorMsg);
         }
+
+            if($output_mode == "json"){
+                $this->view->response = json_encode($this->view->response);
+            }
+            else if($output_mode == "xml"){
+                $doc = new DOMDocument();
+                $doc->formatOutput = true;
+                $el = $doc->createElement('results');
+                $doc->appendChild($el);
+                $this->arrayToXML($doc, $el, $this->view->response);
+                $this->view->response =  $doc->saveXML();
+            }
     }
 
     public function mkdirAction()
