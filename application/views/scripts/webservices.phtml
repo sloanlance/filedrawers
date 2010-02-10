@@ -10,10 +10,12 @@
     <li>limit: How many total files to return maximum</li>
 </ul>
 <br/>
-<h3>Example (replace /u/s/user)</h3>
-    <pre>
-/webservices/download/?path=/afs/umich.edu/user/u/s/user/path/to/file/filename
-</pre>
+<h3>Examples (replace /u/s/user)</h3>
+<br/>
+<ul>
+    <li><a href="list/?json&path=/afs/umich.edu/user/u/s/user&limit=3&offset=3">webservices/list/?json&path=/afs/umich.edu/user/u/s/user&limit=3&offset=3</a></li>
+    <li><a href="list/?xml&path=/afs/umich.edu/user/u/s/user&offset=3&friendly">webservices/list/?xml&path=/afs/umich.edu/user/u/s/user&offset=3&friendly</a></li>
+</ul>
 <br/>
 <h2>Downloading Files</h2>
 <br/>
@@ -22,13 +24,10 @@
     <li>path: The path to the desired file</li>
 </ul>
 <br/>
-<h3>Examples (replace /u/s/user)</h3>
-<br/>
-<h4>listing files</h4>
-<ul>
-    <li><a href="list/?json&path=/afs/umich.edu/user/u/s/user&limit=3&offset=3">webservices/list/?json&path=/afs/umich.edu/user/u/s/user&limit=3&offset=3</a></li>
-    <li><a href="list/?xml&path=/afs/umich.edu/user/u/s/user&offset=3&friendly">webservices/list/?xml&path=/afs/umich.edu/user/u/s/user&offset=3&friendly</a></li>
-</ul>
+<h3>Example (replace /u/s/user)</h3>
+    <pre>
+/webservices/download/?path=/afs/umich.edu/user/u/s/user/path/to/file/filename
+</pre>
 
 <br/>
 <h2>Renaming files</h2>
