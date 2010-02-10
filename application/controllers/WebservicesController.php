@@ -82,15 +82,17 @@ class WebservicesController extends Controller_Core {
         $this->filesystem->addListHelper(array('Model_Mime', 'setMimeType'));
 
         $files = $this->filesystem->listDirectory($path);
+            $files['offset'] = $offset;
+            $files['limit'] = $limit;
         if($files){
             $files['count'] = count($files['contents']);
-            $files['contents'] =  array_slice($files['contents'], $offset, $limit);
+            $contents_slice =  array_slice($files['contents'], $offset, $limit);
+            unset($files['contents']);
+            $files['contents'] = $contents_slice;
         }
         else {
             $files = array('count'=>0,'contents'=>array(),'path'=>$path);
         }
-            $files['offset'] = $offset;
-            $files['limit'] = $limit;
 
 
 
