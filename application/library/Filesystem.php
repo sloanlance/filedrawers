@@ -413,7 +413,7 @@ abstract class Filesystem {
 
         while ( $filename = readdir( $dh )) {
             clearstatcache();
-            if ( !$fileStats = lstat( $filename )) {
+            if ( !$fileStats = @lstat( $filename )) {
                 $modTime = '';
                 $size = 0;
             } else {
@@ -421,8 +421,16 @@ abstract class Filesystem {
                 $size = $fileStats['size'];
             }
 
+            if(is_dir($filename)){
+                $type = "directory";
+            } elseif(is_link($filename)) {
+                $type = "symlink";
+            } else {
+                $type = "file";
+            }
 
             $row = array(
+                'type' => $type,
                 'filename' => $filename,
                 'modTime' => $modTime,
                 'size' => $size);
