@@ -40,7 +40,7 @@ FD.FileInspector = function() {
 		i;
 
 	for (i=0; i<links.length; i++) {
-		action = links[i].href.match(/\/?#(.*)$/);
+		action = links[i].hash.match(/#(.*)$/);
 		actions[action[1]] = {ref: links[i]};
 	}
 
@@ -156,7 +156,7 @@ FD.FileInspector = function() {
 		
 		if (target.href) {
 			YAHOO.util.Event.preventDefault(e);
-			var action = target.href.match(/\/#(.*)$/);
+			var action = target.hash.match(/#(.*)$/);
 
 			if (YAHOO.util.Dom.hasClass(target, 'expandable')) {
 				YAHOO.util.Dom.addClass(target, 'inspSelected');
@@ -439,7 +439,9 @@ FD.NewFolderDialog = function() {
 	var evnt = new YAHOO.util.CustomEvent("New Folder Event");
 
 	var hide = function() {
-		YAHOO.util.Dom.setStyle('newFolder', 'display', 'none');
+		var newFolderForm = YAHOO.util.Dom.get('newFolder');
+		YAHOO.util.Dom.setStyle(newFolderForm, 'display', 'none');
+		newFolderForm.reset();
 	};
 
 	var handleClick = function(e) {
@@ -458,6 +460,8 @@ FD.NewFolderDialog = function() {
 		var target = YAHOO.util.Event.getTarget(e);
 		YAHOO.util.Event.preventDefault(e);
 		evnt.fire(target.folderName.value);
+		hide();
+		FD.InspDialogCloseEvent.fire();
 	};
 	
 	var handleFocus = function(e) {
@@ -485,22 +489,85 @@ FD.NewFolderDialog = function() {
 
 
 FD.FavoritesDialog = function() {
-	var bd = YAHOO.util.Dom.getElementsByClassName('bd', 'div', 'favorites')[0];
+	var favorites = [];
 
 	var hide = function() {
 		YAHOO.util.Dom.setStyle('favorites', 'display', 'none');
+	};
+	
+	var changeTab = function(tabID) {
+		var tabs = YAHOO.util.Dom.get('favMenu').getElementsByTagName('a');
+		
+		for (var i=0; i<tabs.length; i++) {
+			var currentTabID = tabs[i].hash.match(/#(.*)$/).pop();
+
+			if (currentTabID == tabID) {
+				YAHOO.util.Dom.addClass(tabs[i], 'sel');
+				YAHOO.util.Dom.setStyle(currentTabID, 'display', 'block');
+			} else {
+				YAHOO.util.Dom.removeClass(tabs[i], 'sel');
+				YAHOO.util.Dom.setStyle(currentTabID, 'display', 'none');
+			}
+		}
+	};
+
+	var showView = function() {
+		var tabContent = YAHOO.util.Dom.getElementsByClassName('tabContent', 'div', 'viewFav')[0];
+		var favList = '<ul>';
+
+		// Remember, it's better to just touch the DOM once
+		for (var i = 0, len = favorites.contents.length; i < len; ++i) {
+			var f = favorites.contents[i];
+			favList += '<li><a href="' + baseUrl + '/list' + f.target + '">' + f.filename + '</a></li>';
+		}
+
+		favList += '</ul>';
+		tabContent.innerHTML = favList;
+	};
+
+	var showEdit = function() {
+		var tabContent = YAHOO.util.Dom.getElementsByClassName('tabContent', 'div', 'editFav')[0];
+		var favList = '<ul>';
+
+		// Remember, it's better to just touch the DOM once
+		for (var i = 0, len = favorites.contents.length; i < len; ++i) {
+			var f = favorites.contents[i];
+			favList += '<li><input type="text" name="renames[' + f.filename + ']" value="' + f.filename + '" /></li>';
+		}
+
+		favList += '</ul>';
+		tabContent.innerHTML = favList;
 	};
 
 	var handleClick = function(e) {
 		var target = YAHOO.util.Event.getTarget(e);
 		
-		if ( ! target.href) {
+		if ( ! target.hash) {
 			return;
 		}
-
+		
 		YAHOO.util.Event.preventDefault(e);
-		hide();
-		FD.InspDialogCloseEvent.fire();
+		var action = target.hash.match(/#(.*)$/);
+		
+		switch(action[1]) {
+			case 'viewFav':
+				changeTab('viewFav');
+				showView();
+				return;
+			case 'editFav':
+				changeTab('editFav');
+				showEdit();
+				return;
+			case 'addFav':
+				changeTab('addFav');
+				return;
+			case 'close':
+				hide();
+				FD.InspDialogCloseEvent.fire();
+				return;
+			default:
+				return;
+		}
 	};
 	
 	YAHOO.util.Event.on('favorites', 'click', handleClick);
@@ -509,25 +576,15 @@ FD.FavoritesDialog = function() {
 	var callbacks = {
 	
 		success : function (o) {			
-			var favorites = [];
 			try {
-				var favorites = YAHOO.lang.JSON.parse(o.responseText);
+				favorites = YAHOO.lang.JSON.parse(o.responseText);
 			}
 			catch (x) {
 				alert("JSON Parse failed!");
 				return;
 			}
 
-			var favList = '<ul>';
-
-			// Remember, it's better to just touch the DOM once
-			for (var i = 0, len = favorites.contents.length; i < len; ++i) {
-				var f = favorites.contents[i];
-				favList += '<li><a href="' + baseUrl + '/list' + f.target + '">' + f.filename + '</a></li>';
-			}
-
-			favList += '</ul>';
-			bd.innerHTML = favList;
+			showView();
 		},
 
 		failure: function (o) {

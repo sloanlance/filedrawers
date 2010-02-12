@@ -7,16 +7,16 @@
 		<li><a href=".">Refresh</a></li>
 	</ul>
 	<div id="notifyArea"> Location:
-		<form id="changeDirForm"><?php echo $this->createLinkPath($this->path); ?></form>
+		<form id="changeDirForm">
+			<?php echo $this->createLinkPath($this->path); ?>
+		</form>
 	</div>
 	<div class="clear">&nbsp;</div>
 </div>
 <div id="sidebar">
 	<div id="inspector">
 		<h3>Folder Properties</h3>
-		<div id="selectedItem" style="background-image: url(<?php echo $this->baseUrl(); ?>/images/folder.gif);">
-			<?php echo $this->escape(basename(Router::getInstance()->getFSpath())); ?>
-		</div>
+		<div id="selectedItem" style="background-image: url(<?php echo $this->baseUrl(); ?>/images/folder.gif);"> <?php echo $this->escape(basename(Router::getInstance()->getFSpath())); ?> </div>
 		<h4>Actions</h4>
 		<ul id="actionList">
 			<li><a href="#upload">Upload File(s)</a></li>
@@ -38,17 +38,29 @@
 	<div id="version"> filedrawers version: <?php echo Config::getInstance()->filedrawers['version']; ?></div>
 </div>
 <div id="content">
-<?php if ($this->files): ?>
+	<?php if ($this->files): ?>
 	<div id="fileList"></div>
-<?php else: ?>
+	<?php else: ?>
 	<p>The specified file or folder does not exist.</p>
-<?php endif; ?>
+	<?php endif; ?>
 </div>
 <div id="favorites" class="expandItem">
 	<div class="hd"> <a href="#close">[X]</a>
 		<h2>My Favorite Locations</h2>
 	</div>
-	<div class="bd">&nbsp;</div>
+	<div class="bd">
+		<div id="favMenu"><a href="#viewFav" class="sel">View</a> | <a href="#addFav">Add</a> | <a href="#editFav">Edit</a></div>
+		<div id="viewFav">
+			<p>Go to a favorite location:</p>
+			<div class="tabContent">&nbsp;</div>
+		</div>
+		<div id="addFav">
+			<div class="tabContent">&nbsp;</div>
+		</div>
+		<form action="#" method="post" id="editFav">
+			<div class="tabContent">&nbsp;</div>
+		</form>
+	</div>
 </div>
 <div id="permissions" class="expandItem">
 	<div class="titlebar"> <a href="#close">[X]</a>
@@ -60,8 +72,7 @@
 	<div class="hd"> <a href="#close">[X]</a>
 		<h2>Create a New Folder</h2>
 	</div>
-	<div class="bd">
-		<img src="/images/mime/small/folder.gif" width="16" height="16" alt="" />
+	<div class="bd"> <img src="/images/mime/small/folder.gif" width="16" height="16" alt="" />
 		<input type="text" name="folderName" id="newFold" size="34" value="Please enter a name for your new folder." />
 		<input type="submit" name="save" value="Create" />
 	</div>

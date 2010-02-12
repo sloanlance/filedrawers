@@ -431,7 +431,9 @@ abstract class Filesystem {
                 call_user_func_array($helper, array(&$row));
             }
 
-            $files['contents'][] = $row;
+            if (is_array($row)) {
+                $files['contents'][] = $row;
+            }
         }
 
         function naturalSortByName($a, $b) {
