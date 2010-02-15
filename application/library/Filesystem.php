@@ -453,6 +453,29 @@ abstract class Filesystem {
         return $files;                                    
     }
 
+    public function getHomedir(){
+
+        $homedir = null;
+
+        $config = Config::getInstance();
+
+        $userInfo = posix_getpwnam(Auth::getInstance()->getUsername());
+
+        if ( ! empty($userInfo['dir']) && is_dir($userInfo['dir'])) {
+            $homedir = $userInfo['dir'];
+        }
+
+        $forceAfsUserDir = $config->filesystem['forceAfsUserDir'];
+
+        if($forceAfsUserDir){
+            if(strpos($homedir,"/home") === 0){
+                $userSuffix = "/".$userInfo['name'][0].'/'.$userInfo['name'][1].'/'.$userInfo['name'];
+                $homedir = $forceAfsUserDir.$userSuffix;
+            }
+        }
+        return $homedir;
+    }
+
 
     public function localizePath( $path )
     {

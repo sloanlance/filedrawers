@@ -16,20 +16,7 @@ class WebservicesController extends Controller_Core {
 
     public function indexAction()
     {
-        $config = Config::getInstance();
-        $homedir = null;
-
-        if (isset($config->filesystem['homedir'])) {
-            $homedir = $config->filesystem['homedir'];
-        } else {
-            $userInfo = posix_getpwnam(Auth::getInstance()->getUsername());
-
-            if ( ! empty($userInfo['dir']) && is_dir($userInfo['dir'])) {
-                $homedir = $userInfo['dir'];
-            }
-        }
-
-        $this->view->path  = $homedir;
+        $this->view->path  = $this->getHomeDir();
         $this->view->files = $this->filesystem->listDirectory($homedir);
     }
 
@@ -78,6 +65,10 @@ class WebservicesController extends Controller_Core {
         $path = $this->getArg('path','');
         $limit = $this->getArg('limit','/\d*/');
         $offset = $this->getArg('offset','');
+
+        if(empty($path)){
+            $path  = $this->filesystem->getHomeDir();
+        }
 
         $this->filesystem->addListHelper(array('Model_Mime', 'setMimeType'));
 
