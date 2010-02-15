@@ -11,6 +11,8 @@ class WebservicesController extends Controller_Core {
     public function init()
     {
         $this->filesystem = Registry::getInstance()->filesystem;
+        // Could later be concatenated with errorCodes from other components
+        $this->view->errorCodes = $this->filesystem->errorCodes;
     }
 
 
@@ -73,17 +75,22 @@ class WebservicesController extends Controller_Core {
         $this->filesystem->addListHelper(array('Model_Mime', 'setMimeType'));
 
         $files = $this->filesystem->listDirectory($path);
-            $files['offset'] = $offset;
-            $files['limit'] = $limit;
-        if($files){
-            $files['count'] = count($files['contents']);
-            $contents_slice =  array_slice($files['contents'], $offset, $limit);
-            unset($files['contents']);
-            $files['contents'] = $contents_slice;
-        }
-        else {
-            $files = array('count'=>0,'contents'=>array(),'path'=>$path);
-        }
+            if($files){
+                $files['offset'] = $offset;
+                $files['limit'] = $limit;
+                $files['count'] = count($files['contents']);
+                $contents_slice =  array_slice($files['contents'], $offset, $limit);
+                unset($files['contents']);
+                $files['contents'] = $contents_slice;
+            }
+            else {
+                if($this->filesystem->errorCode){
+                    $files['errorCode'] = $this->filesystem->errorCode;
+                    $files['errorMsg'] = $this->filesystem->errorMsg;
+                } else {
+                    $files = array('count'=>0,'contents'=>array(),'path'=>$path);
+                }
+            }
 
 
 

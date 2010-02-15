@@ -10,8 +10,13 @@ abstract class Filesystem {
     protected $startCWD  = null;
     protected $helpers   = array();
     public    $errorMsg  = null;
+    public    $errorCode  = null;
     public    $notifyMsg = null;
 
+    public $errorCodes = array('already exists',
+                               'permission denied',
+                               'not found',
+                               'unknown'); 
 
     public function __construct()
     {
@@ -393,7 +398,7 @@ abstract class Filesystem {
         }
  
         if ( !$this->localizePath( $path )) {
-            $this->errorMsg = "Unable to view: $path.";
+            $this->error('permission denied', "Unable to view: $path.");
             return false;
         }
 
@@ -482,7 +487,7 @@ abstract class Filesystem {
     public function localizePath( $path )
     {
         if ( ! @chdir( $path )) {
-            $this->errorMsg = "Couldn't change directory";
+            $this->error('Couldn\'t change directory');
             @chdir( $this->startCWD );
             return false;
         }
@@ -490,7 +495,7 @@ abstract class Filesystem {
         clearstatcache();
         $stat = stat( '.' );
         if ( $this->fsStat["dev"] != $stat["dev"] ) {
-            $this->errorMsg = "Unable to access path: permission denied.";
+            $this->error('permission denied', "Unable to access path: permission denied.");
             @chdir( $this->startCWD );
             return false;
         }
@@ -508,5 +513,16 @@ abstract class Filesystem {
         } else {
             return false;
         }
+    }
+
+    private function error($code, $message = FALSE){
+        if(!in_array($code, $this->errorCodes)){
+            trigger_error('Invalid error code');
+        }
+            if(!$message){
+                $message = $code;
+            }
+            $this->errorMsg = $message;
+            $this->errorCode = $code;
     }
 }

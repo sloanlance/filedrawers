@@ -21,6 +21,9 @@ class FiledrawersController extends Controller_Core {
         $homedir  = $this->filesystem->getHomeDir();
         $this->view->path  = $homedir;
         $this->view->files = $this->filesystem->listDirectory($homedir);
+        if(!$this->view->files){
+            $this->view->errorMsg = $this->filesystem->errorMsg;
+        }
     }
 
 
@@ -32,6 +35,9 @@ class FiledrawersController extends Controller_Core {
             $path  = $this->filesystem->getHomeDir();
         }
         $this->view->files = $this->filesystem->listDirectory($path);
+        if(!$this->view->files){
+            $this->view->errorMsg = $this->filesystem->errorMsg;
+        }
     }
 
     public function ajaxlistAction()
@@ -39,6 +45,9 @@ class FiledrawersController extends Controller_Core {
         $path = Router::getInstance()->getFSpath();
         $this->view->path  = $path;
         $this->view->files = $this->filesystem->listDirectory($path);
+        if(!$this->view->files){
+            $this->view->errorMsg = $this->filesystem->errorMsg;
+        }
     }
 
     public function downloadAction()

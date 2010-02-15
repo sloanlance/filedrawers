@@ -40,7 +40,9 @@
 <div id="content">
 	<?php if ($this->files): ?>
 	<div id="fileList"></div>
-	<?php else: ?>
+	<?php elseif($this->errorMsg): ?>
+    <p><?=$this->errorMsg?></p>
+	<?php else: var_dump($this);?>
 	<p>The specified file or folder does not exist.</p>
 	<?php endif; ?>
 </div>
