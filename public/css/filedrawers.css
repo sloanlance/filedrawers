@@ -525,3 +525,31 @@ div.expandItem h2, form.expandItem h2 {
 #changeDirForm {
 	display: inline;
 }
+
+#favMenu {
+	margin: 3px 2px 1em 2px;
+	white-space: nowrap;
+	border-bottom: 1px solid #006699;
+	text-align: center;
+}
+#favMenu a {
+	line-height: 16px;
+	text-decoration: none;
+}
+#favMenu a:hover {
+	text-decoration: underline;
+}
+#favMenu a.sel {
+	line-height: 16px;
+	text-decoration: none;
+	color: #003399;
+	border: 1px solid #006699;
+	background-color: #FFFFCC;
+	border-bottom: none;
+	padding: 2px;
+	margin: 0;
+}
+
+#favMenu a.sel:hover {
+	text-decoration: none;
+}

@@ -33,104 +33,52 @@ class FavoritesController extends Controller_Core {
     }
 
 
-    private function addAction()
+    public function addAction()
     {
         if ( ! symlink( $this->favoriteTarget,
                 basename( $this->selectedItems ))) {
             $this->errorMsg = "Unable to add the favorite location.";
-            @chdir( $this->startCWD );
-            return false;
         }
-
-        @chdir( $this->startCWD );
-        return true;
     }
 
 
-    private function renameAction()
+    public function renameAction()
     {
-        if ( ! $this->makePathAFSlocal( $this->path )) {
-            return false;
-        }
+        $this->view->setNoRender();
 
-        $renames = $this->selectedItems;
+        $path = Router::getInstance()->getFSpath();
+        $renames = $_POST['renames'];
 
-        foreach ( $renames as $oldName => $newName ) {
-            $oldName = basename( $oldName );
-            $newName = basename( $newName );
+        foreach ($renames as $oldName => $newName) {
+            $oldName = $path . '/' . $oldName;
+            $newName = $path . '/' . $newName;
 
-            if ( ! $target = @readlink( $oldName )) {
+            if ($oldName == $newName) {
                 continue;
             }
 
-            if ( ! unlink( $oldName )) {
-                $this->errorMsg = 'Unable to rename the favorite(s).';
-                @chdir( $this->startCWD );
-                return false;
-            }
-
-            if ( ! symlink( $target, $newName )) {
-                $this->errorMsg = 'Unable to rename the favorite(s).';
-                @chdir( $this->startCWD );
-                return false;
-            }
+            $this->filesystem->rename($oldPath, $newPath);
         }
-
-        @chdir( $this->startCWD );
-        return true;
     }
 
 
-    public function removeAction()
+    public function deleteAction()
     {
-        if ( ! $this->selectedItems ) {
-            return false;
-        }
+        $this->view->setNoRender();
 
-        if ( !$this->makePathAFSlocal( $this->path )) {
-            return false;
-        }
-
-        foreach ( $this->selectedItems as $link ) {
-            $link = basename( $link );
-
-            if ( ! is_link( $link ) || ! unlink( $link )) {
-                $this->errorMsg = "Unable to remove: $link.";
-                @chdir( $this->startCWD );
-                return false;
-            }
-        }
-
-        @chdir( $this->startCWD );
-        return true;
+        $path = Router::getInstance()->getFSpath();
+        $this->filesystem->deleteFiles($path, $_POST['deletes']);
     }
 
 
     public static function setSymLink(&$row)
     {
-        if (strpos($row['filename'], '.') !== 0) {
+        if (strpos($row['filename'], '.') === 0 || ! is_link($row['filename'])) {
+            $row = false;
+        } else {
             $link = @readlink($row['filename']);
             $row['target'] = $link;
         }
-    }
-
-
-    // Sets the location that a Favorites symlink points to
-    protected function setFavoriteTarget( $target='' )
-    {
-        $target = html_entity_decode( urldecode( $target ), ENT_QUOTES );
-        
-        if ( empty( $target ) || ! $this->makePathAFSlocal( $target )) {
-            $this->errorMsg       = '';
-            $this->favoriteTarget = getBasePath( $this->uniqname );
-            @chdir( $this->startCWD );
-            return false;
-        } else {
-            $this->favoriteTarget = $target;
-        }
-
-        @chdir( $this->startCWD );
-        return true;
     }
 }
 
