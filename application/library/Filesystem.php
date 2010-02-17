@@ -14,6 +14,7 @@ abstract class Filesystem {
     public    $notifyMsg = null;
 
     public $errorCodes = array('already exists',
+                               'delete failed',
                                'permission denied',
                                'not found',
                                'unknown'); 
@@ -105,22 +106,29 @@ abstract class Filesystem {
         }
 
         @chdir( $this->startCWD );
-        $this->errorMsg = 'Unable to remove the folder.';
+        $this->error('delete failed', 'Unable to remove the folder');
         return false;
     }
 
 
     public function deleteFiles($path, $files)
     {
+        $deleted_count = 0;
         $files = (array)$files;
 
         foreach ($files as $file) {
+            if(empty($file)){
+                // otherwise you will start deleting directories
+                continue;
+            }
             // Security checks are in Filesystem::removeDirectory()
             $itemPath = $path . '/' . $file;
 
             if ( is_dir($itemPath) && ! is_link( $itemPath )) {
                 if ( ! $this->removeDirectory( $itemPath )) {
                     return false;
+                } else {
+                    $deleted_count++;
                 }
             } else {
                 if ( ! $this->localizePath( $path )) {
@@ -129,16 +137,21 @@ abstract class Filesystem {
 
                 if ( !@unlink( basename( $file ))) {
                     @chdir( $this->startCWD );
-                    $this->errorMsg = "Unable to delete $file.";
+                    $this->error('delete failed', "Unable to delete $file");
                     return false;
                 } else {
                     @chdir( $this->startCWD );
+                    $deleted_count++;
                     $this->notifyMsg = "Successfully deleted file(s).";
                 }
             }
         }
 
         @chdir( $this->startCWD );
+        if($deleted_count == 0){
+            $this->error("no files deleted");
+            return false;
+        }
         return true;
     }
 
