@@ -54,11 +54,20 @@
 			<p>Go to a favorite location:</p>
 			<div class="tabContent">&nbsp;</div>
 		</div>
-		<div id="addFav">
+		<form action="#" method="post" name="addFav" id="addFav">
+			<p>Enter a name and click 'Add' to add the current location to your favorites.</p>
+			<input type="text" name="selectedItems" size="18" />
+			<p align="center">
+				<input type="hidden" name="formKey" value="c0c17487e741591fdcad1e95aa43d2ad" />
+				<input type="submit" name="command" value="Add" />
+			</p>
+		</form>
+		<form action="#" method="post" name="editFav" id="editFav">
 			<div class="tabContent">&nbsp;</div>
-		</div>
-		<form action="#" method="post" id="editFav">
-			<div class="tabContent">&nbsp;</div>
+			<p align="center">
+				<input type="hidden" name="formKey" value="c0c17487e741591fdcad1e95aa43d2ad" />
+				<input type="submit" name="command" value="Save" />
+			</p>
 		</form>
 	</div>
 </div>

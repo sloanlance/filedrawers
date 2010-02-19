@@ -141,11 +141,11 @@ abstract class Filesystem {
     public function rename($oldPath, $newPath)
     {
         // Security checks are in filedrawers_rename
-        if (is_link($oldPath)) {
+        /*if (is_link($oldPath)) {
             $this->errorMsg = "Symbolic links cannot be renamed or moved.";
             @chdir($this->startCWD);
             return false;
-        }
+        }*/
 
         if ($this->linkSafeFileExists($newPath)) {
             $this->errorMsg = "The file or folder '" . basename($newPath) .

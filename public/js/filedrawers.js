@@ -510,68 +510,7 @@ FD.FavoritesDialog = function() {
 			}
 		}
 	};
-
-	var showView = function() {
-		var tabContent = YAHOO.util.Dom.getElementsByClassName('tabContent', 'div', 'viewFav')[0];
-		var favList = '<ul>';
-
-		// Remember, it's better to just touch the DOM once
-		for (var i = 0, len = favorites.contents.length; i < len; ++i) {
-			var f = favorites.contents[i];
-			favList += '<li><a href="' + baseUrl + '/list' + f.target + '">' + f.filename + '</a></li>';
-		}
-
-		favList += '</ul>';
-		tabContent.innerHTML = favList;
-	};
-
-	var showEdit = function() {
-		var tabContent = YAHOO.util.Dom.getElementsByClassName('tabContent', 'div', 'editFav')[0];
-		var favList = '<ul>';
-
-		// Remember, it's better to just touch the DOM once
-		for (var i = 0, len = favorites.contents.length; i < len; ++i) {
-			var f = favorites.contents[i];
-			favList += '<li><input type="text" name="renames[' + f.filename + ']" value="' + f.filename + '" /></li>';
-		}
-
-		favList += '</ul>';
-		tabContent.innerHTML = favList;
-	};
-
-	var handleClick = function(e) {
-		var target = YAHOO.util.Event.getTarget(e);
-		
-		if ( ! target.hash) {
-			return;
-		}
-		
-		YAHOO.util.Event.preventDefault(e);
-		var action = target.hash.match(/#(.*)$/);
-		
-		switch(action[1]) {
-			case 'viewFav':
-				changeTab('viewFav');
-				showView();
-				return;
-			case 'editFav':
-				changeTab('editFav');
-				showEdit();
-				return;
-			case 'addFav':
-				changeTab('addFav');
-				return;
-			case 'close':
-				hide();
-				FD.InspDialogCloseEvent.fire();
-				return;
-			default:
-				return;
-		}
-	};
 	
-	YAHOO.util.Event.on('favorites', 'click', handleClick);
-
 	// Define the callbacks for the asyncRequest
 	var callbacks = {
 	
@@ -595,6 +534,93 @@ FD.FavoritesDialog = function() {
 
 		timeout: 3000
 	};
+
+	var showView = function() {
+		var tabContent = YAHOO.util.Dom.getElementsByClassName('tabContent', 'div', 'viewFav')[0];
+		var favList = '<ul>';
+		
+		changeTab('viewFav');
+
+		// Remember, it's better to just touch the DOM once
+		for (var i = 0, len = favorites.contents.length; i < len; ++i) {
+			var f = favorites.contents[i];
+			favList += '<li><a href="' + baseUrl + '/list' + f.target + '">' + f.filename + '</a></li>';
+		}
+
+		favList += '</ul>';
+		tabContent.innerHTML = favList;
+	};
+
+	var showEdit = function() {
+		var tabContent = YAHOO.util.Dom.getElementsByClassName('tabContent', 'div', 'editFav')[0];
+		var favList = '<ul>';
+		
+		changeTab('editFav');
+
+		// Remember, it's better to just touch the DOM once
+		for (var i = 0, len = favorites.contents.length; i < len; ++i) {
+			var f = favorites.contents[i];
+			favList += '<li><input type="text" name="renames[' + f.filename + ']" value="' + f.filename + '" /></li>';
+		}
+
+		favList += '</ul>';
+		tabContent.innerHTML = favList;
+	};
+	
+	var submitEdit = function(form) {
+		YAHOO.util.Connect.setForm(form, true);
+		var cObj = YAHOO.util.Connect.asyncRequest('POST', '/mfile050/favorites/rename', callbacks);
+		alert(cObj);
+	};
+
+	var handleClick = function(e) {
+		var target = YAHOO.util.Event.getTarget(e);
+		
+		if ( ! target.hash) {
+			return;
+		}
+		
+		YAHOO.util.Event.preventDefault(e);
+		var action = target.hash.match(/#(.*)$/);
+		
+		switch(action[1]) {
+			case 'viewFav':
+				showView();
+				return;
+			case 'editFav':
+				showEdit();
+				return;
+			case 'addFav':
+				changeTab('addFav');
+				return;
+			case 'close':
+				hide();
+				FD.InspDialogCloseEvent.fire();
+				return;
+			default:
+				return;
+		}
+	};
+	
+	var handleSubmit = function(e) {
+		YAHOO.util.Event.preventDefault(e);
+		var form = YAHOO.util.Event.getTarget(e);
+
+		switch(form.name) {
+			case 'addFav':
+				submitAdd();
+				return;
+			case 'editFav':
+				YAHOO.util.Connect.setForm(form);
+				var cObj = YAHOO.util.Connect.asyncRequest('POST', '/mfile050/favorites/rename', callbacks);
+				return;
+			default:
+				return;
+		}
+	};
+	
+	YAHOO.util.Event.on('favorites', 'click', handleClick);
+	YAHOO.util.Event.on('favorites', 'submit', handleSubmit);
 
 	return {
 		show: function(e, action) {

@@ -56,19 +56,22 @@ class FavoritesController extends Controller_Core {
     {
         $this->view->setNoRender();
 
-        $path = Router::getInstance()->getFSpath();
         $renames = $_POST['renames'];
 
         foreach ($renames as $oldName => $newName) {
-            $oldName = $path . '/' . $oldName;
-            $newName = $path . '/' . $newName;
-
             if ($oldName == $newName) {
                 continue;
             }
 
-            $this->filesystem->rename($oldPath, $newPath);
+            $oldPath = $this->favoritesPath . '/' . $oldName;
+            $newPath = $this->favoritesPath . '/' . $newName;
+
+            echo $oldPath . "\n" . $newPath . "\n";
+
+            //$this->filesystem->rename($oldPath, $newPath);
         }
+
+        echo json_encode($this->filesystem->listDirectory($this->favoritesPath));
     }
 
 
