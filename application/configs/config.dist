@@ -1,5 +1,5 @@
 [filesystem]
-homedir="/afs/umich.edu/user/u/s/username"
+#forceAfsUserDir="/afs/umich.edu/user/" #required if users also have unix home directories
 root="/afs/"
 
 [router]

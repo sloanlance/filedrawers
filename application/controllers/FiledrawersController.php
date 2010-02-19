@@ -17,20 +17,13 @@ class FiledrawersController extends Controller_Core {
     public function indexAction()
     {
         $config = Config::getInstance();
-        $homedir = null;
 
-        if (isset($config->filesystem['homedir'])) {
-            $homedir = $config->filesystem['homedir'];
-        } else {
-            $userInfo = posix_getpwnam(Auth::getInstance()->getUsername());
-
-            if ( ! empty($userInfo['dir']) && is_dir($userInfo['dir'])) {
-                $homedir = $userInfo['dir'];
-            }
-        }
-
+        $homedir  = $this->filesystem->getHomeDir();
         $this->view->path  = $homedir;
         $this->view->files = $this->filesystem->listDirectory($homedir);
+        if(!$this->view->files){
+            $this->view->errorMsg = $this->filesystem->errorMsg;
+        }
     }
 
 
@@ -38,7 +31,13 @@ class FiledrawersController extends Controller_Core {
     {
         $path = Router::getInstance()->getFSpath();
         $this->view->path  = $path;
+        if(empty($path)){
+            $path  = $this->filesystem->getHomeDir();
+        }
         $this->view->files = $this->filesystem->listDirectory($path);
+        if(!$this->view->files){
+            $this->view->errorMsg = $this->filesystem->errorMsg;
+        }
     }
 
     public function ajaxlistAction()
@@ -46,6 +45,9 @@ class FiledrawersController extends Controller_Core {
         $path = Router::getInstance()->getFSpath();
         $this->view->path  = $path;
         $this->view->files = $this->filesystem->listDirectory($path);
+        if(!$this->view->files){
+            $this->view->errorMsg = $this->filesystem->errorMsg;
+        }
     }
 
     public function downloadAction()

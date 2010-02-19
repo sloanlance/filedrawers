@@ -13,8 +13,8 @@
 <h3>Examples (replace /u/s/user)</h3>
 <br/>
 <ul>
-    <li><a href="list/?json&path=/afs/umich.edu/user/u/s/user&limit=3&offset=3">webservices/list/?json&path=/afs/umich.edu/user/u/s/user&limit=3&offset=3</a></li>
-    <li><a href="list/?xml&path=/afs/umich.edu/user/u/s/user&offset=3&friendly">webservices/list/?xml&path=/afs/umich.edu/user/u/s/user&offset=3&friendly</a></li>
+    <li><a href="webservices/list/?json&path=/afs/umich.edu/user/u/s/user&limit=3&offset=3">webservices/list/?json&path=/afs/umich.edu/user/u/s/user&limit=3&offset=3</a></li>
+    <li><a href="webservices/list/?xml&path=/afs/umich.edu/user/u/s/user&offset=3&friendly">webservices/list/?xml&path=/afs/umich.edu/user/u/s/user&offset=3&friendly</a></li>
 </ul>
 <br/>
 <h2>Downloading Files</h2>
@@ -26,7 +26,7 @@
 <br/>
 <h3>Example (replace /u/s/user)</h3>
     <pre>
-/webservices/download/?path=/afs/umich.edu/user/u/s/user/path/to/file/filename
+webservices/download/?path=/afs/umich.edu/user/u/s/user/path/to/file/filename
 </pre>
 
 <br/>
@@ -43,7 +43,7 @@
     Construct a POST to a url like this:
     </p>
     <pre>
-    rename/?json&path=/afs/umich.edu/user/u/s/user/path/to/file
+    webservices/rename/?json&path=/afs/umich.edu/user/u/s/user/path/to/file
     </pre>
     <p>
     Include two POST arguments for old and new file names:
@@ -64,7 +64,7 @@
     Construct a POST to a url like this:
     </p>
     <pre>
-    delete/?json&path=/afs/umich.edu/user/u/s/user/path/to/file
+    webservices/delete/?json&path=/afs/umich.edu/user/u/s/user/path/to/file
     </pre>
     <p>
     Include one POST argument for the file names:
@@ -81,4 +81,27 @@
      &lt;input type="text" name="files[]" value="file2.jpg"/&gt;
 
     </pre>
+<h2>Errors</h2>
+<p>Errors will return a code and a message</p>
+<h3>Possible error codes</h3>
+<br/>
+<ul>
+<? foreach($this->errorCodes as $code){?>
+    <li>
+<?=$code?>
+    </li>
+<?}?>
+</ul>
+<br/>
+<h3>Examples</h3>
+<pre>
+{"errorCode":"permission denied","errorMsg":"Unable to view: \/afs\/umich.edu\/user\/u\/s\/user\/Private."}
+</pre>
+<br/>
+<pre>
+&lt;results&gt;
+  &lt;errorCode&gt;permission denied&lt;/errorCode&gt;
+  &lt;errorMsg&gt;Unable to view: /afs/umich.edu/user/u/s/user/Private.&lt;/errorMsg&gt;
+&lt;/results&gt;
+</pre>
 </div>

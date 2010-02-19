@@ -10,8 +10,14 @@ abstract class Filesystem {
     protected $startCWD  = null;
     protected $helpers   = array();
     public    $errorMsg  = null;
+    public    $errorCode  = null;
     public    $notifyMsg = null;
 
+    public $errorCodes = array('already exists',
+                               'delete failed',
+                               'permission denied',
+                               'not found',
+                               'unknown'); 
 
     public function __construct()
     {
@@ -100,22 +106,29 @@ abstract class Filesystem {
         }
 
         @chdir( $this->startCWD );
-        $this->errorMsg = 'Unable to remove the folder.';
+        $this->error('delete failed', 'Unable to remove the folder');
         return false;
     }
 
 
     public function deleteFiles($path, $files)
     {
+        $deleted_count = 0;
         $files = (array)$files;
 
         foreach ($files as $file) {
+            if(empty($file)){
+                // otherwise you will start deleting directories
+                continue;
+            }
             // Security checks are in Filesystem::removeDirectory()
             $itemPath = $path . '/' . $file;
 
             if ( is_dir($itemPath) && ! is_link( $itemPath )) {
                 if ( ! $this->removeDirectory( $itemPath )) {
                     return false;
+                } else {
+                    $deleted_count++;
                 }
             } else {
                 if ( ! $this->localizePath( $path )) {
@@ -124,16 +137,21 @@ abstract class Filesystem {
 
                 if ( !@unlink( basename( $file ))) {
                     @chdir( $this->startCWD );
-                    $this->errorMsg = "Unable to delete $file.";
+                    $this->error('delete failed', "Unable to delete $file");
                     return false;
                 } else {
                     @chdir( $this->startCWD );
+                    $deleted_count++;
                     $this->notifyMsg = "Successfully deleted file(s).";
                 }
             }
         }
 
         @chdir( $this->startCWD );
+        if($deleted_count == 0){
+            $this->error("no files deleted");
+            return false;
+        }
         return true;
     }
 
@@ -393,7 +411,7 @@ abstract class Filesystem {
         }
  
         if ( !$this->localizePath( $path )) {
-            $this->errorMsg = "Unable to view: $path.";
+            $this->error('permission denied', "Unable to view: $path.");
             return false;
         }
 
@@ -455,11 +473,34 @@ abstract class Filesystem {
         return $files;                                    
     }
 
+    public function getHomedir(){
+
+        $homedir = null;
+
+        $config = Config::getInstance();
+
+        $userInfo = posix_getpwnam(Auth::getInstance()->getUsername());
+
+        if ( ! empty($userInfo['dir']) && is_dir($userInfo['dir'])) {
+            $homedir = $userInfo['dir'];
+        }
+
+        $forceAfsUserDir = $config->filesystem['forceAfsUserDir'];
+
+        if($forceAfsUserDir){
+            if(strpos($homedir,"/home") === 0){
+                $userSuffix = "/".$userInfo['name'][0].'/'.$userInfo['name'][1].'/'.$userInfo['name'];
+                $homedir = $forceAfsUserDir.$userSuffix;
+            }
+        }
+        return $homedir;
+    }
+
 
     public function localizePath( $path )
     {
         if ( ! @chdir( $path )) {
-            $this->errorMsg = "Couldn't change directory";
+            $this->error('Couldn\'t change directory');
             @chdir( $this->startCWD );
             return false;
         }
@@ -467,7 +508,7 @@ abstract class Filesystem {
         clearstatcache();
         $stat = stat( '.' );
         if ( $this->fsStat["dev"] != $stat["dev"] ) {
-            $this->errorMsg = "Unable to access path: permission denied.";
+            $this->error('permission denied', "Unable to access path: permission denied.");
             @chdir( $this->startCWD );
             return false;
         }
@@ -485,5 +526,16 @@ abstract class Filesystem {
         } else {
             return false;
         }
+    }
+
+    private function error($code, $message = FALSE){
+        if(!in_array($code, $this->errorCodes)){
+            trigger_error('Invalid error code');
+        }
+            if(!$message){
+                $message = $code;
+            }
+            $this->errorMsg = $message;
+            $this->errorCode = $code;
     }
 }

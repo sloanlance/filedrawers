@@ -13,19 +13,9 @@ class FavoritesController extends Controller_Core {
     public function init()
     {
         $config = Config::getInstance();
-        $homedir = null;
+        $homedir  = $this->filesystem->getHomeDir();
         $this->filesystem = Registry::getInstance()->filesystem;
 
-        if (isset($config->filesystem['homedir'])) {
-            $homedir = $config->filesystem['homedir'];
-        }
-        else {
-            $userInfo = posix_getpwnam(Auth::getInstance()->getUsername());
-
-            if ( ! empty($userInfo['dir']) && is_dir($userInfo['dir'])) {
-                $homedir = $userInfo['dir'];
-            }
-        }
 
         $this->favoritesPath = $homedir . '/Favorites';
 
