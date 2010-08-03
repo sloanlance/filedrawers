@@ -63,7 +63,7 @@ class Webspaces {
 	$Pts_groups = explode( "\n", $pts_output );
 
 	// Create a list of potential webspaces for this user.
-	getHomeDir( $this->uniqname, $dir, $error_msg );
+	GetHomeDir( $this->uniqname, $dir, $error_msg );
 
     // Add Private and Public webspaces
 	$this->init_webspace( $this->uniqname, $dir );

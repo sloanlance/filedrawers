@@ -881,7 +881,7 @@ class Afs
 
         // Make sure the specified path was accepted
         if ( empty( $this->path )) {
-            getHomeDir( $this->uniqname, $this->path, $this->errorMsg );
+            GetHomeDir( $this->uniqname, $this->path, $this->errorMsg );
             $this->path = $this->pathSecurity( $this->path );
         }
 
