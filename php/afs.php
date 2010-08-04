@@ -57,6 +57,18 @@ class Afs
         $this->startCWD = getcwd();
         $this->afsStat  = stat('/afs/');
 
+        // Bug 2634811 Fixed: Make sure /afs isn't on the local filesystem
+        $rootStat = stat( '/' );
+
+        if ( $this->afsStat['dev'] == $rootStat['dev'] ) {
+            error_log( "/afs has same device ID as / " .
+                "(is afs actually mounted?): $this->uniqname, " .
+                "$this->errorMsg " . __FILE__ );
+            header( 'Location: /missinghomedir.php' );
+            $this->errorMsg = 'Missing home directory.';
+            return false;
+        }
+
         // Bug 1975875 Fixed: Don't trim whitespaces from path
         $this->setPath( $path );
 

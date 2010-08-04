@@ -284,6 +284,21 @@ upload_init( char **dir, struct cgi_list *cl )
 	return( -1 );
     }
     vdev = s.st_dev;
+    /*
+     * if for some reason validpath (presumably a network mount, but this holds
+     * for a non-root local partition, too) isn't mounted, validpath and the
+     * root dir will have the same device ID and the upload.cgi will happily
+     * upload files where it shouldn't. the extra check here catches this.
+     */
+    if ( stat( "/", &s ) != 0 ) {
+	fprintf( stderr, "stat /: %s\n", strerror( errno ));
+	return( -1 );
+    }
+    if ( s.st_dev == vdev ) {
+	fprintf( stderr, "%s has same device ID as / "
+		"(is %s actually mounted?)\n", validpath, validpath );
+	return( -1 );
+    }
     if ( stat( *dir, &s ) != 0 ) {
 	fprintf( stderr, "stat %s: %s\n", *dir, strerror( errno ));
 	return( -1 );
