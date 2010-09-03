@@ -241,18 +241,6 @@ FD.DirList = function(files, xhrData) {
 		return res;
 	};
 
-	var handleFileSelection = function(oArgs) {
-		var elCheckbox = oArgs.target;
-
-		if (elCheckbox.checked === true) {
-			var row = this.getTrEl(elCheckbox);
-			this.selectRow(row);
-		} else {
-			var row = this.getTrEl(elCheckbox);
-			this.unselectRow(row);
-		}
-	};
-
 	var columnDefs = [
 		{key:"checked",label:"", width:"30", formatter:YAHOO.widget.DataTable.formatCheckbox},
 		{key:"mimeImage", label:"Type", formatter:formatType},
@@ -299,7 +287,6 @@ FD.DirList = function(files, xhrData) {
 
 			dirTable = new YAHOO.widget.DataTable("fileList", columnDefs, dsLocal, {
 				sortedBy:{key:"filename", dir:"asc"}});
-			dirTable.subscribe("checkboxClickEvent", handleFileSelection);
 
 			return dirTable;
 		},
@@ -368,13 +355,24 @@ FD.DirList = function(files, xhrData) {
 
 			var td = trs[0].getElementsByTagName('td')[2];
 			dirTable.showCellEditor(td);
+		},
 
-			var callback = getAjaxListCallback(dirTable);
+		handleFileSelection: function(oArgs) {
+			var elCheckbox = oArgs.target;
+	
+			if (elCheckbox.checked === true) {
+				var row = this.getTrEl(elCheckbox);
+				this.selectRow(row);
+			} else {
+				var row = this.getTrEl(elCheckbox);
+				this.unselectRow(row);
+			}
+		},
+
+		handleNameEditorSave: function(oArgs) {
+			var callback = getAjaxListCallback(this);
 			var sUrl = baseUrl + '/rename' + FD.Config.path;
-			
-			dirTable.subscribe('editorSaveEvent', function(oArgs) {
-				YAHOO.util.Connect.asyncRequest('POST', sUrl, callback, 'oldName=' + oArgs.oldData + '&newName=' + oArgs.newData);
-			});
+			YAHOO.util.Connect.asyncRequest('POST', sUrl, callback, 'oldName=' + oArgs.oldData + '&newName=' + oArgs.newData);
 		},
 
 		dsLocal:dsLocal,
@@ -514,7 +512,7 @@ FD.FavoritesDialog = function() {
 	// Define the callbacks for the asyncRequest
 	var callbacks = {
 	
-		success : function (o) {			
+		success: function (o) {			
 			try {
 				favorites = YAHOO.lang.JSON.parse(o.responseText);
 			}
@@ -569,7 +567,7 @@ FD.FavoritesDialog = function() {
 	
 	var submitEdit = function(form) {
 		YAHOO.util.Connect.setForm(form, true);
-		var cObj = YAHOO.util.Connect.asyncRequest('POST', '/mfile050/favorites/rename', callbacks);
+		var cObj = YAHOO.util.Connect.asyncRequest('POST', baseUrl + '/favorites/rename', callbacks);
 		alert(cObj);
 	};
 
@@ -612,7 +610,7 @@ FD.FavoritesDialog = function() {
 				return;
 			case 'editFav':
 				YAHOO.util.Connect.setForm(form);
-				var cObj = YAHOO.util.Connect.asyncRequest('POST', '/mfile050/favorites/rename', callbacks);
+				var cObj = YAHOO.util.Connect.asyncRequest('POST', baseUrl + '/favorites/rename', callbacks);
 				return;
 			default:
 				return;
@@ -630,30 +628,145 @@ FD.FavoritesDialog = function() {
 			}
 
 			YAHOO.util.Dom.setStyle('favorites', 'display', 'block');
-			YAHOO.util.Connect.asyncRequest('GET',"/mfile050/favorites/", callbacks);
+			YAHOO.util.Connect.asyncRequest('GET', baseUrl + "/favorites/", callbacks);
 		}
 	}
 }();
 
 
 FD.PermissionsDialog = function() {
+	var favorites = [];
+
 	var hide = function() {
 		YAHOO.util.Dom.setStyle('permissions', 'display', 'none');
+	};
+	
+	var changeTab = function(tabID) {
+		var tabs = YAHOO.util.Dom.get('favMenu').getElementsByTagName('a');
+		
+		for (var i=0; i<tabs.length; i++) {
+			var currentTabID = tabs[i].hash.match(/#(.*)$/).pop();
+
+			if (currentTabID == tabID) {
+				YAHOO.util.Dom.addClass(tabs[i], 'sel');
+				YAHOO.util.Dom.setStyle(currentTabID, 'display', 'block');
+			} else {
+				YAHOO.util.Dom.removeClass(tabs[i], 'sel');
+				YAHOO.util.Dom.setStyle(currentTabID, 'display', 'none');
+			}
+		}
+	};
+	
+	// Define the callbacks for the asyncRequest
+	var callbacks = {
+	
+		success: function (o) {			
+			try {
+				favorites = YAHOO.lang.JSON.parse(o.responseText);
+			}
+			catch (x) {
+				alert("JSON Parse failed!");
+				return;
+			}
+
+			showView();
+		},
+
+		failure: function (o) {
+			if ( ! YAHOO.util.Connect.isCallInProgress(o)) {
+				alert("Async call failed!");
+			}
+		},
+
+		timeout: 3000
+	};
+
+	var showView = function() {
+		var tabContent = YAHOO.util.Dom.getElementsByClassName('tabContent', 'div', 'viewFav')[0];
+		var favList = '<ul>';
+		
+		changeTab('viewFav');
+
+		// Remember, it's better to just touch the DOM once
+		for (var i = 0, len = favorites.contents.length; i < len; ++i) {
+			var f = favorites.contents[i];
+			favList += '<li><a href="' + baseUrl + '/list' + f.target + '">' + f.filename + '</a></li>';
+		}
+
+		favList += '</ul>';
+		tabContent.innerHTML = favList;
+	};
+
+	var showEdit = function() {
+		var tabContent = YAHOO.util.Dom.getElementsByClassName('tabContent', 'div', 'editFav')[0];
+		var favList = '<ul>';
+		
+		changeTab('editFav');
+
+		// Remember, it's better to just touch the DOM once
+		for (var i = 0, len = favorites.contents.length; i < len; ++i) {
+			var f = favorites.contents[i];
+			favList += '<li><input type="text" name="renames[' + f.filename + ']" value="' + f.filename + '" /></li>';
+		}
+
+		favList += '</ul>';
+		tabContent.innerHTML = favList;
+	};
+	
+	var submitEdit = function(form) {
+		YAHOO.util.Connect.setForm(form, true);
+		var cObj = YAHOO.util.Connect.asyncRequest('POST', baseUrl + '/favorites/rename', callbacks);
+		alert(cObj);
 	};
 
 	var handleClick = function(e) {
 		var target = YAHOO.util.Event.getTarget(e);
 		
-		if ( ! target.href) {
+		if ( ! target.hash) {
 			return;
 		}
-
+		
 		YAHOO.util.Event.preventDefault(e);
-		hide();
-		FD.InspDialogCloseEvent.fire();
+		var action = target.hash.match(/#(.*)$/);
+		
+		switch(action[1]) {
+			case 'viewFav':
+				showView();
+				return;
+			case 'editFav':
+				showEdit();
+				return;
+			case 'addFav':
+				changeTab('addFav');
+				return;
+			case 'close':
+				hide();
+				FD.InspDialogCloseEvent.fire();
+				return;
+			default:
+				return;
+		}
 	};
+	
+	var handleSubmit = function(e) {
+		YAHOO.util.Event.preventDefault(e);
+		var form = YAHOO.util.Event.getTarget(e);
 
+		switch(form.name) {
+			case 'addFav':
+				submitAdd();
+				return;
+			case 'editFav':
+				YAHOO.util.Connect.setForm(form);
+				var cObj = YAHOO.util.Connect.asyncRequest('POST', baseUrl + '/favorites/rename', callbacks);
+				return;
+			default:
+				return;
+		}
+	};
+	
 	YAHOO.util.Event.on('permissions', 'click', handleClick);
+	YAHOO.util.Event.on('permissions', 'submit', handleSubmit);
 
 	return {
 		show: function(e, action) {
@@ -663,7 +776,8 @@ FD.PermissionsDialog = function() {
 			}
 
 			YAHOO.util.Dom.setStyle('permissions', 'display', 'block');
-		}	
+			YAHOO.util.Connect.asyncRequest('GET', baseUrl + "/favorites/", callbacks);
+		}
 	}
 }();
 
@@ -715,6 +829,134 @@ FD.TransactionMonitor = function() {
 };
 
 
+FD.UploadDialog = function() {
+	var evnt = new YAHOO.util.CustomEvent("Upload Event");
+	var fileList = YAHOO.util.Dom.get('uploadFileList');
+	var template = fileList.getElementsByTagName('li')[0];
+	var uploadLimit = 5; // XXX Make this a config variable
+	var uploadCount = 0;
+
+	var hide = function() {
+		var uploadForm = YAHOO.util.Dom.get('upload');
+		YAHOO.util.Dom.setStyle(uploadForm, 'display', 'none');
+		uploadForm.reset();
+	};
+	
+	var addFile = function() {
+		if (uploadCount < uploadLimit) {
+			var newItem = template.cloneNode(true);
+			fileList.appendChild(newItem);
+			uploadCount++;
+			
+			if (uploadCount == uploadLimit) {
+				var a = newItem.getElementsByTagName('a')[0];
+				YAHOO.util.Dom.setStyle(a, 'display', 'none');
+			}
+		}
+	};
+
+
+	var handleClick = function(e) {
+		var target = YAHOO.util.Event.getTarget(e);
+		
+		if ( ! target.hash) {
+			return;
+		}
+		
+		YAHOO.util.Event.preventDefault(e);
+		var action = target.hash.match(/#(.*)$/);
+		
+		switch(action[1]) {
+			case 'viewFav':
+				showView();
+				return;
+			case 'editFav':
+				showEdit();
+				return;
+			case 'addFile':
+				addFile();
+				return;
+			case 'close':
+				hide();
+				FD.InspDialogCloseEvent.fire();
+				return;
+			default:
+				return;
+		}
+	};
+
+
+	// Define the callbacks for the asyncRequest
+	var callback = {
+		success: function (o) {			
+			try {
+				favorites = YAHOO.lang.JSON.parse(o.responseText);
+			}
+			catch (x) {
+				alert("JSON Parse failed!");
+				return;
+			}
+
+			alert('upload success');
+		},
+
+		failure: function (o) {
+			if ( ! YAHOO.util.Connect.isCallInProgress(o)) {
+				alert("Async call failed!");
+			}
+		},
+		
+		upload: function(eventType, args) {
+			alert('upload');
+		},
+
+		timeout: 3000
+	};
+	
+	var handleUpload = function(e) {
+		YAHOO.util.Event.preventDefault(e);
+
+		//the second argument of setForm is crucial,
+		//which tells Connection Manager this is a file upload form
+		YAHOO.util.Connect.setForm('upload', true, true);
+		YAHOO.util.Event.preventDefault(e);
+			   
+		var uploadHandler = {
+			upload: function(o) {
+				var bdy = document.getElementsByTagName('body')[0];
+				bdy.innerHTML += '<div style="1px solid black; margin: 1em;">' + o.responseText + '</div>';
+			}
+		};
+
+		YAHOO.util.Connect.asyncRequest('POST', '/mfile-bin/upload.cgi', uploadHandler);
+		YAHOO.util.Event.preventDefault(e);
+	};
+
+
+	var handleFocus = function(e) {
+		var target = YAHOO.util.Event.getTarget(e);
+			target.value = '';
+	};
+
+	YAHOO.util.Event.on('upload', 'click', handleClick);
+	YAHOO.util.Event.on('uploadButton', 'click', handleUpload);
+	YAHOO.util.Event.on('newFold', 'focus', handleFocus);
+	
+	return {
+		show: function(e, action) {
+			if (action != 'upload') {
+				hide();
+				return;
+			}
+
+			YAHOO.util.Dom.setStyle('upload', 'display', 'block');
+		},
+		
+		evnt:evnt
+	}
+}();
+
+
 FD.FileManager = function(e, files) {
 	FD.Config.path = files.path;
 
@@ -735,11 +977,14 @@ FD.FileManager = function(e, files) {
 	inspector.evnt.subscribe(FD.NewFolderDialog.show);
 	inspector.evnt.subscribe(FD.FavoritesDialog.show);
 	inspector.evnt.subscribe(FD.PermissionsDialog.show);
+	inspector.evnt.subscribe(FD.UploadDialog.show);
 
 	YAHOO.util.Connect.successEvent.subscribe(txMonitor.handle);
 	YAHOO.util.Connect.failureEvent.subscribe(txMonitor.handleFailure);
 
 	// Event associations
+	dirTable.subscribe('checkboxClickEvent', dirList.handleFileSelection);
+	dirTable.subscribe('editorSaveEvent', dirList.handleNameEditorSave);
 	dirTable.subscribe('rowSelectEvent', inspector.update);
 	dirTable.subscribe('rowUnselectEvent', inspector.update);
 	dirTable.subscribe('rowUnselectEvent', inspector.update);

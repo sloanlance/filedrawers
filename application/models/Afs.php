@@ -1,10 +1,10 @@
 <?php
 /* $Revision: $
  *
- * Copyright (c) 2009 Regents of the University of Michigan.
+ * Copyright (c) 2010 Regents of the University of Michigan.
  * All rights reserved.
  */
-class Model_Afs extends Filesystem
+class Model_Afs extends Filedrawers_Filesystem
 {
     // Change the ACL for a given path
     public function changeAcl($entity,
@@ -106,10 +106,9 @@ class Model_Afs extends Filesystem
 
     protected static function getCallerAccess($path)
     {
-        $utilsPath = Config::getInstance()->afs['utilitiesPath'];
+        $utilsPath = Zend_Registry::get('config')->afs->utilitiesPath;
 
-        $cmd = "$utilsPath/fs getcalleraccess "
-                . escapeshellarg( '/afs/umich.edu/user/j/o/joshfiel');
+        $cmd = "$utilsPath/fs getcalleraccess " . escapeshellarg($path);
         $result = shell_exec( $cmd . " 2>&1" );
 
         $acls = '';

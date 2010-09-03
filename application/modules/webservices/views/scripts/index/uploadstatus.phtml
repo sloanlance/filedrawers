@@ -1,0 +1,4 @@
+<?php echo $this->displayErrors($this->errorMsg); ?>
+<?php if ($this->uploadProgress): ?>
+	<p><?php echo $this->escape($this->uploadProgress); ?></p>
+<?php endif; ?>

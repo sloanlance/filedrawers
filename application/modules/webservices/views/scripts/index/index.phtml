@@ -1,0 +1,92 @@
+<div id="content">
+	<h2>Listing Files</h2>
+	<br/>
+	<h3>Arguments</h3>
+	<ul>
+		<li>path: The path to the directory to be listed</li>
+		<li>xml or json: The format of the output</li>
+		<li>friendly: Converty bytes and dates into human readable formats</li>
+		<li>offset: How many files to skip before starting the list</li>
+		<li>limit: How many total files to return maximum</li>
+	</ul>
+	<br/>
+	<h3>Examples</h3>
+	<br/>
+	<ul>
+		<li>webservices/list/?format=json&amp;path=/path/to/directory&amp;limit=3&amp;offset=3</li>
+		<li>webservices/list/?format=xml&amp;path=/path/to/directory&amp;offset=3&amp;friendly</li>
+	</ul>
+	<br/>
+	<h2>Downloading Files</h2>
+	<br/>
+	<h3>Arguments</h3>
+	<ul>
+		<li>path: The path to the desired file</li>
+	</ul>
+	<br/>
+	<h3>Example</h3>
+	<pre>
+		webservices/download/?path=/path/to/file
+	</pre>
+	<br/>
+	<h2>Renaming files</h2>
+	<p>
+	<h3>Arguments</h3>
+	<ul>
+		<li>path: The path that the subject file is in</li>
+		<li>xml or json: The format of the output</li>
+		<li>oldName: A POST variable to use for the old name of the file, excluding the path.</li>
+		<li>newName: A POST variable to use for the new name of the file, excluding the path.</li>
+	</ul>
+	<br/>
+	Construct a POST to a url like this:
+	</p>
+	<pre>
+    	webservices/rename/?format=json&amp;path=/path/to/file
+    </pre>
+	<p> Include two POST arguments for old and new file names:
+	<pre>
+        oldName
+        newName
+    </pre>
+	</p>
+	<h2>Deleting files</h2>
+	<p>
+	<h3>Arguments</h3>
+	<ul>
+		<li>path: The path that the subject file is in</li>
+		<li>xml or json: The format of the output</li>
+		<li>files: A POST variable to hold filenames, excluding the path. It can be a single file, or an array of values.</li>
+	</ul>
+	<br/>
+	Construct a POST to a url like this:
+	</p>
+	<pre>
+    	webservices/delete/?format=json&amp;path=/path/to/file
+    </pre>
+	<p> Include one POST argument for the file names:
+	<pre>
+        files
+    </pre>
+	An html example of constructing a file input for posting:
+	<pre>
+     &lt;input type="text" name="files" value="file1.jpg"/&gt;
+        
+        or 
+
+     &lt;input type="text" name="files[]" value="file1.jpg"/&gt;
+     &lt;input type="text" name="files[]" value="file2.jpg"/&gt;
+
+    </pre>
+	<h2>Errors Messages</h2>
+	<h3>Examples</h3>
+	<pre>
+		{"errorMsg":"Message Text Here"}
+	</pre>
+	<br/>
+	<pre>
+&lt;results&gt;
+  &lt;errorMsg&gt;Message Text Here&lt;/errorMsg&gt;
+&lt;/results&gt;
+</pre>
+</div>

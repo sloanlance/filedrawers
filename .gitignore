@@ -1,3 +1,6 @@
 .DS_Store
-config.ini
+*.ini
 .htaccess
+/application/modules/webapp/controllers/
+/application/modules/webapp/views/scripts/index/
+/public/js/

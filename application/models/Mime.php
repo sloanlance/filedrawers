@@ -1,6 +1,6 @@
 <?php
 /*
- * Copyright (c) 2005 - 2009 Regents of The University of Michigan.
+ * Copyright (c) 2005 - 2010 Regents of The University of Michigan.
  * All Rights Reserved.  See COPYRIGHT.
  */
 
@@ -84,7 +84,7 @@ class Model_Mime
     // Also, if user does not have read permission, file is not viewable
     public function setIcon(&$row)
     {
-        $imagesPath = Config::getInstance()->mime['imagesPath'];
+        $imagesPath = Zend_Registry::get('config')->mime->imagesPath;
         $filename = $row['filename'];
 
         if ( is_link( $filename )) {

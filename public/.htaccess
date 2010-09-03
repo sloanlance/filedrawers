@@ -1,7 +1,10 @@
+SetEnv APPLICATION_ENVIRONMENT development
+
 RewriteEngine On
-RewriteBase /mfile050
+RewriteBase /mfile-josh/
 RewriteCond %{REQUEST_FILENAME} -s [OR]
 RewriteCond %{REQUEST_FILENAME} -l [OR]
 RewriteCond %{REQUEST_FILENAME} -d
 RewriteRule ^.*$ - [NC,L]
 RewriteRule ^.*$ index.php [NC,L]
+
