@@ -1,4 +1,4 @@
-SetEnv APPLICATION_ENVIRONMENT development
+SetEnv APPLICATION_ENVIRONMENT production
 
 RewriteEngine On
 RewriteBase /mfile-josh/

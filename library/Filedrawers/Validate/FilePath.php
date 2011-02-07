@@ -7,15 +7,17 @@ class Filedrawers_Validate_FilePath extends Zend_Validate_Abstract
     const WRONG_TYPE = 'wrongType';
     const NO_READ = 'noRead';
     const NO_MODIFY = 'noModify';
+    const NO_CONTEXT = 'noContext';
 
     protected $_options = array();
 
     protected $_messageTemplates = array(
-        self::EXISTS => "'%value%' does not exist.",
+        self::EXISTS => "'%value%' does not exist or cannot be modified.",
         self::ALREADY_EXISTS => "'%value%' already exists.",
         self::WRONG_TYPE => "'%value%' is not the correct type.",
         self::NO_READ => "'%value%' cannot be modified.",
-        self::NO_MODIFY => "'%value%' cannot be modified."
+        self::NO_MODIFY => "'%value%' cannot be modified.",
+        self::NO_CONTEXT => "No path value was found in the input."
     );
 
 
@@ -31,7 +33,11 @@ class Filedrawers_Validate_FilePath extends Zend_Validate_Abstract
         $filesystem = Zend_Registry::get('filesystem');
 
         if (isset($this->_options['pathContext'])) {
-            $value = $context['path'] . '/' . $value;
+            if ( ! isset($context[$this->_options['pathContext']])) {
+                $this->_error(self::NO_CONTEXT);
+                return false;
+            }
+            $value = $context[$this->_options['pathContext']] . '/' . $value;
         }
 
         $info = $filesystem->getInfo($value);

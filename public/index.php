@@ -1,4 +1,8 @@
 <?php
+// PHP's basename function will not handle high-ASCII characters correctly
+// without this being set.  Using Zend_Locale alone won't fix this issue
+setlocale(LC_ALL, 'en_US.UTF8');
+
 if ( ! extension_loaded( 'posix' )) {
     dl( 'posix.so' );
 }

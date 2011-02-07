@@ -22,7 +22,7 @@ class Form_MkdirForm extends Zend_Form
         $path->setLabel('Path');
         $path->setRequired(true)
             ->addValidator('NotEmpty', true, array('messages' => array('isEmpty' =>
-                'You must specifiy the path for the file or folder to rename.')
+                'You must specifiy the parent path for the new folder.')
             )
         );
         $path->addValidator('FilePath', true, array(
@@ -43,7 +43,7 @@ class Form_MkdirForm extends Zend_Form
             )
         );
         $folderName->addValidator('FilePath', true, array(
-            'pathContext' => 'useContext',
+            'pathContext' => 'path',
             'exists' => 'checkExisting'
         ));
         $this->addElement($folderName);

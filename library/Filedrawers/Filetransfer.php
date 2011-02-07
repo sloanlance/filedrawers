@@ -64,26 +64,25 @@ class Filedrawers_Filetransfer {
         header('Content-Type: application/force-download' );
         header("Last-Modified: " . date('D, m M Y H:i:s O', $this->_stats['mtime']));
 
-        while ( !feof( $handle )) {
+        while ( !feof( $this->_handle )) {
             set_time_limit(0);
 
             if ( isset( $range['start'] )) {
-                $chunksize = max( 1, min( $this->_stats['size'] - $rangeStart,
+                $chunksize = max( 1, min( $this->_stats['size'] - $range['start'],
                         $this->_stats['size'] - $bytesread, 1024 * 1024 ));
             }
             else {
                 $chunksize = 1024 * 1024;
             }
 
-            error_log( "chunksize: $chunksize\n", 3, '/tmp/tttt' );
-            echo fread( $handle, $chunksize );
+            echo fread( $this->_handle, $chunksize );
             $bytesread += $chunksize;
 
             flush();
             ob_flush();
         }
 
-        fclose( $handle );
+        fclose( $this->_handle );
     }
 
 
@@ -91,29 +90,30 @@ class Filedrawers_Filetransfer {
     {
        /*
         * this needs to support all possible range formats. for the
-        * first pass, we're only implementing "bytes=min-[max]".
+        * first pass, we're only implementing "bytes=start-[end]".
         *
         * return an array of ranges if the Range header is valid,
         * false otherwise.
         */
         
-        if ( !preg_match( '/^bytes=(\d+)-(\d*)/i', $rangeHeader, $matches )) {
+        if ( !preg_match( "/^bytes=(\d+)-(\d*)/i", $rangeHeader, $matches )) {
             return( false );
         }
-        
+
+
         $ranges = array();
         if ( isset( $matches[ 1 ] )) {
             if ( (int)$matches[ 1 ] >= $this->_stats['size'] ) {
                 return( false );
             }
-            $ranges['min'] = $matches[ 1 ];
+            $ranges['start'] = $matches[ 1 ];
         }
 
         if ( isset( $matches[ 2 ] )) {
             if ( (int)$matches[ 2 ] > $this->_stats['size'] ) {
                 return( false );
             }
-            $ranges['max'] = $matches[ 1 ];
+            $ranges['end'] = $matches[ 2 ];
         }
 
         return( $ranges );
