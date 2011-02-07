@@ -25,7 +25,7 @@ abstract class Filedrawers_Filesystem {
         $name = basename($name);
         $this->localizePath($path);
 
-        if ( ! @mkdir(trim($name), 0644, true)) {
+        if ( ! @mkdir(trim($name), 0744, true)) {
             throw new Filedrawers_Filesystem_Exception(sprintf(
                 'Unable to create the directory "%s".', $name), 5);
         }
@@ -44,7 +44,7 @@ abstract class Filedrawers_Filesystem {
                 // otherwise you will start deleting directories
                 continue;
             }
-            // Security checks are in Filesystem::_removeDir()
+
             $itemPath = $path . '/' . $file;
 
             if ( is_dir($itemPath) && ! is_link( $itemPath )) {
@@ -55,7 +55,8 @@ abstract class Filedrawers_Filesystem {
 
                 if ( ! @unlink( basename($file))) {
                     chdir($this->startCWD);
-                    throw new Filedrawers_Filesystem_Exception('Unable to remove the directory', 2);
+                    throw new Filedrawers_Filesystem_Exception(sprintf(
+                'Unable to remove the file "%s".', basename($file)), 2);
                 } else {
                     chdir($this->startCWD);
                     $deletedCount++;
@@ -93,19 +94,14 @@ abstract class Filedrawers_Filesystem {
 
             $itemPath = $path . '/' . $item;
 
-            if (@is_dir($itemPath) && ! @is_link($itemPath)) {                
-                if ( ! $this->_removeDir($itemPath)) {
-                    throw new Filedrawers_Filesystem_Exception(sprintf(
-                        'Unable to remove "%s" because a file or folder in "%s" can\'t be removed.',
-                        $name), 5);
-                }
+            if (@is_dir($itemPath) && ! @is_link($itemPath)) {
+                $this->_removeDir($itemPath);
             } else {
                 $this->localizePath($path);
                 $base = basename($item);
                 if ( ! @is_writable($base) || ! @unlink($base)) {
                     throw new Filedrawers_Filesystem_Exception(sprintf(
-                        'Unable to remove a child file or directory.',
-                        $name), 5);
+                        'Unable to remove the file "%s".', $base), 5);
                 }
 
                 chdir( $this->startCWD );
@@ -115,14 +111,16 @@ abstract class Filedrawers_Filesystem {
         closedir( $handle );
 
         $this->localizePath($path);
+        $cwdBase = basename(getcwd());
 
-        $rmPath = '../' . basename(getcwd());
+        $rmPath = '../' . $cwdBase;
 
         if (@is_writable($rmPath) && @rmdir($rmPath)) {
             chdir($this->startCWD);
         } else {
             chdir( $this->startCWD );
-            throw new Filedrawers_Filesystem_Exception('Unable to remove the directory', 5);
+            throw new Filedrawers_Filesystem_Exception(sprintf(
+                        'Unable to remove the folder "%s".', $cwdBase), 5);
         }
     }
 
@@ -326,12 +324,6 @@ abstract class Filedrawers_Filesystem {
     }
 
 
-    public function clearListHelpers()
-    {
-        $this->listHelpers = array();
-    }
-
-
     public function listDirectory($path, $associativeArray=false)
     {
         $files = array();
@@ -424,7 +416,7 @@ abstract class Filedrawers_Filesystem {
     }
 
 
-    protected function _getInfo($filename)
+    protected function _getInfo($filename, $useListHelpers=true)
     {
         clearstatcache();
         if ( ! $fileStats = @lstat($filename)) {
@@ -442,8 +434,10 @@ abstract class Filedrawers_Filesystem {
             'modTime' => $modTime,
             'size' => $size);
 
-        foreach($this->listHelpers as $helper) {
-            call_user_func_array($helper, array(&$info));
+        if ($useListHelpers) {
+            foreach($this->listHelpers as $helper) {
+                call_user_func_array($helper, array(&$info));
+            }
         }
 
         return $info;
@@ -466,7 +460,7 @@ abstract class Filedrawers_Filesystem {
                 return false;
             }
 
-            $info = $this->_getInfo($file);
+            $info = $this->_getInfo($file, false);
             $info['modifyable'] = @is_writable($file);
             $info['readable'] = @is_readable($file);
 

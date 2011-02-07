@@ -43,7 +43,7 @@ class Form_RenameForm extends Zend_Form
         );
         $oldName->addValidator('FilePath', true, array(
             'modifyable' => true,
-            'pathContext' => 'useContext'
+            'pathContext' => 'path'
         ));
         $oldName->addFilter('StringTrim');
         $this->addElement($oldName);
@@ -57,7 +57,7 @@ class Form_RenameForm extends Zend_Form
             )
         );
         $newName->addValidator('FilePath', true, array(
-            'pathContext' => 'useContext',
+            'pathContext' => 'path',
             'exists' => 'checkExisting'
         ));
         $newName->addFilter('StringTrim');

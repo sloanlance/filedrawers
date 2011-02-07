@@ -18,6 +18,7 @@ class Webservices_IndexController extends Zend_Controller_Action {
         'delete' => array('xml', 'json', 'html'),
         'move' => array('xml', 'json', 'html'),
         'mkdir' => array('xml', 'json', 'html'),
+        'gettoken' => array('xml', 'json', 'html'),
         'uploadstatus' => array('xml', 'json', 'html'),
         'uploadfinish' => array('xml', 'json', 'html')
     );
@@ -184,8 +185,7 @@ class Webservices_IndexController extends Zend_Controller_Action {
         if ( ! $this->getRequest()->isPost()) {
             return;
         }
-
-        if ( ! $this->_form->isValid($_POST)) {
+        else if ( ! $this->_form->isValid($_POST)) {
             $this->view->errorMsg = $this->_form->getMessages(null, true);
             return;
         }
@@ -194,7 +194,7 @@ class Webservices_IndexController extends Zend_Controller_Action {
 
         $this->_filesystem->remove($input->path, $values['files']);
         $this->view->status = 'success';
-        $this->view->message = 'Successfully deleted the directory.';
+        $this->view->message = 'Delete successful.';
     }
 
 
@@ -217,16 +217,18 @@ class Webservices_IndexController extends Zend_Controller_Action {
 
         $input = new Zend_Filter_Input($this->_baseFilter, $validators, $_GET, $options);
 
-        $this->_filesystem->addListHelper(array($this, 'filterByFileName'));
-
         if ( ! $input->isValid('path')) {
             $this->view->errorMsg = $input->getMessages();
             return;
         }
 
+        $this->_filesystem->addListHelper(array($this, 'filterByFileName'));
         $files = $this->_filesystem->listDirectory($input->path, true);
-        $this->_filesystem->clearListHelpers();
-        $this->_form = new Form_MoveForm($this->_csrfToken, $files['contents']);
+        $this->_form = new Form_MoveForm(
+            $this->_csrfToken,
+            $files['contents'],
+            $input->path
+        );
 
         if ( ! $this->getRequest()->isPost()) {
             return;
@@ -253,7 +255,6 @@ class Webservices_IndexController extends Zend_Controller_Action {
             return;
         }
         else if ( ! $this->_form->isValid($_POST)) {
-            $this->view->errorCode = 5;
             $this->view->errorMsg = $this->_form->getMessages(null, true);
             return;
         }
@@ -291,7 +292,6 @@ class Webservices_IndexController extends Zend_Controller_Action {
 
         $input = new Zend_Filter_Input($this->_baseFilter, $validators, $_GET);
         if ( ! $input->isValid('id')) {
-            $this->view->errorCode = 5;
             $this->view->errorMsg = $input->getMessages();
             return;
         }
