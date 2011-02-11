@@ -1,0 +1,570 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html dir="ltr" lang="en">
+	<head>
+		<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+		<title>DataTable + JSON testing</title>
+		<link href="css/filedrawers.css" rel="stylesheet" type="text/css" />
+		<link rel="stylesheet" type="text/css" href="yui/build/fonts/fonts-min.css"> 
+		<link rel="stylesheet" type="text/css" href="yui/build/datatable/assets/skins/sam/datatable.css"> 
+		<script type="text/javascript" src="yui/build/yahoo-dom-event/yahoo-dom-event.js"></script> 
+		<script type="text/javascript" src="yui/build/dragdrop/dragdrop-min.js"></script> 
+		<script type="text/javascript" src="yui/build/element/element-min.js"></script> 
+		<script type="text/javascript" src="yui/build/datasource/datasource-min.js"></script> 
+		<script type="text/javascript" src="yui/build/datatable/datatable-min.js"></script> 
+		<script type="text/javascript" src="yui/build/connection/connection-min.js"></script>
+		
+		<script type="text/javascript" src="yui/build/json/json-min.js"></script>
+		
+		<script type="text/javascript">
+		
+			var myJSONdata,
+			myPerms;
+		
+			if (typeof FD == "undefined" || ! FD) {
+				var FD = {};
+			}
+		
+			function roundNum( num )
+			{
+				return Math.round( num * Math.pow( 10, 1 )) / 
+					Math.pow( 10, 1 );
+			}
+			
+			FD.DirList = function() {	
+					
+				formatDate = function(elCell, oRecord, oColumn, oData) {
+					var oDate = new Date(oData*1000);
+					var str = (oDate.getMonth() + 1) + '/' + oDate.getDate() + '/' + oDate.getFullYear();
+					elCell.innerHTML = str;
+				}
+				
+				formatBytes = function(elCell, oRecord, oColumn, oData)	{
+					var bytes = oData;
+					var str;
+
+					if ( bytes >= 1073741824 ) {
+						str = roundNum( bytes / 1073741824 ) + ' GB';
+					} else if ( bytes >= 1048576 ) {
+						str = roundNum( bytes / 1048576 ) + ' MB';
+					} else if ( bytes > 102 ) {
+						str =  roundNum( bytes / 1024 ) + ' KB';
+					} else if ( bytes > 0 ) {
+						str = bytes + ' B';
+					} else if ( true /*readPriv*/ ) { // size unknown - file is probably not readable
+						str = 'empty';
+					} else {
+						str = '-';
+					}
+
+					elCell.innerHTML = str;
+				}
+				
+				formatType = function(elCell, oRecord, oColumn, sData) {
+					var baseUrl = '';
+					elCell.innerHTML = '<img src="' + baseUrl + 'images/mime/small/' + sData + '.gif" />';
+				};
+				
+				handleFileSelection = function(oArgs) {
+					var elCheckbox = oArgs.target;
+
+					if (elCheckbox.checked === true) {
+						var row = this.getTrEl(elCheckbox);
+						this.selectRow(row);
+					} else {
+						var row = this.getTrEl(elCheckbox);
+						this.unselectRow(row);
+					}
+				}
+				
+				var myColumnDefs = [
+					{key:"checked",label:"", width:"30", formatter:YAHOO.widget.DataTable.formatCheckbox},
+					/*{key:"type", sortable:true, resizeable:true},*/
+					{key:"filename", label:"Name", sortable:true, resizeable:true},
+					{key:"modTime", label:"Last Modified", formatter:formatDate, sortable:true, sortOptions:{defaultDir:YAHOO.widget.DataTable.CLASS_DESC}},
+					{key:"size", label:"Size", formatter:formatBytes, sortable:true, resizeable:true},
+					{key:"mimeImage", label:"Type", formatter:formatType, sortable:true, resizeable:true},
+					//{key:"perms", sortable:true, resizeable:true},
+					/*{key:"mimeType", sortable:true, resizeable:true}*/
+				];
+				
+				return {
+					init: function() {
+				
+						myDataSource = new YAHOO.util.DataSource("webservices/list/?format=json");  // first call
+						myDataSource.responseType = YAHOO.util.DataSource.TYPE_JSON; 
+						myDataSource.responseSchema = {
+							resultsList: "contents",
+							fields: ["type","filename","modTime","size","mimeImage","perms","mimeType"]
+						};	
+								
+						myDataSource.subscribe('responseEvent', function(oDS){  // triggered by data return
+							myJSONdata = YAHOO.lang.JSON.parse(oDS.response.responseText);
+							//alert(YAHOO.lang.dump(myJSONdata.path));
+							myPerms = YAHOO.lang.dump(myJSONdata.contents[0].perms);
+							
+							var currentDir,
+							changeDirForm = YAHOO.util.Dom.get('changeDirForm'),
+							viewHTML;
+
+							changeDirForm.innerHTML = YAHOO.lang.dump(myJSONdata.path);
+
+						}
+						);				
+								
+						dirTable = new YAHOO.widget.DataTable("content", myColumnDefs, myDataSource);
+						
+						dirTable.subscribe('checkboxClickEvent', handleFileSelection);
+						
+						return dirTable;
+					}
+										
+					/*
+					var myCallback = function() {
+						dirTable.onDataReturnAppendRows(arguments);
+						alert("callback called.");
+					};
+					
+					var callback1 = {
+						success : myCallback,
+						failure : myCallback,
+						//scope : myDataTable
+					};
+					*/
+					
+					//myDataSource.sendRequest("", callback1);
+
+									
+					
+					/*
+					return {
+						init: function() {
+							//dirTable = new YAHOO.widget.DataTable("content", myColumnDefs, myDataSource);
+							//return dirTable;
+						},
+					}
+					*/
+				}
+			}
+			
+			FD.InfoBar = function() {
+	
+				var currentDir,
+				changeDirForm = YAHOO.util.Dom.get('changeDirForm'),
+				viewHTML;
+
+				var changeDirView = '<input type="button" name="changeDir" value="Change" />';
+				changeDirForm.innerHTML += changeDirView;
+				viewHTML = changeDirForm.innerHTML;
+
+				var update = function(oArgs) {};
+
+				var handleClick = function(e) {
+					var target = YAHOO.util.Event.getTarget(e);
+
+					if ( ! target.value) {
+						return;
+					}
+
+					YAHOO.util.Event.preventDefault(e);
+
+					if (target.value == 'Change') {
+						changeDirForm.innerHTML =
+						'<input type="text" size="40" maxlength="100" value="' +
+						currentDir + '" />' +
+						'<input type="submit" value="Go" />' +
+						'<input type="button" value="Cancel" />';
+					} else if (target.value == 'Go') {
+						location = baseUrl + '/list' +
+						target.parentNode.getElementsByTagName('input')[0].value;
+					} else if (target.value == 'Cancel') {
+						changeDirForm.innerHTML = viewHTML;
+					}
+				};
+
+				var handleSubmit = function(e) {
+					YAHOO.util.Event.preventDefault(e);
+				};
+
+				YAHOO.util.Event.on('infoBar', 'click', handleClick);
+				YAHOO.util.Event.on('changeDirForm', 'submit', handleSubmit);
+
+				var kl = new YAHOO.util.KeyListener(document, {keys:13}, {fn:function(){alert('enter');}});
+
+				return {
+					init: function(crntDir) {
+						currentDir = crntDir;
+					},
+
+					update:update
+				}
+			};	
+			
+			FD.FileInspector = function() {
+			
+				var currentDir,
+				actions = {},
+				temp = YAHOO.util.Dom.get('actionList'),
+				links = temp.getElementsByTagName('a'),
+				i;
+				
+				// called upon instantiation.
+				for (i=0; i<links.length; i++) {
+					action = links[i].hash.match(/#(.*)$/);  // converts link to an array, with original in index 0 and #-less in index 1
+					actions[action[1]] = {ref: links[i]};  // actions becomes an array of objects with char indexes based on action, and links to that action.  example:  actions["cut"] hold href obj for cut
+				}
+				
+				/*var updateItemInfo = function(selectedRows) {
+					var itemInfo = YAHOO.util.Dom.get('itemInfo'),
+					totalBytes = 0,
+					filenames = [],
+					record;
+
+					if ( ! selectedRows || selectedRows.length < 1) {
+						itemInfo.innerHTML = '';
+						return;
+					}
+
+					for (var i=0; i< selectedRows.length; i++) {
+						record = this.getRecord(selectedRows[i]).getData();
+						totalBytes += record.size;
+						filenames.push(record.filename);
+					}
+
+					var itemInfoContent = '<h4>Information</h4><ul><li><strong>' +
+					selectedRows.length + ' items selected</strong><br />' +
+					//FD.Utils.formatBytes(totalBytes) + '</li></ul>';
+
+					if (selectedRows.length < 1000) {
+						itemInfoContent += '<ul>';
+						for (var i=0; i< filenames.length; i++) {
+							itemInfoContent += '<li>' + filenames[i] + '</li>';
+						}
+						itemInfoContent += '</ul>';
+					}
+
+					// It's better to touch the DOM just once:
+					itemInfo.innerHTML = itemInfoContent;
+				};*/
+				
+				// makes menu options active or inactive based on the permissions
+				var update = function(oArgs) {
+
+					var numSelected,
+					i,
+					permissions = {
+						r: false,   // read
+						l: false,   // list
+						i: false,   // insert
+						d: false,   // delete
+						w: false,   // write
+						k: false,   // lock
+						a: false    // administrative
+					};
+
+					if (oArgs) {
+						numSelected = this.getSelectedRows().length;
+						//updateItemInfo.apply(this, [this.getSelectedRows()]);
+					} else {
+						numSelected = 0;
+						//updateItemInfo();
+					}
+
+					for (i=0; i < myPerms.length; i++) {
+						permissions[myPerms.charAt(i)] = true;
+						//alert(myPerms.charAt(i) + " = " + permissions[myPerms.charAt(i)]);
+					}
+					
+					//alert(actions.upload.ref);
+					
+					filesSelected = (numSelected > 0) ? true : false;
+
+					// Set actions
+					if (permissions.i) {
+						YAHOO.util.Dom.addClass(actions.upload.ref, 'enabled');
+						YAHOO.util.Dom.addClass(actions.createFolder.ref, 'enabled');
+					} else {
+						YAHOO.util.Dom.removeClass(actions.upload.ref, 'enabled');
+						YAHOO.util.Dom.removeClass(actions.createFolder.ref, 'enabled');
+					}
+
+					if (filesSelected && permissions.r && permissions.d) {
+						YAHOO.util.Dom.addClass(actions.cut.ref, 'enabled');
+					} else {
+						YAHOO.util.Dom.removeClass(actions.cut.ref, 'enabled');
+					}
+
+					if (filesSelected && permissions.r) {
+						YAHOO.util.Dom.addClass(actions.copy.ref, 'enabled');
+					} else {
+						YAHOO.util.Dom.removeClass(actions.copy.ref, 'enabled');
+					}
+
+					// delete is weird... you need ldw and either r or i
+					if (filesSelected && permissions.d && (permissions.r || permissions.i) && permissions.w) {
+						YAHOO.util.Dom.addClass(actions.del.ref, 'enabled');
+					} else {
+						YAHOO.util.Dom.removeClass(actions.del.ref, 'enabled');
+					}
+
+					if (filesSelected && numSelected < 2 && permissions.r && permissions.i && permissions.d) {
+						YAHOO.util.Dom.addClass(actions.rename.ref, 'enabled');
+					} else {
+						YAHOO.util.Dom.removeClass(actions.rename.ref, 'enabled');
+					}
+
+					// set permissions for folder
+					/*if ( itemInfo.numSel == 1 && files[ itemInfo.lastId ].type == folderMime ) {
+					setInspControl( 'permsCtrl', 'permsCtrl_cmd()',
+					'Set Permissions for Folder' );
+					} else {
+					setInspControl( 'permsCtrl', '', 'Set Permissions for Folder' );
+					}*/
+				};
+				
+				return {
+					init: function(crntDir) {
+						currentDir = crntDir;
+						update();
+					},
+
+					update:update,
+					//evnt:evnt,
+					//clearSelection:clearSelection
+				}
+				
+			}
+			
+			YAHOO.util.Event.addListener(window, "load", function() {
+							
+				var dirList = new FD.DirList(),
+				dirTable = dirList.init(),
+				inspector = new FD.FileInspector(),
+				infoBar = new FD.InfoBar();
+				
+				dirTable.subscribe('rowSelectEvent', inspector.update);
+				dirTable.subscribe('rowUnselectEvent', inspector.update);
+				dirTable.subscribe('initEvent', inspector.update);
+				
+			});
+			
+
+		</script>
+	</head>
+	<body class="yui-skin-sam">
+	<div id="head">
+		<h1>Filedrawers</h1>
+		<ul>
+			<li><a href="#" class="active">Home</a></li>
+			<li><a href="/make-webspace/">Web Sites</a></li>
+			<li><a href="/help.php">Help</a></li>
+			<li><a href="/cgi-bin/logout?http://mfile.umich.edu/">Logout</a></li>
+		</ul>
+		<div class="clear">&nbsp;</div>
+	</div>
+	<div id="infoBar">
+		<ul id="infoMenu">
+			<li>Download</li>
+			<li><a href="..">Go Up &uarr;</a></li>
+			<li><a href=".">Refresh</a></li>
+		</ul>
+		<div id="notifyArea"> Location:
+			<form id="changeDirForm">
+				<p>Current directory info goes here</p>
+			</form>
+		</div>
+		<div class="clear">&nbsp;</div>
+	</div>
+	<div id="sidebar">
+		<div id="inspector">
+			<h3>Folder Properties</h3>
+			<div id="selectedItem" style="background-image: url('/images/folder.gif');"></div>
+			<h4>Actions</h4>
+			<ul id="actionList">
+				<li><a href="#upload">Upload File(s)</a></li>
+				<li><a href="#cut">Cut Selected Item(s)</a></li>
+				<li><a href="#copy">Copy Selected Item(s)</a></li>
+				<li><a href="#paste">Paste to This Folder</a></li>
+				<li><a href="#del">Delete Selected Item(s)</a></li>
+				<li><a href="#createFolder" class="expandable">Create a New Folder</a></li>
+				<li><a href="#rename">Rename Selected Item</a></li>
+				<li><a href="#permissions">Set Permissions for Folder</a></li>
+				<li><a href="#favorites" class="global expandable">Favorite Locations</a></li>
+			</ul>
+			<div id="itemInfo"></div>
+			<h4>View Options</h4>
+			<ul>
+				<li><a href="#showHidden" class="global">Show Hidden Files</a></li>
+			</ul>
+		</div>
+		<div id="version"> filedrawers version: insert version number</div>
+	</div>
+	<div id="content">
+		<div id="fileList"></div>
+	</div>
+	<div id="favorites" class="expandItem">
+		<div class="hd"> <a href="#close">[X]</a>
+			<h2>My Favorite Locations</h2>
+		</div>
+		<div class="bd">
+			<div id="favMenu"><a href="#viewFav" class="sel">View</a> | <a href="#addFav">Add</a> | <a href="#editFav">Edit</a></div>
+			<div id="viewFav">
+				<p>Go to a favorite location:</p>
+				<div class="tabContent">&nbsp;</div>
+			</div>
+			<form action="#" method="post" name="addFav" id="addFav">
+				<p>Enter a name and click 'Add' to add the current location to your favorites.</p>
+				<input type="text" name="selectedItems" size="18" />
+				<p align="center">
+					<input type="hidden" name="formKey" value="c0c17487e741591fdcad1e95aa43d2ad" />
+					<input type="submit" name="command" value="Add" />
+				</p>
+			</form>
+			<form action="#" method="post" name="editFav" id="editFav">
+				<div class="tabContent">&nbsp;</div>
+				<p align="center">
+					<input type="hidden" name="formKey" value="c0c17487e741591fdcad1e95aa43d2ad" />
+					<input type="submit" name="command" value="Save" />
+				</p>
+			</form>
+		</div>
+	</div>
+	<div id="permissions" class="expandItem">
+		<div class="hd"> <a href="#close">[X]</a>
+			<h2>Permissions Manager</h2>
+		</div>
+		<div class="bd">
+			<form name="acl" id="acl" method="post" action="#">
+				<input type="hidden" name="formKey" value="c0c17487e741591fdcad1e95aa43d2ad">
+				<div id="permissionsBox">
+					<table>
+						<thead>
+							<tr>
+								<th width="185px">Normal Rights for $DIRECTORY</th>
+								<th>lookup</th>
+								<th>read</th>
+								<th>write</th>
+								<th>insert</th>
+								<th>delete</th>
+								<th>lock</th>
+								<th>admin</th>
+							</tr>
+						</thead>
+						<tbody>
+							<tr>
+								<td>sample pts group 1
+									<input type="hidden" name="nrm[umweb:servers][]" value=" " /></td>
+								<td><input type="checkbox" name="nrm[umweb:servers][]" value="l" checked="checked" /></td>
+								<td><input type="checkbox" name="nrm[umweb:servers][]" value="r" /></td>
+								<td><input type="checkbox" name="nrm[umweb:servers][]" value="w" /></td>
+								<td><input type="checkbox" name="nrm[umweb:servers][]" value="i" /></td>
+								<td><input type="checkbox" name="nrm[umweb:servers][]" value="d" /></td>
+								<td><input type="checkbox" name="nrm[umweb:servers][]" value="k" /></td>
+								<td><input type="checkbox" name="nrm[umweb:servers][]" value="a" /></td>
+							</tr>
+							<tr>
+								<td>sample pts group 2
+									<input type="hidden" name="nrm[system:anyuser][]" value=" " /></td>
+								<td><input type="checkbox" name="nrm[system:anyuser][]" value="l" checked="checked" /></td>
+								<td><input type="checkbox" name="nrm[system:anyuser][]" value="r" /></td>
+								<td><input type="checkbox" name="nrm[system:anyuser][]" value="w" /></td>
+								<td><input type="checkbox" name="nrm[system:anyuser][]" value="i" /></td>
+								<td><input type="checkbox" name="nrm[system:anyuser][]" value="d" /></td>
+								<td><input type="checkbox" name="nrm[system:anyuser][]" value="k" /></td>
+								<td><input type="checkbox" name="nrm[system:anyuser][]" value="a" /></td>
+							</tr>
+							<tr>
+								<td>joshfiel
+									<input type="hidden" name="nrm[joshfiel][]" value=" " /></td>
+								<td><input type="checkbox" name="nrm[joshfiel][]" value="l" /></td>
+								<td><input type="checkbox" name="nrm[joshfiel][]" value="r" /></td>
+								<td><input type="checkbox" name="nrm[joshfiel][]" value="w" /></td>
+								<td><input type="checkbox" name="nrm[joshfiel][]" value="i" /></td>
+								<td><input type="checkbox" name="nrm[joshfiel][]" value="d" /></td>
+								<td><input type="checkbox" name="nrm[joshfiel][]" value="k" /></td>
+								<td><input type="checkbox" name="nrm[joshfiel][]" value="a" checked="checked" /></td>
+							</tr>
+							<tr>
+								<td><input type="text" name="nrm_add_name" length="40" maxlength="40" value="" /></td>
+								<td><input type="checkbox" name="nrm[nrm_add][]" value="l" /></td>
+								<td><input type="checkbox" name="nrm[nrm_add][]" value="r" /></td>
+								<td><input type="checkbox" name="nrm[nrm_add][]" value="w" /></td>
+								<td><input type="checkbox" name="nrm[nrm_add][]" value="i" /></td>
+								<td><input type="checkbox" name="nrm[nrm_add][]" value="d" /></td>
+								<td><input type="checkbox" name="nrm[nrm_add][]" value="k" /></td>
+								<td><input type="checkbox" name="nrm[nrm_add][]" value="a" /></td>
+							</tr>
+						</tbody>
+						<thead>
+							<tr>
+								<th width="185px">Negative Rights for
+									AAAtest8</th>
+								<th>lookup</th>
+								<th>read</th>
+								<th>write</th>
+								<th>insert</th>
+								<th>delete</th>
+								<th>lock</th>
+								<th>admin</th>
+							</tr>
+						</thead>
+						<tbody>
+							<tr>
+								<td><input type="text" name="neg_add_name" length="40" maxlength="40" value="" /></td>
+								<td><input type="checkbox" name="neg[neg_add][]" value="l" /></td>
+								<td><input type="checkbox" name="neg[neg_add][]" value="r" /></td>
+								<td><input type="checkbox" name="neg[neg_add][]" value="w" /></td>
+								<td><input type="checkbox" name="neg[neg_add][]" value="i" /></td>
+								<td><input type="checkbox" name="neg[neg_add][]" value="d" /></td>
+								<td><input type="checkbox" name="neg[neg_add][]" value="k" /></td>
+								<td><input type="checkbox" name="neg[neg_add][]" value="a" /></td>
+							</tr>
+						</tbody>
+					</table>
+				</div>
+				<input name="save" type="submit" class="saveButton" value="Save Permissions" />
+			</form>
+		</div>
+	</div>
+	<form id="newFolder" class="expandItem">
+		<div class="hd"> <a href="#close">[X]</a>
+			<h2>Create a New Folder</h2>
+		</div>
+		<div class="bd"> <img src="/images/mime/small/folder.gif" width="16" height="16" alt="" />
+			<input type="text" name="folderName" id="newFold" size="34" value="Please enter a name for your new folder." />
+			<input type="submit" name="save" value="Create" />
+		</div>
+	</form>
+	<form name="upload2" id="upload" class="expandItem" style="display: none;" enctype="multipart/form-data" action="/mfile-bin/upload.cgi" method="post">
+		<div class="titlebar"> <a href="javascript:closeItem('uploadCtrl','upload');document.getElementById('upload').reset();">[X]</a>
+			<h2>Upload Files to AFS</h2>
+		</div>
+		<input type="hidden" name="sessionid" id="sessionid" value="" />
+		<input type="hidden" name="path" id="uploadpath" value="" />
+		<input type="hidden" name="returnToURI" id="returnToURI" value="" />
+		<input type="hidden" name="overwrite_file" id="overwrite_file" value="" />
+		<ul>
+			<li id="file1">
+				<input type="file" name="file" />
+				<p><a href="javascript:toggleDisplay('file2');">Add Another File</a></p>
+			</li>
+		</ul>
+		<div class="uploadctrl" id="uploadctrl"> Overwrite files during upload?
+			<input type="checkbox" name="overwrite_box" id="overwrite_box" onclick="processClobberCheckbox();" />
+			<input type="button" name="upload" value="Upload File(s)" onclick="uploadloopcnt=0; ajaxupload();" />
+			&nbsp;&nbsp; </div>
+		<div id="lbtop">
+			<div id="lbinner"></div>
+			<table width="100%">
+				<tr>
+					<td id="fileinfo"></td>
+					<td align="right" id="lbpercent"></td>
+				</tr>
+			</table>
+		</div>
+	</form>
+
+
+
+	</body>
+</html>
+		
