@@ -1,92 +1,162 @@
+<style type="text/css">
+#content {
+    margin-right: 225px;
+}
+
+.documentation {
+    margin: 1em;
+    border: 1px solid #AAA;
+    padding: 1em;
+}
+
+.documentation h2 {
+    font-weight: bold;
+}
+
+.documentation h3 {
+    margin: .7em 0 .1em 1em ;
+}
+
+.documentation p {
+    margin: .7em 0 .1em 2em ;
+}
+
+.documentation ul li {
+    margin-left: 3em;
+}
+
+.documentation ul.examples li {
+    white-space: pre-wrap;
+    font-family: monospace;
+
+}
+
+.documentation pre {
+    margin: 1em 3em;
+    border: 1px solid #ccc;
+    padding: .5em;
+    background: #eee;
+}
+
+</style>
+
 <div id="content">
-	<h2>Listing Files</h2>
-	<br/>
-	<h3>Arguments</h3>
-	<ul>
-		<li>path: The path to the directory to be listed</li>
-		<li>xml or json: The format of the output</li>
-		<li>friendly: Converty bytes and dates into human readable formats</li>
-		<li>offset: How many files to skip before starting the list</li>
-		<li>limit: How many total files to return maximum</li>
+
+<div class="documentation">
+<h2>Listing Files</h2>
+    <h3>Arguments</h3>
+	<ul class="arguements">
+            <li>path: The path to the directory to be listed</li>
+            <li>xml or json: The format of the output</li>
+            <li>friendly: Converty bytes and dates into human readable formats</li>
+            <li>offset: How many files to skip before starting the list</li>
+            <li>limit: How many total files to return maximum</li>
 	</ul>
-	<br/>
-	<h3>Examples</h3>
-	<br/>
-	<ul>
-		<li>webservices/list/?format=json&amp;path=/path/to/directory&amp;limit=3&amp;offset=3</li>
-		<li>webservices/list/?format=xml&amp;path=/path/to/directory&amp;offset=3&amp;friendly</li>
+    <h3>Examples</h3>
+	<ul class="examples">
+            <li>webservices/list/?format=json&amp;path=/path/to/directory&amp;limit=3&amp;offset=3</li>
+            <li>webservices/list/?format=xml&amp;path=/path/to/directory&amp;offset=3&amp;friendly</li>
 	</ul>
-	<br/>
-	<h2>Downloading Files</h2>
-	<br/>
-	<h3>Arguments</h3>
-	<ul>
-		<li>path: The path to the desired file</li>
+</div> <!-- .documentation -->
+
+<div class="documentation">
+<h2>Downloading Files</h2>
+    <h3>Arguments</h3>
+	<ul class="arguements">
+            <li>path: The path to the desired file</li>
 	</ul>
-	<br/>
-	<h3>Example</h3>
-	<pre>
-		webservices/download/?path=/path/to/file
-	</pre>
-	<br/>
-	<h2>Renaming files</h2>
-	<p>
-	<h3>Arguments</h3>
-	<ul>
-		<li>path: The path that the subject file is in</li>
-		<li>xml or json: The format of the output</li>
-		<li>oldName: A POST variable to use for the old name of the file, excluding the path.</li>
-		<li>newName: A POST variable to use for the new name of the file, excluding the path.</li>
+    <h3>Example</h3>
+	<ul class="examples">
+            <li>webservices/download/?path=/path/to/file</li>
 	</ul>
-	<br/>
-	Construct a POST to a url like this:
-	</p>
-	<pre>
-    	webservices/rename/?format=json&amp;path=/path/to/file
-    </pre>
-	<p> Include two POST arguments for old and new file names:
-	<pre>
-        oldName
-        newName
-    </pre>
-	</p>
-	<h2>Deleting files</h2>
-	<p>
-	<h3>Arguments</h3>
-	<ul>
-		<li>path: The path that the subject file is in</li>
-		<li>xml or json: The format of the output</li>
-		<li>files: A POST variable to hold filenames, excluding the path. It can be a single file, or an array of values.</li>
+</div> <!-- .documentation -->
+
+<div class="documentation">
+<h2>Creating Folders</h2>
+    <h3>Arguments</h3>
+	<ul class="arguements">
+            <li>path: The path in which to create the new folder</li>
+            <li>folderName: The desired name of the new folder</li>
 	</ul>
-	<br/>
-	Construct a POST to a url like this:
-	</p>
-	<pre>
-    	webservices/delete/?format=json&amp;path=/path/to/file
-    </pre>
-	<p> Include one POST argument for the file names:
-	<pre>
-        files
-    </pre>
-	An html example of constructing a file input for posting:
-	<pre>
-     &lt;input type="text" name="files" value="file1.jpg"/&gt;
+    <h3>Usage</h3>
+    <p>Construct a POST to a url like this:</p>
+        <ul class="examples">
+    	    <li>webservices/mkdir/?format=json&amp;path=/path/to/file</li>
+        </ul>
+    <p>Include a POST argument for the new folder name:</p>
+        <ul class="examples">
+    	    <li>folderName</li>
+        </ul>
+    <h3>Example</h3>
+        <ul class="examples">
+            <li>webservices/mkdir/?path=/path/to/existing/folder&amp;folderName=new_folder_name</li>
+        </ul>
+</div> <!-- .documentation -->
+
+<div class="documentation">
+<h2>Renaming files</h2>
+    <h3>Arguments</h3>
+        <ul>
+            <li>path: The path that the subject file is in</li>
+            <li>xml or json: The format of the output</li>
+            <li>oldName: A POST variable to use for the old name of the file, excluding the path.</li>
+            <li>newName: A POST variable to use for the new name of the file, excluding the path.</li>
+	</ul>
+
+    <h3>Usage</h3>
+    <p>Construct a POST to a url like this:</p>
+        <ul class="examples">
+    	    <li>webservices/rename/?format=json&amp;path=/path/to/file</li>
+    <p>Include two POST arguments for old and new file names:</p>
+	</ul>
+        <ul class="examples">
+        <li>oldName</li>
+        <li>newName</li>
+	</ul>
+</div> <!-- .documentation -->
+
+<div class="documentation">
+<h2>Deleting files</h2>
+    <h3>Arguments</h3>
+	<ul class="arguements">
+            <li>path: The path that the subject file is in</li>
+            <li>xml or json: The format of the output</li>
+            <li>files: A POST variable to hold filenames, excluding the path. It can be a single file, or an array of values.</li>
+	</ul>
+
+    <h3>Usage</h3>
+	<p>Construct a POST to a url like this:</p>
+	<ul class="examples">
+            <li>webservices/delete/?format=json&amp;path=/path/to/file</li>
+        </ul>
+	<p>Include one POST argument for the file names:</p>
+	<ul class="examples">
+            <li>files</li>
+        </ul>
+
+    <h3>Example</h3>
+	<p>An html example of constructing a file input for posting:</p>
+	<ul class="examples">
+             <li>&lt;input type="text" name="files" value="file1.jpg"/&gt;</li>
+        </ul>
         
-        or 
+        <p>or</p>
 
-     &lt;input type="text" name="files[]" value="file1.jpg"/&gt;
-     &lt;input type="text" name="files[]" value="file2.jpg"/&gt;
+	<ul class="examples">
+             <li>&lt;input type="text" name="files[]" value="file1.jpg"/&gt;</li>
+         <li>&lt;input type="text" name="files[]" value="file2.jpg"/&gt;</li>
 
-    </pre>
-	<h2>Errors Messages</h2>
-	<h3>Examples</h3>
-	<pre>
-		{"errorMsg":"Message Text Here"}
-	</pre>
-	<br/>
+        </ul>
+</div> <!-- .documentation -->
+
+<div class="documentation">
+<h2>Errors Messages</h2>
+    <h3>Examples</h3>
+	<pre>{"errorMsg":"Message Text Here"}</pre>
 	<pre>
 &lt;results&gt;
   &lt;errorMsg&gt;Message Text Here&lt;/errorMsg&gt;
 &lt;/results&gt;
 </pre>
-</div>
+</div> <!-- .documentation -->
+</div> <!-- .content -->
