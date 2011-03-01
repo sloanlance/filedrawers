@@ -18,7 +18,8 @@
 		<script type="text/javascript">
 		
 			var myJSONdata,
-			myPerms;
+			myPerms,
+			homeURL;
 		
 			if (typeof FD == "undefined" || ! FD) {
 				var FD = {};
@@ -31,6 +32,8 @@
 			}
 			
 			FD.DirList = function() {	
+			
+				var showHidden = false;
 					
 				formatDate = function(elCell, oRecord, oColumn, oData) {
 					var oDate = new Date(oData*1000);
@@ -87,6 +90,27 @@
 					/*{key:"mimeType", sortable:true, resizeable:true}*/
 				];
 				
+				var hiddenFileFilter = function (req, raw, res, cb) {
+		
+					var data     = res.results || [],
+					filtered = [],
+					i,
+					l;
+
+					if (showHidden) {
+						return res;
+					}
+
+					for (i = 0, l = data.length; i < l; ++i) {
+						if (data[i].filename.indexOf('.') !== 0) {
+							filtered.push(data[i]);
+						}
+					}
+					
+					res.results = filtered;
+					return res;
+				};
+				
 				return {
 					init: function() {
 				
@@ -95,11 +119,14 @@
 						myDataSource.responseSchema = {
 							resultsList: "contents",
 							fields: ["type","filename","modTime","size","mimeImage","perms","mimeType"]
-						};	
+						};
+
+						myDataSource.doBeforeCallback = hiddenFileFilter;
 								
 						myDataSource.subscribe('responseEvent', function(oDS){  // triggered by data return
 							myJSONdata = YAHOO.lang.JSON.parse(oDS.response.responseText);
-							//alert(YAHOO.lang.dump(myJSONdata.path));
+							homeURL = YAHOO.lang.dump(myJSONdata.path);
+							//alert(homeURL);
 							myPerms = YAHOO.lang.dump(myJSONdata.contents[0].perms);
 							
 							var currentDir,
@@ -116,6 +143,41 @@
 						dirTable.subscribe('checkboxClickEvent', handleFileSelection);
 						
 						return dirTable;
+					},
+					
+					toggleHiddenFilter: function(e, action) {
+					
+						//alert("toggleHiddenFilter function entered");
+				
+						if (action != 'showHidden') {
+							return;
+						}
+
+						var tableState = dirTable.getState();
+
+						showHidden = ! showHidden;
+						
+
+						var l = document.getElementById( 'hidnFilesCtrl' );
+							if ( showHidden ) {
+							var t = document.createTextNode( 'Hide Hidden Files' );
+							l.replaceChild( t, l.firstChild );
+						} else {
+							var t = document.createTextNode( 'Show Hidden Files' );
+							l.replaceChild( t, l.firstChild );
+						}
+
+
+
+						myDataSource.sendRequest(null, dirTable.onDataReturnInitializeTable, dirTable);
+						
+						/*						
+						myDataSource.sendRequest(showHidden,{
+							success  : dirTable.onDataReturnInitializeTable,
+							failure  : dirTable.onDataReturnInitializeTable,
+							scope    : dirTable,
+							argument : tableState
+						});*/
 					}
 										
 					/*
@@ -204,6 +266,7 @@
 				var currentDir,
 				actions = {},
 				temp = YAHOO.util.Dom.get('actionList'),
+				evnt = new YAHOO.util.CustomEvent("Inspector Event"),
 				links = temp.getElementsByTagName('a'),
 				i;
 				
@@ -321,6 +384,27 @@
 					}*/
 				};
 				
+				var handleClick = function(e) {
+				
+					//alert("handleClick entered");
+	
+					var target = YAHOO.util.Event.getTarget(e);
+
+					if (target.href) {
+						YAHOO.util.Event.preventDefault(e);
+						var action = target.hash.match(/#(.*)$/);
+
+						if (YAHOO.util.Dom.hasClass(target, 'expandable')) {
+							YAHOO.util.Dom.addClass(target, 'inspSelected');
+						}
+
+					evnt.fire(action[1]);
+					
+					}
+				};
+				
+				YAHOO.util.Event.on('inspector', 'click', handleClick);
+				
 				return {
 					init: function(crntDir) {
 						currentDir = crntDir;
@@ -328,7 +412,7 @@
 					},
 
 					update:update,
-					//evnt:evnt,
+					evnt:evnt
 					//clearSelection:clearSelection
 				}
 				
@@ -340,6 +424,8 @@
 				dirTable = dirList.init(),
 				inspector = new FD.FileInspector(),
 				infoBar = new FD.InfoBar();
+				
+				inspector.evnt.subscribe(dirList.toggleHiddenFilter);
 				
 				dirTable.subscribe('rowSelectEvent', inspector.update);
 				dirTable.subscribe('rowUnselectEvent', inspector.update);
@@ -393,7 +479,7 @@
 			<div id="itemInfo"></div>
 			<h4>View Options</h4>
 			<ul>
-				<li><a href="#showHidden" class="global">Show Hidden Files</a></li>
+				<li><a href="#showHidden" class="global" id="hidnFilesCtrl">Show Hidden Files</a></li>
 			</ul>
 		</div>
 		<div id="version"> filedrawers version: insert version number</div>
