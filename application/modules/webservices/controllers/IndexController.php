@@ -17,6 +17,8 @@ class Webservices_IndexController extends Zend_Controller_Action {
         'rename' => array('xml', 'json', 'html'),
         'delete' => array('xml', 'json', 'html'),
         'move' => array('xml', 'json', 'html'),
+        'duplicate' => array('xml', 'json', 'html'),
+        'copy' => array('xml', 'json', 'html'),
         'mkdir' => array('xml', 'json', 'html'),
         'gettoken' => array('xml', 'json', 'html'),
         'uploadstatus' => array('xml', 'json', 'html'),
@@ -243,6 +245,78 @@ class Webservices_IndexController extends Zend_Controller_Action {
         $this->_filesystem->move($values['files'], $input->path, $values['toPath']);
         $this->view->status = 'success';
         $this->view->message = 'Successfully moved the files(s) or folder(s).';
+    }
+
+
+    public function duplicateAction()
+    {
+        $this->_form = new Form_DuplicateForm($this->_csrfToken,
+            $this->_request->getParam('path'));
+
+        if ( ! $this->getRequest()->isPost()) {
+            return;
+        }
+        else if ( ! $this->_form->isValid($_POST)) {
+            $this->view->errorMsg = $this->_form->getMessages(null, true);
+            return;
+        }
+
+        $values = $this->_form->getValidValues($_POST);
+
+        $oldPath = $values['path'] . '/' . $values['originName'];
+        $newPath = $values['path'] . '/' . $values['newName'];
+        $this->_filesystem->duplicate($oldPath, $newPath);
+
+        $this->view->status = 'success';
+        $this->view->message = 'Successfully duplicated the file or directory.';
+    }
+
+
+    public function copyAction()
+    {
+        $validators = array(
+            'path'     => array(
+                array(
+                    'FilePath', array(
+                        'type' => 'dir',
+                        'readable' => 'true'
+                     )
+                ), 'presence' => 'required')
+        );
+
+        $options = array(
+            'inputNamespace' => 'Filedrawers_Validate',
+            'missingMessage' => 'You must specify an origin path in the URL before copying files or folders.'
+        );
+
+        $input = new Zend_Filter_Input($this->_baseFilter, $validators, $_GET, $options);
+
+        if ( ! $input->isValid('path')) {
+            $this->view->errorMsg = $input->getMessages();
+            return;
+        }
+
+        $this->_filesystem->addListHelper(array($this, 'filterByFileName'));
+        $files = $this->_filesystem->listDirectory($input->path, true);
+        $this->_form = new Form_CopyForm(
+            $this->_csrfToken,
+            $files['contents'],
+            $input->path
+        );
+
+        if ( ! $this->getRequest()->isPost()) {
+            return;
+        }
+        else if ( ! $this->_form->isValid($_POST)) {
+            $this->view->errorMsg = $this->_form->getMessages(null, true);
+            return;
+        }
+
+        $values = $this->_form->getValidValues($_POST);
+        
+        $this->_filesystem->copy($values['files'], $input->path, $values['toPath']);
+        $this->view->status = 'success';
+        $this->view->message = 'Successfully copied the files(s) or folder(s).';
     }
 
 

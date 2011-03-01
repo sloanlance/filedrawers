@@ -165,6 +165,20 @@ abstract class Filedrawers_Filesystem {
     }
 
 
+    public function duplicate($oldPath, $newPath)
+    {
+        if ( filetype( $oldPath ) == 'dir' ) {
+            if ( !$this->_copyDirectory( $oldPath, $newPath )) {
+                chdir($this->startCWD);
+                throw new Filedrawers_Filesystem_Exception(sprintf('Unable to copy directory "%s"', $oldPath), 5);
+            }
+        } else if ( !$this->_copyFiles( $oldPath, $newPath )) {
+            chdir($this->startCWD);
+            throw new Filedrawers_Filesystem_Exception(sprintf('Unable to copy file "%s"', $oldPath), 5);
+        }
+    }
+
+
     public function copy($files, $fromPath, $toPath)
     {
         $files = (array) $files;
@@ -178,14 +192,10 @@ abstract class Filedrawers_Filesystem {
             $from = $fromPath . '/' . $file;
             $to   = $toPath . '/' . $file;
 
-            if ( filetype( $sourcePath ) == 'dir' ) {
-                if ( ! $this->_copyDirectory( $from, $to )) {
-                    chdir($this->startCWD);
-                    throw new Filedrawers_Filesystem_Exception(sprintf('Unable to copy "%s"', $file), 5);
-                }
-            } else if ( !$this->_copyFiles( $from, $to )) {
-                chdir($this->startCWD);
-                throw new Filedrawers_Filesystem_Exception(sprintf('Unable to copy "%s"', $file), 5);
+            try {
+                $this->duplicate($from, $to);
+            } catch (FileDrawers_Filesystem_Exception $e) {
+                throw new FileDrawers_Filesystem_Exception(sprintf('Unable to copy "%S"', $file), 5);
             }
         }
     }
