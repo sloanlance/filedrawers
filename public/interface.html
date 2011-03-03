@@ -19,7 +19,9 @@
 		
 			var myJSONdata,
 			myPerms,
-			homeURL;
+			homeURL,
+			currentURL,
+			baseUrl = '';
 		
 			if (typeof FD == "undefined" || ! FD) {
 				var FD = {};
@@ -62,9 +64,18 @@
 					elCell.innerHTML = str;
 				}
 				
-				formatType = function(elCell, oRecord, oColumn, sData) {
-					var baseUrl = '';
+				formatType = function(elCell, oRecord, oColumn, sData) {					
 					elCell.innerHTML = '<img src="' + baseUrl + 'images/mime/small/' + sData + '.gif" />';
+				};
+				
+				formatURL = function(elCell, oRecord, oColumn, sData) {	
+					// this works for files.  add code to handle folders.
+					
+					if (oRecord.getData("type") == "dir") {
+						elCell.innerHTML = '<a id="folderLink">' + sData + '</a>';
+					} else {
+						elCell.innerHTML = '<a href="webservices/download/?path=' + currentURL + '/' + sData + '">' + sData + '</a>';
+					}
 				};
 				
 				handleFileSelection = function(oArgs) {
@@ -77,17 +88,25 @@
 						var row = this.getTrEl(elCheckbox);
 						this.unselectRow(row);
 					}
-				}
+				};
+				
+				handleTableClick = function(oArgs) {
+								
+					if (oArgs.target.id == "folderLink") {
+						myDataSource.sendRequest("list/?format=json&path=" + currentURL + "/" + oArgs.target.innerHTML, dirTable.onDataReturnInitializeTable, dirTable);
+					}		
+					
+				};
 				
 				var myColumnDefs = [
 					{key:"checked",label:"", width:"30", formatter:YAHOO.widget.DataTable.formatCheckbox},
-					/*{key:"type", sortable:true, resizeable:true},*/
-					{key:"filename", label:"Name", sortable:true, resizeable:true},
+					{key:"type", sortable:true, resizeable:true},
+					{key:"filename", label:"Name", formatter:formatURL, sortable:true, resizeable:true},
 					{key:"modTime", label:"Last Modified", formatter:formatDate, sortable:true, sortOptions:{defaultDir:YAHOO.widget.DataTable.CLASS_DESC}},
 					{key:"size", label:"Size", formatter:formatBytes, sortable:true, resizeable:true},
 					{key:"mimeImage", label:"Type", formatter:formatType, sortable:true, resizeable:true},
 					//{key:"perms", sortable:true, resizeable:true},
-					/*{key:"mimeType", sortable:true, resizeable:true}*/
+					{key:"mimeType", sortable:true, resizeable:true}
 				];
 				
 				var hiddenFileFilter = function (req, raw, res, cb) {
@@ -114,7 +133,7 @@
 				return {
 					init: function() {
 				
-						myDataSource = new YAHOO.util.DataSource("webservices/list/?format=json");  // first call
+						myDataSource = new YAHOO.util.DataSource("webservices/");  // first call
 						myDataSource.responseType = YAHOO.util.DataSource.TYPE_JSON; 
 						myDataSource.responseSchema = {
 							resultsList: "contents",
@@ -125,8 +144,12 @@
 								
 						myDataSource.subscribe('responseEvent', function(oDS){  // triggered by data return
 							myJSONdata = YAHOO.lang.JSON.parse(oDS.response.responseText);
-							homeURL = YAHOO.lang.dump(myJSONdata.path);
-							//alert(homeURL);
+							currentURL = YAHOO.lang.dump(myJSONdata.path);
+							
+							if (!homeURL) {
+								homeURL = currentURL;
+							}
+							
 							myPerms = YAHOO.lang.dump(myJSONdata.contents[0].perms);
 							
 							var currentDir,
@@ -138,16 +161,15 @@
 						}
 						);				
 								
-						dirTable = new YAHOO.widget.DataTable("content", myColumnDefs, myDataSource);
+						dirTable = new YAHOO.widget.DataTable("content", myColumnDefs, myDataSource, {initialRequest:"list/?format=json"});
 						
 						dirTable.subscribe('checkboxClickEvent', handleFileSelection);
+						dirTable.subscribe('click', handleTableClick);
 						
 						return dirTable;
 					},
 					
 					toggleHiddenFilter: function(e, action) {
-					
-						//alert("toggleHiddenFilter function entered");
 				
 						if (action != 'showHidden') {
 							return;
@@ -169,7 +191,7 @@
 
 
 
-						myDataSource.sendRequest(null, dirTable.onDataReturnInitializeTable, dirTable);
+						myDataSource.sendRequest("list/?format=json", dirTable.onDataReturnInitializeTable, dirTable);
 						
 						/*						
 						myDataSource.sendRequest(showHidden,{
@@ -228,6 +250,8 @@
 					}
 
 					YAHOO.util.Event.preventDefault(e);
+					
+					alert(target.value);
 
 					if (target.value == 'Change') {
 						changeDirForm.innerHTML =
@@ -246,9 +270,15 @@
 				var handleSubmit = function(e) {
 					YAHOO.util.Event.preventDefault(e);
 				};
+				
+				var locationClick = function(e) {
+					alert("location clicked");
+				}
 
 				YAHOO.util.Event.on('infoBar', 'click', handleClick);
 				YAHOO.util.Event.on('changeDirForm', 'submit', handleSubmit);
+				
+				YAHOO.util.Event.on('notifyArea', 'click', locationClick);
 
 				var kl = new YAHOO.util.KeyListener(document, {keys:13}, {fn:function(){alert('enter');}});
 
@@ -385,8 +415,6 @@
 				};
 				
 				var handleClick = function(e) {
-				
-					//alert("handleClick entered");
 	
 					var target = YAHOO.util.Event.getTarget(e);
 
@@ -431,6 +459,11 @@
 				dirTable.subscribe('rowUnselectEvent', inspector.update);
 				dirTable.subscribe('initEvent', inspector.update);
 				
+				YAHOO.util.Event.on('homeBtn', 'click', function() {
+					//alert(homeURL);
+					myDataSource.sendRequest("list/?format=json", dirTable.onDataReturnInitializeTable, dirTable);
+				});
+								
 			});
 			
 
@@ -440,7 +473,7 @@
 	<div id="head">
 		<h1>Filedrawers</h1>
 		<ul>
-			<li><a href="#" class="active">Home</a></li>
+			<li><a href="#" class="active" id="homeBtn">Home</a></li>
 			<li><a href="/make-webspace/">Web Sites</a></li>
 			<li><a href="/help.php">Help</a></li>
 			<li><a href="/cgi-bin/logout?http://mfile.umich.edu/">Logout</a></li>
