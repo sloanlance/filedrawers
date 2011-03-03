@@ -60,7 +60,7 @@ class Filedrawers_Filetransfer {
         $name = str_replace('"', '\"', $this->_filename);
 
         header('Content-Description: File Transfer');
-        header("Content-Disposition: attachment; filename=$name;");
+        header("Content-Disposition: attachment; filename=\"$name\";");
         header('Content-Type: application/force-download' );
         header("Last-Modified: " . date('D, m M Y H:i:s O', $this->_stats['mtime']));
 
