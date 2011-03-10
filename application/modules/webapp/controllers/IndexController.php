@@ -32,6 +32,7 @@ class IndexController extends Zend_Controller_Action
             $path = $this->_filesystem->getHomeDir();
         }
 
+        /*
         $uploadForm = new Form_UploadForm();
         $uri = $uploadForm->getElement('returnToURI');
         $sid = $uploadForm->getElement('sessionid');
@@ -42,6 +43,7 @@ class IndexController extends Zend_Controller_Action
         $formPath->setValue($path);
 
         $this->view->uploadForm = $uploadForm;
+         */
 
         $this->view->path  = $path;
         $this->view->files = $this->_filesystem->listDirectory($path);

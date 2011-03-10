@@ -47,7 +47,7 @@ class Bootstrap extends Zend_Application_Bootstrap_Bootstrap
     {
         $router = Zend_Controller_Front::getInstance()->getRouter();
 
-        /*$home = new Zend_Controller_Router_Route_Static(
+        $home = new Zend_Controller_Router_Route_Static(
             '',
             array(
                 'controller' => 'index',
@@ -69,6 +69,7 @@ class Bootstrap extends Zend_Application_Bootstrap_Bootstrap
         );
 
 
+        /*
         $finishUpload = new Zend_Controller_Router_Route_Regex(
             'finish/([a-f0-9]*)(.*)',
             array(
@@ -80,7 +81,8 @@ class Bootstrap extends Zend_Application_Bootstrap_Bootstrap
                 1 => 'finishID',
                 2 => 'path'
             ),"finish/%s%s"
-        );*/
+        );
+         */
 
 
         // Since the application only handles the webservice for now, I'm 
@@ -112,7 +114,7 @@ class Bootstrap extends Zend_Application_Bootstrap_Bootstrap
         );*/
 
         //$router->addRoute('home', $home);
-        //$router->addRoute('list', $list);
+        $router->addRoute('list', $list);
         //$router->addRoute('finishUpload', $finishUpload);
         $router->addRoute('webservice', $webservice);
         //$router->addRoute('favorites', $favorites);
