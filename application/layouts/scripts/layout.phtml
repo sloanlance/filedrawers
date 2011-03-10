@@ -4,6 +4,8 @@
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 <?php
 	$this->headLink()->appendStylesheet($this->baseUrl('/css/filedrawers.css'));
+        $this->headLink()->appendStylesheet('http://yui.yahooapis.com/2.8.0r4/build/logger/assets/skins/sam/logger.css');
+        $this->headLink()->appendStylesheet('http://yui.yahooapis.com/2.8.0r4/build/datatable/assets/skins/sam/datatable.css');
 	$this->headTitle($this->title);
 
 	echo $this->headMeta() . "\n";
@@ -11,8 +13,6 @@
 	echo $this->headScript() . "\n";
 	echo $this->headTitle() . "\n";
 ?>
-<link href="http://yui.yahooapis.com/2.8.0r4/build/logger/assets/skins/sam/logger.css" rel="stylesheet" type="text/css" />
-<link href="http://yui.yahooapis.com/2.8.0r4/build/datatable/assets/skins/sam/datatable.css" rel="stylesheet" type="text/css" />
 </head>
 <body class="yui-skin-sam">
 <div id="head">

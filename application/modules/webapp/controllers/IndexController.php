@@ -46,11 +46,6 @@ class IndexController extends Zend_Controller_Action
          */
 
         $this->view->path  = $path;
-        $this->view->files = $this->_filesystem->listDirectory($path);
-
-        if (!$this->view->files) {
-            $this->view->errorMsg = $this->_filesystem->errorMsg;
-        }
     }
 
 

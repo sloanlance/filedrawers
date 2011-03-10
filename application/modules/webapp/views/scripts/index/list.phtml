@@ -1,221 +1,234 @@
-<div id="infoBar">
-	<ul id="infoMenu">
-		<?php if ($this->type == 'file'): ?>
-		<li><a href="<?php echo $this->baseUrl('/download/' . $this->path); ?>">Download</a></li>
-		<?php endif; ?>
-		<li><a href="..">Go Up &uarr;</a></li>
-		<li><a href=".">Refresh</a></li>
-	</ul>
-	<div id="notifyArea"> Location:
-		<form id="changeDirForm">
-			<?php echo $this->createLinkPath($this->path); ?>
-		</form>
-	</div>
-	<div class="clear">&nbsp;</div>
-</div>
-<div id="sidebar">
-	<div id="inspector">
-		<h3>Folder Properties</h3>
-		<div id="selectedItem" style="background-image: url(<?php echo $this->baseUrl('/images/folder.gif'); ?>);"> <?php echo $this->escape(basename($this->path)); ?> </div>
-		<h4>Actions</h4>
-		<ul id="actionList">
-			<li><a href="#upload">Upload File(s)</a></li>
-			<li><a href="#cut">Cut Selected Item(s)</a></li>
-			<li><a href="#copy">Copy Selected Item(s)</a></li>
-			<li><a href="#paste">Paste to This Folder</a></li>
-			<li><a href="#del">Delete Selected Item(s)</a></li>
-			<li><a href="#createFolder" class="expandable">Create a New Folder</a></li>
-			<li><a href="#rename">Rename Selected Item</a></li>
-			<li><a href="#permissions">Set Permissions for Folder</a></li>
-			<li><a href="#favorites" class="global expandable">Favorite Locations</a></li>
-		</ul>
-		<div id="itemInfo"></div>
-		<h4>View Options</h4>
+<?
+$this->headLink()->appendStylesheet($this->baseUrl('yui/build/fonts/fonts-min.css')); 
+$this->headLink()->appendStylesheet($this->baseUrl('yui/build/datatable/assets/skins/sam/datatable.css')); 
+
+$this->headScript()->appendFile('yui/build/yahoo-dom-event/yahoo-dom-event.js');
+$this->headScript()->appendFile('yui/build/dragdrop/dragdrop-min.js');
+$this->headScript()->appendFile('yui/build/element/element-min.js');
+$this->headScript()->appendFile('yui/build/datasource/datasource-min.js');
+$this->headScript()->appendFile('yui/build/datatable/datatable-min.js');
+$this->headScript()->appendFile('yui/build/connection/connection-min.js');
+$this->headScript()->appendFile('yui/build/json/json-min.js');
+$this->headScript()->appendFile('js/filedrawers.js');
+?>
+		<script type="text/javascript">
+		
+		</script>
+	</head>
+	<body class="yui-skin-sam">
+	<div id="head">
+		<h1>Filedrawers</h1>
 		<ul>
-			<li><a href="#showHidden" class="global">Show Hidden Files</a></li>
+			<li><a href="#" class="active" id="homeBtn">Home</a></li>
+			<li><a href="/make-webspace/">Web Sites</a></li>
+			<li><a href="/help.php">Help</a></li>
+			<li><a href="/cgi-bin/logout?http://mfile.umich.edu/">Logout</a></li>
 		</ul>
+		<div class="clear">&nbsp;</div>
 	</div>
-	<div id="version"> filedrawers version: <?php echo Zend_Registry::get('config')->filedrawers->version; ?></div>
-</div>
-<div id="content">
-	<?php if ($this->files): ?>
-	<div id="fileList"></div>
-	<?php elseif($this->errorMsg): ?>
-	<p>
-		<?=$this->errorMsg?>
-	</p>
-	<?php else: var_dump($this);?>
-	<p>The specified file or folder does not exist.</p>
-	<?php endif; ?>
-</div>
-<div id="favorites" class="expandItem">
-	<div class="hd"> <a href="#close">[X]</a>
-		<h2>My Favorite Locations</h2>
-	</div>
-	<div class="bd">
-		<div id="favMenu"><a href="#viewFav" class="sel">View</a> | <a href="#addFav">Add</a> | <a href="#editFav">Edit</a></div>
-		<div id="viewFav">
-			<p>Go to a favorite location:</p>
-			<div class="tabContent">&nbsp;</div>
+	<div id="infoBar">
+		<ul id="infoMenu">
+			<li>Download</li>
+			<li><a href="..">Go Up &uarr;</a></li>
+			<li><a href=".">Refresh</a></li>
+		</ul>
+		<div id="notifyArea"> Location:
+			<form id="changeDirForm">
+				<p>Current directory info goes here</p>
+			</form>
 		</div>
-		<form action="#" method="post" name="addFav" id="addFav">
-			<p>Enter a name and click 'Add' to add the current location to your favorites.</p>
-			<input type="text" name="selectedItems" size="18" />
-			<p align="center">
-				<input type="hidden" name="formKey" value="c0c17487e741591fdcad1e95aa43d2ad" />
-				<input type="submit" name="command" value="Add" />
-			</p>
-		</form>
-		<form action="#" method="post" name="editFav" id="editFav">
-			<div class="tabContent">&nbsp;</div>
-			<p align="center">
-				<input type="hidden" name="formKey" value="c0c17487e741591fdcad1e95aa43d2ad" />
-				<input type="submit" name="command" value="Save" />
-			</p>
-		</form>
+		<div class="clear">&nbsp;</div>
 	</div>
-</div>
-<div id="permissions" class="expandItem">
-	<div class="hd"> <a href="#close">[X]</a>
-		<h2>Permissions Manager</h2>
+	<div id="sidebar">
+		<div id="inspector">
+			<h3>Folder Properties</h3>
+			<div id="selectedItem" style="background-image: url('/images/folder.gif');"></div>
+			<h4>Actions</h4>
+			<ul id="actionList">
+				<li><a href="#upload">Upload File(s)</a></li>
+				<li><a href="#cut">Cut Selected Item(s)</a></li>
+				<li><a href="#copy">Copy Selected Item(s)</a></li>
+				<li><a href="#paste">Paste to This Folder</a></li>
+				<li><a href="#del">Delete Selected Item(s)</a></li>
+				<li><a href="#createFolder" class="expandable">Create a New Folder</a></li>
+				<li><a href="#rename">Rename Selected Item</a></li>
+				<li><a href="#permissions">Set Permissions for Folder</a></li>
+				<li><a href="#favorites" class="global expandable">Favorite Locations</a></li>
+			</ul>
+			<div id="itemInfo"></div>
+			<h4>View Options</h4>
+			<ul>
+				<li><a href="#showHidden" class="global" id="hidnFilesCtrl">Show Hidden Files</a></li>
+			</ul>
+		</div>
+		<div id="version"> filedrawers version: insert version number</div>
 	</div>
-	<div class="bd">
-		<form name="acl" id="acl" method="post" action="#">
-			<input type="hidden" name="formKey" value="c0c17487e741591fdcad1e95aa43d2ad">
-			<div id="permissionsBox">
-				<table>
-					<thead>
-						<tr>
-							<th width="185px">Normal Rights for $DIRECTORY</th>
-							<th>lookup</th>
-							<th>read</th>
-							<th>write</th>
-							<th>insert</th>
-							<th>delete</th>
-							<th>lock</th>
-							<th>admin</th>
-						</tr>
-					</thead>
-					<tbody>
-						<tr>
-							<td>sample pts group 1
-								<input type="hidden" name="nrm[umweb:servers][]" value=" " /></td>
-							<td><input type="checkbox" name="nrm[umweb:servers][]" value="l" checked="checked" /></td>
-							<td><input type="checkbox" name="nrm[umweb:servers][]" value="r" /></td>
-							<td><input type="checkbox" name="nrm[umweb:servers][]" value="w" /></td>
-							<td><input type="checkbox" name="nrm[umweb:servers][]" value="i" /></td>
-							<td><input type="checkbox" name="nrm[umweb:servers][]" value="d" /></td>
-							<td><input type="checkbox" name="nrm[umweb:servers][]" value="k" /></td>
-							<td><input type="checkbox" name="nrm[umweb:servers][]" value="a" /></td>
-						</tr>
-						<tr>
-							<td>sample pts group 2
-								<input type="hidden" name="nrm[system:anyuser][]" value=" " /></td>
-							<td><input type="checkbox" name="nrm[system:anyuser][]" value="l" checked="checked" /></td>
-							<td><input type="checkbox" name="nrm[system:anyuser][]" value="r" /></td>
-							<td><input type="checkbox" name="nrm[system:anyuser][]" value="w" /></td>
-							<td><input type="checkbox" name="nrm[system:anyuser][]" value="i" /></td>
-							<td><input type="checkbox" name="nrm[system:anyuser][]" value="d" /></td>
-							<td><input type="checkbox" name="nrm[system:anyuser][]" value="k" /></td>
-							<td><input type="checkbox" name="nrm[system:anyuser][]" value="a" /></td>
-						</tr>
-						<tr>
-							<td>joshfiel
-								<input type="hidden" name="nrm[joshfiel][]" value=" " /></td>
-							<td><input type="checkbox" name="nrm[joshfiel][]" value="l" /></td>
-							<td><input type="checkbox" name="nrm[joshfiel][]" value="r" /></td>
-							<td><input type="checkbox" name="nrm[joshfiel][]" value="w" /></td>
-							<td><input type="checkbox" name="nrm[joshfiel][]" value="i" /></td>
-							<td><input type="checkbox" name="nrm[joshfiel][]" value="d" /></td>
-							<td><input type="checkbox" name="nrm[joshfiel][]" value="k" /></td>
-							<td><input type="checkbox" name="nrm[joshfiel][]" value="a" checked="checked" /></td>
-						</tr>
-						<tr>
-							<td><input type="text" name="nrm_add_name" length="40" maxlength="40" value="" /></td>
-							<td><input type="checkbox" name="nrm[nrm_add][]" value="l" /></td>
-							<td><input type="checkbox" name="nrm[nrm_add][]" value="r" /></td>
-							<td><input type="checkbox" name="nrm[nrm_add][]" value="w" /></td>
-							<td><input type="checkbox" name="nrm[nrm_add][]" value="i" /></td>
-							<td><input type="checkbox" name="nrm[nrm_add][]" value="d" /></td>
-							<td><input type="checkbox" name="nrm[nrm_add][]" value="k" /></td>
-							<td><input type="checkbox" name="nrm[nrm_add][]" value="a" /></td>
-						</tr>
-					</tbody>
-					<thead>
-						<tr>
-							<th width="185px">Negative Rights for
-								AAAtest8</th>
-							<th>lookup</th>
-							<th>read</th>
-							<th>write</th>
-							<th>insert</th>
-							<th>delete</th>
-							<th>lock</th>
-							<th>admin</th>
-						</tr>
-					</thead>
-					<tbody>
-						<tr>
-							<td><input type="text" name="neg_add_name" length="40" maxlength="40" value="" /></td>
-							<td><input type="checkbox" name="neg[neg_add][]" value="l" /></td>
-							<td><input type="checkbox" name="neg[neg_add][]" value="r" /></td>
-							<td><input type="checkbox" name="neg[neg_add][]" value="w" /></td>
-							<td><input type="checkbox" name="neg[neg_add][]" value="i" /></td>
-							<td><input type="checkbox" name="neg[neg_add][]" value="d" /></td>
-							<td><input type="checkbox" name="neg[neg_add][]" value="k" /></td>
-							<td><input type="checkbox" name="neg[neg_add][]" value="a" /></td>
-						</tr>
-					</tbody>
-				</table>
+	<div id="content">
+		<div id="fileList"></div>
+	</div>
+	<div id="favorites" class="expandItem">
+		<div class="hd"> <a href="#close">[X]</a>
+			<h2>My Favorite Locations</h2>
+		</div>
+		<div class="bd">
+			<div id="favMenu"><a href="#viewFav" class="sel">View</a> | <a href="#addFav">Add</a> | <a href="#editFav">Edit</a></div>
+			<div id="viewFav">
+				<p>Go to a favorite location:</p>
+				<div class="tabContent">&nbsp;</div>
 			</div>
-			<input name="save" type="submit" class="saveButton" value="Save Permissions" />
-		</form>
+			<form action="#" method="post" name="addFav" id="addFav">
+				<p>Enter a name and click 'Add' to add the current location to your favorites.</p>
+				<input type="text" name="selectedItems" size="18" />
+				<p align="center">
+					<input type="hidden" name="formKey" value="c0c17487e741591fdcad1e95aa43d2ad" />
+					<input type="submit" name="command" value="Add" />
+				</p>
+			</form>
+			<form action="#" method="post" name="editFav" id="editFav">
+				<div class="tabContent">&nbsp;</div>
+				<p align="center">
+					<input type="hidden" name="formKey" value="c0c17487e741591fdcad1e95aa43d2ad" />
+					<input type="submit" name="command" value="Save" />
+				</p>
+			</form>
+		</div>
 	</div>
-</div>
-<form id="newFolder" class="expandItem">
-	<div class="hd"> <a href="#close">[X]</a>
-		<h2>Create a New Folder</h2>
+	<div id="permissions" class="expandItem">
+		<div class="hd"> <a href="#close">[X]</a>
+			<h2>Permissions Manager</h2>
+		</div>
+		<div class="bd">
+			<form name="acl" id="acl" method="post" action="#">
+				<input type="hidden" name="formKey" value="c0c17487e741591fdcad1e95aa43d2ad">
+				<div id="permissionsBox">
+					<table>
+						<thead>
+							<tr>
+								<th width="185px">Normal Rights for $DIRECTORY</th>
+								<th>lookup</th>
+								<th>read</th>
+								<th>write</th>
+								<th>insert</th>
+								<th>delete</th>
+								<th>lock</th>
+								<th>admin</th>
+							</tr>
+						</thead>
+						<tbody>
+							<tr>
+								<td>sample pts group 1
+									<input type="hidden" name="nrm[umweb:servers][]" value=" " /></td>
+								<td><input type="checkbox" name="nrm[umweb:servers][]" value="l" checked="checked" /></td>
+								<td><input type="checkbox" name="nrm[umweb:servers][]" value="r" /></td>
+								<td><input type="checkbox" name="nrm[umweb:servers][]" value="w" /></td>
+								<td><input type="checkbox" name="nrm[umweb:servers][]" value="i" /></td>
+								<td><input type="checkbox" name="nrm[umweb:servers][]" value="d" /></td>
+								<td><input type="checkbox" name="nrm[umweb:servers][]" value="k" /></td>
+								<td><input type="checkbox" name="nrm[umweb:servers][]" value="a" /></td>
+							</tr>
+							<tr>
+								<td>sample pts group 2
+									<input type="hidden" name="nrm[system:anyuser][]" value=" " /></td>
+								<td><input type="checkbox" name="nrm[system:anyuser][]" value="l" checked="checked" /></td>
+								<td><input type="checkbox" name="nrm[system:anyuser][]" value="r" /></td>
+								<td><input type="checkbox" name="nrm[system:anyuser][]" value="w" /></td>
+								<td><input type="checkbox" name="nrm[system:anyuser][]" value="i" /></td>
+								<td><input type="checkbox" name="nrm[system:anyuser][]" value="d" /></td>
+								<td><input type="checkbox" name="nrm[system:anyuser][]" value="k" /></td>
+								<td><input type="checkbox" name="nrm[system:anyuser][]" value="a" /></td>
+							</tr>
+							<tr>
+								<td>joshfiel
+									<input type="hidden" name="nrm[joshfiel][]" value=" " /></td>
+								<td><input type="checkbox" name="nrm[joshfiel][]" value="l" /></td>
+								<td><input type="checkbox" name="nrm[joshfiel][]" value="r" /></td>
+								<td><input type="checkbox" name="nrm[joshfiel][]" value="w" /></td>
+								<td><input type="checkbox" name="nrm[joshfiel][]" value="i" /></td>
+								<td><input type="checkbox" name="nrm[joshfiel][]" value="d" /></td>
+								<td><input type="checkbox" name="nrm[joshfiel][]" value="k" /></td>
+								<td><input type="checkbox" name="nrm[joshfiel][]" value="a" checked="checked" /></td>
+							</tr>
+							<tr>
+								<td><input type="text" name="nrm_add_name" length="40" maxlength="40" value="" /></td>
+								<td><input type="checkbox" name="nrm[nrm_add][]" value="l" /></td>
+								<td><input type="checkbox" name="nrm[nrm_add][]" value="r" /></td>
+								<td><input type="checkbox" name="nrm[nrm_add][]" value="w" /></td>
+								<td><input type="checkbox" name="nrm[nrm_add][]" value="i" /></td>
+								<td><input type="checkbox" name="nrm[nrm_add][]" value="d" /></td>
+								<td><input type="checkbox" name="nrm[nrm_add][]" value="k" /></td>
+								<td><input type="checkbox" name="nrm[nrm_add][]" value="a" /></td>
+							</tr>
+						</tbody>
+						<thead>
+							<tr>
+								<th width="185px">Negative Rights for
+									AAAtest8</th>
+								<th>lookup</th>
+								<th>read</th>
+								<th>write</th>
+								<th>insert</th>
+								<th>delete</th>
+								<th>lock</th>
+								<th>admin</th>
+							</tr>
+						</thead>
+						<tbody>
+							<tr>
+								<td><input type="text" name="neg_add_name" length="40" maxlength="40" value="" /></td>
+								<td><input type="checkbox" name="neg[neg_add][]" value="l" /></td>
+								<td><input type="checkbox" name="neg[neg_add][]" value="r" /></td>
+								<td><input type="checkbox" name="neg[neg_add][]" value="w" /></td>
+								<td><input type="checkbox" name="neg[neg_add][]" value="i" /></td>
+								<td><input type="checkbox" name="neg[neg_add][]" value="d" /></td>
+								<td><input type="checkbox" name="neg[neg_add][]" value="k" /></td>
+								<td><input type="checkbox" name="neg[neg_add][]" value="a" /></td>
+							</tr>
+						</tbody>
+					</table>
+				</div>
+				<input name="save" type="submit" class="saveButton" value="Save Permissions" />
+			</form>
+		</div>
 	</div>
-	<div class="bd"> <img src="/images/mime/small/folder.gif" width="16" height="16" alt="" />
-		<input type="text" name="folderName" id="newFold" size="34" value="Please enter a name for your new folder." />
-		<input type="submit" name="save" value="Create" />
-	</div>
-</form>
-<form name="upload2" id="upload" class="expandItem" style="display: none;" enctype="multipart/form-data" action="/mfile-bin/upload.cgi" method="post">
-	<div class="titlebar"> <a href="javascript:closeItem('uploadCtrl','upload');document.getElementById('upload').reset();">[X]</a>
-		<h2>Upload Files to AFS</h2>
-	</div>
-	<input type="hidden" name="sessionid" id="sessionid" value="" />
-	<input type="hidden" name="path" id="uploadpath" value="" />
-	<input type="hidden" name="returnToURI" id="returnToURI" value="" />
-	<input type="hidden" name="overwrite_file" id="overwrite_file" value="" />
-	<ul>
-		<li id="file1">
-			<input type="file" name="file" />
-			<p><a href="javascript:toggleDisplay('file2');">Add Another File</a></p>
-		</li>
-	</ul>
-	<div class="uploadctrl" id="uploadctrl"> Overwrite files during upload?
-		<input type="checkbox" name="overwrite_box" id="overwrite_box" onclick="processClobberCheckbox();" />
-		<input type="button" name="upload" value="Upload File(s)" onclick="uploadloopcnt=0; ajaxupload();" />
-		&nbsp;&nbsp; </div>
-	<div id="lbtop">
-		<div id="lbinner"></div>
-		<table width="100%">
-			<tr>
-				<td id="fileinfo"></td>
-				<td align="right" id="lbpercent"></td>
-			</tr>
-		</table>
-	</div>
-</form>
-<script type="text/javascript" src="http://yui.yahooapis.com/combo?2.8.0r4/build/yahoo-dom-event/yahoo-dom-event.js&2.8.0r4/build/calendar/calendar-min.js&2.8.0r4/build/connection/connection-min.js&2.8.0r4/build/datasource/datasource-min.js&2.8.0r4/build/element/element-min.js&2.8.0r4/build/datatable/datatable-min.js&2.8.0r4/build/json/json-min.js"></script>
-<script type="text/javascript" src="<?php echo $this->baseUrl('/js/filedrawers.js'); ?>"></script>
-<script type="application/javascript">
-var username = "<?php echo Zend_Auth::getInstance()->getIdentity(); ?>";
-var baseUrl = "<?php echo $this->baseUrl(); ?>";
-<?php if ($this->files): ?>
-YAHOO.util.Event.addListener(window, "load", FD.FileManager, <?php echo json_encode($this->files); ?>);
-//YAHOO.util.Event.addListener(window, "load", Filedrawers.FileInspector.init);
-<?php endif; ?>
-</script>
+	<form id="newFolder" class="expandItem">
+		<div class="hd"> <a href="#close">[X]</a>
+			<h2>Create a New Folder</h2>
+		</div>
+		<div class="bd"> <img src="/images/mime/small/folder.gif" width="16" height="16" alt="" />
+			<input type="text" name="folderName" id="newFold" size="34" value="Please enter a name for your new folder." />
+			<input type="submit" name="save" value="Create" />
+		</div>
+	</form>
+	<form name="upload2" id="upload" class="expandItem" style="display: none;" enctype="multipart/form-data" action="/mfile-bin/upload.cgi" method="post">
+		<div class="titlebar"> <a href="javascript:closeItem('uploadCtrl','upload');document.getElementById('upload').reset();">[X]</a>
+			<h2>Upload Files to AFS</h2>
+		</div>
+		<input type="hidden" name="sessionid" id="sessionid" value="" />
+		<input type="hidden" name="path" id="uploadpath" value="" />
+		<input type="hidden" name="returnToURI" id="returnToURI" value="" />
+		<input type="hidden" name="overwrite_file" id="overwrite_file" value="" />
+		<ul>
+			<li id="file1">
+				<input type="file" name="file" />
+				<p><a href="javascript:toggleDisplay('file2');">Add Another File</a></p>
+			</li>
+		</ul>
+		<div class="uploadctrl" id="uploadctrl"> Overwrite files during upload?
+			<input type="checkbox" name="overwrite_box" id="overwrite_box" onclick="processClobberCheckbox();" />
+			<input type="button" name="upload" value="Upload File(s)" onclick="uploadloopcnt=0; ajaxupload();" />
+			&nbsp;&nbsp; </div>
+		<div id="lbtop">
+			<div id="lbinner"></div>
+			<table width="100%">
+				<tr>
+					<td id="fileinfo"></td>
+					<td align="right" id="lbpercent"></td>
+				</tr>
+			</table>
+		</div>
+	</form>
+
+
+
+	</body>
+		

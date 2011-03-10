@@ -113,7 +113,7 @@ class Bootstrap extends Zend_Application_Bootstrap_Bootstrap
             )
         );*/
 
-        //$router->addRoute('home', $home);
+        $router->addRoute('home', $home);
         $router->addRoute('list', $list);
         //$router->addRoute('finishUpload', $finishUpload);
         $router->addRoute('webservice', $webservice);
