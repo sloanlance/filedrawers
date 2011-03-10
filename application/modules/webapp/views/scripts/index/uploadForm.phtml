@@ -1,0 +1,24 @@
+<form name="<?php echo $this->element->getName(); ?>" id="upload" class="expandItem" style="display: none;" enctype="multipart/form-data" action="<?php echo $this->element->getAction(); ?>" method="<?php echo $this->element->getMethod(); ?>">
+	<div class="hd"> <a href="#close">[X]</a>
+		<h2>Upload Files to AFS</h2>
+	</div>
+	<div class="bd">
+		<?php
+		echo $this->element->sessionid;
+		echo $this->element->returnToURI;
+		echo $this->element->path;
+		?>
+		<input type="hidden" name="overwrite_file" id="overwrite_file" value="" />
+		<ul id="uploadFileList">
+			<li>
+				<input type="file" name="file" />
+				<p><a href="#addFile">Add Another File</a></p>
+			</li>
+		</ul>
+		<div class="uploadctrl" id="uploadctrl"> Overwrite files during upload?
+			<input type="checkbox" name="overwrite_box" id="overwrite_box" />
+			<input type="submit" name="upload" id="uploadButton" value="Upload File(s)" />
+			&nbsp;&nbsp; </div>
+		<div id="uploadProgBar">&nbsp;</div>
+	</div>
+</form>
