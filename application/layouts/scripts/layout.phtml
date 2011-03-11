@@ -3,7 +3,7 @@
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 <?php
-	$this->headLink()->appendStylesheet($this->baseUrl('/css/filedrawers.css'));
+	$this->headLink()->prependStylesheet($this->baseUrl('/css/filedrawers.css'));
         $this->headLink()->appendStylesheet('http://yui.yahooapis.com/2.8.0r4/build/logger/assets/skins/sam/logger.css');
         $this->headLink()->appendStylesheet('http://yui.yahooapis.com/2.8.0r4/build/datatable/assets/skins/sam/datatable.css');
 	$this->headTitle($this->title);
