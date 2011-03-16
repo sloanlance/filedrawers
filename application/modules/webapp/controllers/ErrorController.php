@@ -40,7 +40,7 @@ class ErrorController extends Zend_Controller_Action
         }
 
         // conditionally display exceptions
-        if ($this->getInvokeArg('displayExceptions') == true) {
+        if (APPLICATION_ENVIRONMENT == 'development' or $this->getInvokeArg('displayExceptions') == true) {
             $this->view->displayExceptions = true;
             $this->view->exception = $errors->exception;
             $this->view->request   = $errors->request;
