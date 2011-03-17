@@ -195,10 +195,8 @@ FD.DirList = function() {
 				var t = document.createTextNode( 'Show Hidden Files' );
 				l.replaceChild( t, l.firstChild );
 			}
-
-
-
-			myDataSource.sendRequest("list/?format=json", dirTable.onDataReturnInitializeTable, dirTable);
+			
+			myDataSource.sendRequest("list/?format=json&path=" + currentURL, dirTable.onDataReturnInitializeTable, dirTable);
 			
 			/*						
 			myDataSource.sendRequest(showHidden,{
