@@ -1,6 +1,6 @@
 <?php echo $this->displayErrors($this->errorMsg); ?>
 <?php if (is_array($this->contents)): ?>
 <table>
-	<?php echo $this->partialLoop('index/_partial_list.phtml', $this->contents);?>
+	<?php echo $this->partialLoop('_partial_list.phtml', $this->contents);?>
 </table>
 <?php endif; ?>
