@@ -29,7 +29,6 @@ class Webservices_IndexController extends Zend_Controller_Action {
     public function init()
     {
         $this->_helper->layout->disableLayout();
-        $this->_filesystem = Zend_Registry::get('filesystem');
         $this->_csrfToken = new Zend_Form_Element_Hash('formToken');
         $this->_csrfToken->initCsrfToken();
         
@@ -44,6 +43,45 @@ class Webservices_IndexController extends Zend_Controller_Action {
         $this->_view = Zend_Controller_Front::getInstance()->getParam('bootstrap')->getResource('view');
         $this->_view->setScriptPath( null );
         $this->_view->addScriptPath( APPLICATION_PATH .'/modules/webservices/views/scripts/index/' );
+    }
+
+
+    public function preDispatch()
+    {
+        $filesystemValidator = new Zend_Validate_InArray( array( 'afs' ));
+        $filesystemValidator->setStrict( TRUE );
+        $validators = array(
+            'filesystem' => array(
+                $filesystemValidator,
+                'presence' => 'optional',
+                'default' => 'afs'
+            )
+        );
+        $options = array('inputNamespace' => 'Filedrawers_Validate');
+        $input = new Zend_Filter_Input($this->_baseFilter, $validators, $_GET, $options);
+
+        if ( ! $input->isValid( 'filesystem' )) {
+            $this->view->errorMsg = array( 'filesystem' => array( 'invalid' => 'invalid filesystem specified' ));
+            throw( new Zend_Exception( 'filesystem parameter must be "afs"' ));
+        }
+
+        switch ( $input->filesystem ) {
+        case 'afs':
+        default:
+            $this->_filesystem = new Model_Afs();
+            Zend_Registry::set('filesystem', $this->_filesystem);
+
+            // When we're working on our dev server, our home directories are not
+            // in AFS so we have to find it.  I'm leaving it in for production.
+            // Andrew says our /etc/password is really big.  There will be a delay
+            // getting the home dir until the path is cached by nscd and everytime
+            // the cache is cleared.  I'd like to see this plugin declared in the
+            // ini if possible.
+            $this->_filesystem->setHomeDirHelper(array('Model_UMForceHomeDirectory', 'getHomeDirectory'));
+            $this->_filesystem->addListHelper(array('Model_Mime', 'setIcon'));
+            $this->_filesystem->addListHelper(array('Model_Afs', 'setPermissions'));
+            break;
+        }
     }
 
 

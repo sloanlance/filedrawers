@@ -13,7 +13,7 @@ class IndexController extends Zend_Controller_Action
 
     public function init()
     {
-        $this->_filesystem = Zend_Registry::get('filesystem');
+        //$this->_filesystem = Zend_Registry::get('filesystem');
         $this->_flashMessenger = $this->_helper->getHelper('FlashMessenger');
         $this->_redirector = $this->_helper->getHelper('Redirector');
     }
@@ -29,7 +29,7 @@ class IndexController extends Zend_Controller_Action
         $path = $this->_request->getUserParam('path');
 
         if (empty($path)){
-            $path = $this->_filesystem->getHomeDir();
+            //$path = $this->_filesystem->getHomeDir();
         }
 
         /*

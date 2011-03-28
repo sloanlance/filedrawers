@@ -30,23 +30,6 @@ class Bootstrap extends Zend_Application_Bootstrap_Bootstrap
 	}
 
 
-    protected function _initFilesystem()
-    {
-        $afs = new Model_Afs();
-        Zend_Registry::set('filesystem', $afs);
-
-        // When we're working on our dev server, our home directories are not 
-        // in AFS so we have to find it.  I'm leaving it in for production.
-        // Andrew says our /etc/password is really big.  There will be a delay
-        // getting the home dir until the path is cached by nscd and everytime
-        // the cache is cleared.  I'd like to see this plugin declared in the
-        // ini if possible.
-        $afs->setHomeDirHelper(array('Model_UMForceHomeDirectory', 'getHomeDirectory'));
-        $afs->addListHelper(array('Model_Mime', 'setIcon'));
-        $afs->addListHelper(array('Model_Afs', 'setPermissions'));
-    }
-
-
     public function _initRoutes()
     {
         $router = Zend_Controller_Front::getInstance()->getRouter();
