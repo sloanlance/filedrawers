@@ -96,7 +96,8 @@ class Bootstrap extends Zend_Application_Bootstrap_Bootstrap
             'webservices/:action',
             array(
                 'module' => 'webservices',
-                'controller' => 'index'
+                'controller' => 'v1',
+                'action' => 'index'
             )
         );
 
