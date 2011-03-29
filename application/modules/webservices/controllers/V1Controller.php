@@ -48,7 +48,7 @@ class Webservices_V1Controller extends Zend_Controller_Action {
 
     public function preDispatch()
     {
-        $filesystemValidator = new Zend_Validate_InArray( array( 'afs' ));
+        $filesystemValidator = new Zend_Validate_InArray( array( 'afs', 'cifs' ));
         $filesystemValidator->setStrict( TRUE );
         $validators = array(
             'filesystem' => array(
@@ -62,10 +62,31 @@ class Webservices_V1Controller extends Zend_Controller_Action {
 
         if ( ! $input->isValid( 'filesystem' )) {
             $this->view->errorMsg = array( 'filesystem' => array( 'invalid' => 'invalid filesystem specified' ));
-            throw( new Zend_Exception( 'filesystem parameter must be "afs"' ));
+            throw( new Zend_Exception( 'filesystem parameter must be "afs" or "cifs"' ));
         }
 
         switch ( $input->filesystem ) {
+        case 'cifs':
+            $shareValidator = new Zend_Validate_Regex(array('pattern' => '/.*/'));
+            $validators = array(
+                'share' => array(
+                    $shareValidator,
+                    'presence' => 'required',
+                )
+            );
+            $options = array('inputNamespace' => 'Filedrawers_Validate');
+            $shareInput = new Zend_Filter_Input($this->_baseFilter, $validators, $_GET, $options);
+
+            if ( ! $shareInput->isValid( 'share' )) {
+                $this->view->errorMsg = array( 'share' => array( 'invalid' => 'invalid share specified' ));
+                throw( new Zend_Exception( 'invalid CIFS share name' ));
+            }
+
+
+            $this->_filesystem = new Model_Cifs();
+            $this->_filesystem->setShareName( $shareInput->share );
+            Zend_Registry::set('filesystem', $this->_filesystem);
+            break;
         case 'afs':
         default:
             $this->_filesystem = new Model_Afs();
@@ -78,10 +99,10 @@ class Webservices_V1Controller extends Zend_Controller_Action {
             // the cache is cleared.  I'd like to see this plugin declared in the
             // ini if possible.
             $this->_filesystem->setHomeDirHelper(array('Model_UMForceHomeDirectory', 'getHomeDirectory'));
-            $this->_filesystem->addListHelper(array('Model_Mime', 'setIcon'));
             $this->_filesystem->addListHelper(array('Model_Afs', 'setPermissions'));
             break;
         }
+        $this->_filesystem->addListHelper(array('Model_Mime', 'setIcon'));
     }
 
 
@@ -112,7 +133,6 @@ class Webservices_V1Controller extends Zend_Controller_Action {
             'limit'    => array('Digits', 'allowEmpty' => true),
             'offset'   => array('Digits', 'allowEmpty' => true)
         );
-
         $options = array('inputNamespace' => 'Filedrawers_Validate');
         $input = new Zend_Filter_Input($this->_baseFilter, $validators, $_GET, $options);
 
