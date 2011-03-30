@@ -270,7 +270,37 @@ FD.DirList = function() {
 			
 			getToken();			
 		
-		}					
+		},
+
+		createNewFolder: function(e, args) {
+						
+			var successHandler = function(o) {
+			
+				var callback = getAjaxListCallback(dirTable);
+				var sUrl = baseUrl + 'webservices/mkdir/?format=json';
+				
+				var postData = 'folderName=' + args[0];
+				postData += '&formToken=' + YAHOO.lang.JSON.parse(o.responseText).formToken;
+				postData += '&path=' + currentURL;
+				
+				var request = YAHOO.util.Connect.asyncRequest('POST', sUrl, callback, postData);			
+			};
+			
+			var failureHandler = function(o) {
+				alert(o.status + " : " + o.statusText);
+			};
+			
+			var getToken = function() {		
+				YAHOO.util.Connect.asyncRequest("POST", 'webservices/gettoken?format=json', {
+					success: successHandler,
+					failure: failureHandler
+				});
+				return false;
+			};
+			
+			getToken();
+			
+		}
 							
 		/*
 		var myCallback = function() {
@@ -360,6 +390,67 @@ FD.InfoBar = function() {
 		update:update
 	}
 };	
+
+FD.NewFolderDialog = function() {
+	var evnt = new YAHOO.util.CustomEvent("New Folder Event");
+
+	var hide = function() {
+		var newFolderForm = YAHOO.util.Dom.get('newFolder');
+		YAHOO.util.Dom.setStyle(newFolderForm, 'display', 'none');
+		newFolderForm.reset();
+	};
+
+	var handleClick = function(e) {
+		var target = YAHOO.util.Event.getTarget(e);
+
+		if ( ! target.href) {
+			return;
+		}
+
+		YAHOO.util.Event.preventDefault(e);
+		hide();
+		FD.InspDialogCloseEvent.fire();
+	};
+
+	var handleSubmit = function(e) {
+		var target = YAHOO.util.Event.getTarget(e);
+		YAHOO.util.Event.preventDefault(e);
+		evnt.fire(target.folderName.value);
+		hide();
+		FD.InspDialogCloseEvent.fire();
+	};
+
+	// improved this function (imho) to set focus in the text box when 'create new folder'
+	// is clicked and highlights instruction text for easy delete/overwrite with new folder name - cwL
+	
+	/*
+	var handleFocus = function(e) {
+		var target = YAHOO.util.Event.getTarget(e);
+		target.value = 'enter name';
+	};
+	*/
+
+	// YAHOO.util.Event.on('newFold', 'focus', handleFocus);
+	YAHOO.util.Event.on('newFolder', 'click', handleClick);
+	YAHOO.util.Event.on('newFolder', 'submit', handleSubmit);
+	
+
+	return {
+		show: function(e, action) {
+			if (action != 'createFolder') {
+				hide();
+				return;
+			}
+
+			YAHOO.util.Dom.setStyle('newFolder', 'display', 'block');
+			document.getElementById('newFold').focus() 
+		},
+
+		evnt:evnt
+	}
+}();   //END FD.NewFolderDialog
+
+FD.InspDialogCloseEvent = new YAHOO.util.CustomEvent('InspDialogCloseEvent');
 
 FD.FileInspector = function() {
 
@@ -483,6 +574,10 @@ FD.FileInspector = function() {
 		}*/
 	};
 	
+	clearSelection = function(e) {
+		YAHOO.util.Dom.removeClass(links, 'inspSelected');
+	};
+	
 	var handleClick = function(e) {
 
 		var target = YAHOO.util.Event.getTarget(e);
@@ -509,8 +604,8 @@ FD.FileInspector = function() {
 		},
 
 		update:update,
-		evnt:evnt
-		//clearSelection:clearSelection
+		evnt:evnt,
+		clearSelection:clearSelection
 	}
 	
 }
@@ -524,10 +619,15 @@ YAHOO.util.Event.addListener(window, "load", function() {
 	
 	inspector.evnt.subscribe(dirList.toggleHiddenFilter);
 	inspector.evnt.subscribe(dirList.deleteItems);
+	inspector.evnt.subscribe(FD.NewFolderDialog.show);
 	
 	dirTable.subscribe('rowSelectEvent', inspector.update);
 	dirTable.subscribe('rowUnselectEvent', inspector.update);
 	dirTable.subscribe('initEvent', inspector.update);
+	
+	FD.NewFolderDialog.evnt.subscribe(dirList.createNewFolder);
+	
+	FD.InspDialogCloseEvent.subscribe(inspector.clearSelection);
 	
 	YAHOO.util.Event.on('homeBtn', 'click', function() {
 		//alert(homeURL);
