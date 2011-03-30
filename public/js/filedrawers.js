@@ -116,6 +116,30 @@ FD.DirList = function() {
 		{key:"mimeType", sortable:true, resizeable:true}
 	];
 	
+	var getAjaxListCallback = function(oTable) {
+	
+		var tableState = oTable.getState();
+
+		return callback = {
+			success: function (o) {
+				
+				//myDataSource.responseSchema = responseSchema;
+				myDataSource.doBeforeCallback = hiddenFileFilter;
+
+				//tableState.sortedBy = tableInitialSort;
+
+				myDataSource.sendRequest("list/?format=json&path=" + currentURL, {
+					success  : oTable.onDataReturnInitializeTable,
+					failure  : oTable.onDataReturnInitializeTable,
+					scope    : oTable,
+					argument : tableState
+				});
+			},
+
+			timeout: 3000
+		};
+	};
+	
 	var hiddenFileFilter = function (req, raw, res, cb) {
 
 		var data     = res.results || [],
@@ -213,19 +237,39 @@ FD.DirList = function() {
 			}
 
 			var tableState = dirTable.getState();
-			var callback = getAjaxListCallback(dirTable);
-
+			var callback = getAjaxListCallback(dirTable);	
+		
 			var postData = 'files[]=';
 			var files = [];
 
 			for (var i=0; i < tableState.selectedRows.length; i++) {
 				files.push(dirTable.getRecord(tableState.selectedRows[i]).getData().filename);
 			}
-
+					
 			postData += files.join('&files[]=');
-
-			var sUrl = baseUrl + '/delete' + FD.Config.path;
-			var request = YAHOO.util.Connect.asyncRequest('POST', sUrl, callback, postData);
+			
+			//alert(postData);			
+			
+			var successHandler = function(o) {
+				var sUrl = baseUrl + 'webservices/delete/?path=' + currentURL;
+				postData += '&formToken=' + YAHOO.lang.JSON.parse(o.responseText).formToken;
+				var request = YAHOO.util.Connect.asyncRequest('POST', sUrl, callback, postData);				
+			};
+			
+			var failureHandler = function(o) {
+				alert(o.status + " : " + o.statusText);
+			};
+			
+			var getToken = function() {		
+				YAHOO.util.Connect.asyncRequest("POST", 'webservices/gettoken?format=json', {
+					success: successHandler,
+					failure: failureHandler
+				});
+				return false;
+			};
+			
+			getToken();			
+		
 		}					
 							
 		/*
@@ -479,6 +523,7 @@ YAHOO.util.Event.addListener(window, "load", function() {
 	infoBar = new FD.InfoBar();
 	
 	inspector.evnt.subscribe(dirList.toggleHiddenFilter);
+	inspector.evnt.subscribe(dirList.deleteItems);
 	
 	dirTable.subscribe('rowSelectEvent', inspector.update);
 	dirTable.subscribe('rowUnselectEvent', inspector.update);
