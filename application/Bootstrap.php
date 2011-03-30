@@ -4,9 +4,13 @@ class Bootstrap extends Zend_Application_Bootstrap_Bootstrap
 {
     protected function _initAutoload()
     {
-        $moduleLoader = new Zend_Application_Module_Autoloader(array(
-            'namespace' => '',
-            'basePath' => APPLICATION_PATH));
+        $moduleLoader = new Zend_Application_Module_Autoloader(
+            array(
+                'namespace' => '',
+                'basePath' => APPLICATION_PATH
+            )
+        );
+        $moduleLoader->addResourceType( 'controller', 'modules/webservices/controllers', 'Webservices' );
         return $moduleLoader;
     }
 
@@ -96,6 +100,15 @@ class Bootstrap extends Zend_Application_Bootstrap_Bootstrap
         );*/
 
 
+        $v1 = new Zend_Controller_Router_Route(
+            'webservices/v1/:action',
+            array(
+                'module' => 'webservices',
+                'controller' => 'v1',
+                'action' => 'index'
+            )
+        );
+
         $webservice = new Zend_Controller_Router_Route(
             'webservices/:action',
             array(
@@ -105,19 +118,20 @@ class Bootstrap extends Zend_Application_Bootstrap_Bootstrap
         );
 
 
-        /*$favorites = new Zend_Controller_Router_Route(
+        $favorites = new Zend_Controller_Router_Route(
             'webservices/favorites/:action',
             array(
                 'module' => 'webservices',
                 'controller' => 'favorites'
             )
-        );*/
+        );
 
         $router->addRoute('home', $home);
         $router->addRoute('list', $list);
         //$router->addRoute('finishUpload', $finishUpload);
         $router->addRoute('webservice', $webservice);
-        //$router->addRoute('favorites', $favorites);
+        $router->addRoute('v1', $v1);
+        $router->addRoute('favorites', $favorites);
     }
 }
 

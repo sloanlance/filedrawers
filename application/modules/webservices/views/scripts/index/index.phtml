@@ -116,6 +116,28 @@
 </div> <!-- .documentation -->
 
 <div class="documentation">
+<h2>Duplicating files</h2>
+    <h3>Arguments</h3>
+        <ul>
+            <li>path: The path that the subject file is in</li>
+            <li>xml or json: The format of the output</li>
+            <li>originName: A POST variable to use for the orignal file, excluding the path.</li>
+            <li>newName: A POST variable to use for the new copy, excluding the path.</li>
+	</ul>
+
+    <h3>Usage</h3>
+    <p>Construct a POST to a url like this:</p>
+        <ul class="examples">
+    	    <li>webservices/duplicate/?format=json&amp;path=/path/to/file</li>
+    <p>Include two POST arguments for original and new file names:</p>
+	</ul>
+        <ul class="examples">
+        <li>originName</li>
+        <li>newName</li>
+	</ul>
+</div> <!-- .documentation -->
+
+<div class="documentation">
 <h2>Deleting files</h2>
     <h3>Arguments</h3>
 	<ul class="arguements">

@@ -168,13 +168,21 @@ abstract class Filedrawers_Filesystem {
     public function duplicate($oldPath, $newPath)
     {
         if ( filetype( $oldPath ) == 'dir' ) {
-            if ( !$this->_copyDirectory( $oldPath, $newPath )) {
+            try {
+                $this->_copyDirectory( $oldPath, $newPath );
+            }
+            catch (Filedrawers_Filesystem_Exception $e) {
                 chdir($this->startCWD);
                 throw new Filedrawers_Filesystem_Exception(sprintf('Unable to copy directory "%s"', $oldPath), 5);
             }
-        } else if ( !$this->_copyFiles( $oldPath, $newPath )) {
-            chdir($this->startCWD);
-            throw new Filedrawers_Filesystem_Exception(sprintf('Unable to copy file "%s"', $oldPath), 5);
+        } else {
+            try {
+                $this->_copyFiles( $oldPath, $newPath );
+            }
+            catch (Filedrawers_Filesystem_Exception $e) {
+                chdir($this->startCWD);
+                throw new Filedrawers_Filesystem_Exception(sprintf('Unable to copy file "%s"', $oldPath), 5);
+            }
         }
     }
 
