@@ -108,7 +108,7 @@ FD.DirList = function() {
 	var myColumnDefs = [
 		{key:"checked",label:"", width:"30", formatter:YAHOO.widget.DataTable.formatCheckbox},
 		{key:"type", sortable:true, resizeable:true},
-		{key:"filename", label:"Name", formatter:formatURL, sortable:true, resizeable:true},
+		{key:"filename", label:"Name", formatter:formatURL, sortable:true, resizeable:true, editor: new YAHOO.widget.TextboxCellEditor({disableBtns:true})},
 		{key:"modTime", label:"Last Modified", formatter:formatDate, sortable:true, sortOptions:{defaultDir:YAHOO.widget.DataTable.CLASS_DESC}},
 		{key:"size", label:"Size", formatter:formatBytes, sortable:true, resizeable:true},
 		{key:"mimeImage", label:"Type", formatter:formatType, sortable:true, resizeable:true},
@@ -300,6 +300,59 @@ FD.DirList = function() {
 			
 			getToken();
 			
+		},
+		
+		renameItem: function(e, action) {
+			
+			if (action != 'rename') {
+				return;
+			}
+
+			var trs = dirTable.getSelectedTrEls();
+
+			if ( ! trs.length) {
+				return;
+			}
+
+			// Hack to temporarily disable document cell editor bluring
+			var blurEvent = dirTable.onEditorBlurEvent;
+			dirTable.onEditorBlurEvent = function() {
+				dirTable.onEditorBlurEvent = blurEvent;
+			};
+
+			var td = trs[0].getElementsByTagName('td')[2];
+						
+			dirTable.showCellEditor(td);
+		},
+		
+		handleNameEditorSave: function(oArgs) {
+		
+			var callback = getAjaxListCallback(this);
+			var sUrl = baseUrl + 'webservices/rename/?format=json';
+
+			var postData = 'oldName=' + oArgs.oldData + '&newName=' + oArgs.newData;
+			postData += '&path=' + currentURL;
+		
+			var successHandler = function(o) {
+			
+				postData += '&formToken=' + YAHOO.lang.JSON.parse(o.responseText).formToken;
+				var request = YAHOO.util.Connect.asyncRequest('POST', sUrl, callback, postData);			
+			};
+			
+			var failureHandler = function(o) {
+				alert(o.status + " : " + o.statusText);
+			};
+			
+			var getToken = function() {		
+				YAHOO.util.Connect.asyncRequest("POST", 'webservices/gettoken?format=json', {
+					success: successHandler,
+					failure: failureHandler
+				});
+				return false;
+			};
+			
+			getToken();
+
 		}
 							
 		/*
@@ -619,11 +672,13 @@ YAHOO.util.Event.addListener(window, "load", function() {
 	
 	inspector.evnt.subscribe(dirList.toggleHiddenFilter);
 	inspector.evnt.subscribe(dirList.deleteItems);
+	inspector.evnt.subscribe(dirList.renameItem);
 	inspector.evnt.subscribe(FD.NewFolderDialog.show);
 	
 	dirTable.subscribe('rowSelectEvent', inspector.update);
 	dirTable.subscribe('rowUnselectEvent', inspector.update);
 	dirTable.subscribe('initEvent', inspector.update);
+	dirTable.subscribe('editorSaveEvent', dirList.handleNameEditorSave);
 	
 	FD.NewFolderDialog.evnt.subscribe(dirList.createNewFolder);
 	
