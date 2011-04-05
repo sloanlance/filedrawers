@@ -2,6 +2,9 @@ var myJSONdata,
 myPerms,
 homeURL,
 currentURL,
+cutCopyURL,
+cutCopyFiles = [],
+clipboardState,
 baseUrl = '';
 
 if (typeof FD == "undefined" || ! FD) {
@@ -39,6 +42,8 @@ FD.Utils = {
 		return size;
 	}
 };
+
+FD.cutCopyEvent = new YAHOO.util.CustomEvent('cutCopyEvent');
 
 FD.DirList = function() {	
 
@@ -161,6 +166,16 @@ FD.DirList = function() {
 		return res;
 	};
 	
+	var clearTable = function() {
+		dirTable.unselectAllRows();
+		rows = dirTable.getRecordSet().getRecords();
+		for (i=0; i < rows.length; i++) {
+			dirTable.getRecordSet().updateKey(rows[i], "checked", "");
+		}
+		dirTable.render();
+	};
+		
+	
 	return {
 		init: function() {
 	
@@ -246,9 +261,7 @@ FD.DirList = function() {
 				files.push(dirTable.getRecord(tableState.selectedRows[i]).getData().filename);
 			}
 					
-			postData += files.join('&files[]=');
-			
-			//alert(postData);			
+			postData += files.join('&files[]=');		
 			
 			var successHandler = function(o) {
 				var sUrl = baseUrl + 'webservices/delete/?path=' + currentURL;
@@ -353,6 +366,45 @@ FD.DirList = function() {
 			
 			getToken();
 
+		},
+		
+		cutCopyItems: function(e, action) {
+			if (action == 'copy') {
+				clipboardState = "copy";
+			} else if (action == 'cut') {
+				clipboardState = "cut";
+			} else {
+				return;
+			}
+			
+			var tableState = dirTable.getState();
+			var callback = getAjaxListCallback(dirTable);
+			
+			var cutCopyFiles = [];
+
+			for (var i=0; i < tableState.selectedRows.length; i++) {
+				cutCopyFiles.push(dirTable.getRecord(tableState.selectedRows[i]).getData().filename);
+			}
+			
+			cutCopyURL = currentURL;
+			
+			clearTable();
+						
+			FD.cutCopyEvent.fire();
+						
+		},
+		
+		pasteItems: function(e, action) {
+			if (action != 'paste') {
+				return;
+			}
+			
+			//add code to perform paste here.
+			
+			alert("paste function reached");
+			cutCopyFiles = [];
+			cutCopyURL = "";
+			FD.cutCopyEvent.fire();
 		}
 							
 		/*
@@ -381,6 +433,7 @@ FD.DirList = function() {
 		}
 		*/
 	}
+	
 }
 
 FD.InfoBar = function() {
@@ -554,7 +607,7 @@ FD.FileInspector = function() {
 	
 	// makes menu options active or inactive based on the permissions
 	var update = function(oArgs) {
-
+	
 		var numSelected,
 		i,
 		permissions = {
@@ -568,8 +621,8 @@ FD.FileInspector = function() {
 		};
 
 		if (oArgs) {
-			numSelected = this.getSelectedRows().length;
-			updateItemInfo.apply(this, [this.getSelectedRows()]);
+			numSelected = dirTable.getSelectedRows().length;
+			updateItemInfo.apply(dirTable, [dirTable.getSelectedRows()]);
 		} else {
 			numSelected = 0;
 			updateItemInfo();
@@ -616,6 +669,13 @@ FD.FileInspector = function() {
 			YAHOO.util.Dom.addClass(actions.rename.ref, 'enabled');
 		} else {
 			YAHOO.util.Dom.removeClass(actions.rename.ref, 'enabled');
+		}
+		
+		// paste condition
+		if (permissions.i && !filesSelected && cutCopyURL) {
+			YAHOO.util.Dom.addClass(actions.paste.ref, 'enabled');
+		} else {
+			YAHOO.util.Dom.removeClass(actions.paste.ref, 'enabled');
 		}
 
 		// set permissions for folder
@@ -672,8 +732,12 @@ YAHOO.util.Event.addListener(window, "load", function() {
 	
 	inspector.evnt.subscribe(dirList.toggleHiddenFilter);
 	inspector.evnt.subscribe(dirList.deleteItems);
+	inspector.evnt.subscribe(dirList.cutCopyItems);
+	inspector.evnt.subscribe(dirList.pasteItems);
 	inspector.evnt.subscribe(dirList.renameItem);
 	inspector.evnt.subscribe(FD.NewFolderDialog.show);
+	
+	FD.cutCopyEvent.subscribe(inspector.update);
 	
 	dirTable.subscribe('rowSelectEvent', inspector.update);
 	dirTable.subscribe('rowUnselectEvent', inspector.update);
@@ -688,5 +752,5 @@ YAHOO.util.Event.addListener(window, "load", function() {
 		//alert(homeURL);
 		myDataSource.sendRequest("list/?format=json", dirTable.onDataReturnInitializeTable, dirTable);
 	});
-					
+	
 });
