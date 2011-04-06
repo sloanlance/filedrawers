@@ -29,7 +29,7 @@ abstract class Filedrawers_Filesystem_URL extends Filedrawers_Filesystem {
         $this->_path = $path;
     }
 
-    public function getUrl() {
+    public function getUrl( $path = NULL ) {
         $url = $this->_scheme .'://';
         if ( ! empty( $this->_user )) {
             $url .= $this->_user;
@@ -39,6 +39,13 @@ abstract class Filedrawers_Filesystem_URL extends Filedrawers_Filesystem {
             $url .= '@';
         }
         $url .= $this->_host;
-        $url .= '/'. ltrim( $this->_path, '/' );
+
+        if ( $path === NULL ) {
+            $path = $this->_path;
+        }
+
+        $url .= '/'. ltrim( $path, '/' );
+
+        return $url;
     }
 }
