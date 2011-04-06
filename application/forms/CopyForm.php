@@ -1,6 +1,6 @@
 <?php
 
-class Form_MoveForm extends Zend_Form
+class Form_CopyForm extends Zend_Form
 {
     protected $_csrfToken = null;
     protected $_options = array();
@@ -41,7 +41,7 @@ class Form_MoveForm extends Zend_Form
         $files->addFilter('StringTrim');
         $files->setRequired(true)
             ->addValidator('NotEmpty', true, array('messages' => array('isEmpty' =>
-                'You must specifiy at least one file or folder to move.')
+                'You must specifiy at least one file or folder to copy.')
             )
         );
         $files->addValidator('FilePath', true, array(
@@ -57,7 +57,7 @@ class Form_MoveForm extends Zend_Form
         $toPath->setLabel('To Path');
         $toPath->setRequired(true)
             ->addValidator('NotEmpty', true, array('messages' => array('isEmpty' =>
-                'You must specifiy the path where the file(s) or folder(s) should be moved to.')
+                'You must specifiy the path where the file(s) or folder(s) should be copied to.')
             )
         );
         $toPath->addValidator('FilePath', true, array(
