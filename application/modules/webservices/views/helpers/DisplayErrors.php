@@ -9,13 +9,13 @@ class Zend_View_Helper_DisplayErrors extends Zend_View_Helper_Abstract
             return '';
         }
 
-        foreach($errors as $error) {
+        foreach($errors as $param => $error) {
             if ( ! is_array($error)) {
                 continue;
             }
 
             foreach($error as $message) {
-                $html .= '<li>' . $this->view->escape($message) . '</li>';
+                $html .= '<li><strong>' . $this->view->escape( $param ) .'</strong>: ' . $this->view->escape($message) . '</li>';
             }
         }
 
