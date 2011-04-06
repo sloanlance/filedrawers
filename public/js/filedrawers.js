@@ -380,7 +380,7 @@ FD.DirList = function() {
 			var tableState = dirTable.getState();
 			var callback = getAjaxListCallback(dirTable);
 			
-			var cutCopyFiles = [];
+			cutCopyFiles = [];
 
 			for (var i=0; i < tableState.selectedRows.length; i++) {
 				cutCopyFiles.push(dirTable.getRecord(tableState.selectedRows[i]).getData().filename);
@@ -391,6 +391,8 @@ FD.DirList = function() {
 			clearTable();
 						
 			FD.cutCopyEvent.fire();
+			
+			alert(cutCopyFiles);
 						
 		},
 		
@@ -399,11 +401,50 @@ FD.DirList = function() {
 				return;
 			}
 			
-			//add code to perform paste here.
+			var successHandler = function(o) {
 			
-			alert("paste function reached");
-			cutCopyFiles = [];
-			cutCopyURL = "";
+				var callback = getAjaxListCallback(dirTable);
+				
+				if (clipboardState == "cut") {
+					var sUrl = baseUrl + 'webservices/move/?format=json';
+				} else if (clipboardState == "copy") {
+					var sUrl = baseUrl + 'webservices/copy/?format=json';
+				} else {
+					alert("no clipboardState available");
+				}
+				
+				sUrl += '&path=' + cutCopyURL;
+				
+				var postData = 'files[]=';
+				
+				postData += cutCopyFiles.join('&files[]=');
+				
+				postData += '&formToken=' + YAHOO.lang.JSON.parse(o.responseText).formToken;
+				postData += '&fromPath=' + cutCopyURL;
+				postData += '&toPath=' + currentURL;
+				
+				alert(postData);
+
+				var request = YAHOO.util.Connect.asyncRequest('POST', sUrl, callback, postData);			
+			};
+			
+			var failureHandler = function(o) {
+				alert(o.status + " : " + o.statusText);
+			};
+			
+			var getToken = function() {		
+				YAHOO.util.Connect.asyncRequest("POST", 'webservices/gettoken?format=json', {
+					success: successHandler,
+					failure: failureHandler
+				});
+				return false;
+			};
+			
+			getToken();
+			
+			alert("paste function reached.  action = " + clipboardState + ".  files = " + cutCopyFiles + ".  prevURL = " + cutCopyURL);
+			//cutCopyFiles = [];
+			//cutCopyURL = "";
 			FD.cutCopyEvent.fire();
 		}
 							
