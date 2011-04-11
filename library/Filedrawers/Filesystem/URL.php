@@ -29,7 +29,7 @@ abstract class Filedrawers_Filesystem_URL extends Filedrawers_Filesystem {
         $this->_path = $path;
     }
 
-    public function getUrl( $path = NULL ) {
+    public function getUrl( $file = NULL ) {
         $url = $this->_scheme .'://';
         if ( ! empty( $this->_user )) {
             $url .= $this->_user;
@@ -40,12 +40,130 @@ abstract class Filedrawers_Filesystem_URL extends Filedrawers_Filesystem {
         }
         $url .= $this->_host;
 
-        if ( $path === NULL ) {
-            $path = $this->_path;
+        $url .= '/'. ltrim( $this->_path, '/' );
+
+        if ( ! empty( $file )) {
+            $url = rtrim( $url, '/' ) . '/' .$file;
         }
 
-        $url .= '/'. ltrim( $path, '/' );
+        return trim( $url );
+    }
 
-        return $url;
+
+    public function createDirectory($path, $name)
+    {
+        $name = basename($name);
+
+        if ( ! @mkdir($this->getUrl( $name ), 0744, true)) {
+            throw new Filedrawers_Filesystem_Exception(sprintf(
+                'Unable to create the directory "%s".', $name), 5);
+        }
+    }
+
+
+    public function addListHelper($function)
+    {
+        $this->listHelpers[] = $function;
+    }
+
+
+    public function listDirectory($path, $associativeArray=false)
+    {
+        $this->setPath( $path );
+        $url = $this->getUrl();
+        $url = (is_file($url)) ? dirname($url) : $url;
+
+        $files = array();
+        $files['path'] = $path;
+
+        // Open the path and read its contents
+        if ( !$dh = @opendir( $url )) {
+            throw new Filedrawers_Filesystem_Exception(sprintf('Unable to view: %s', $path), 5);
+        }
+
+        while ( $filename = readdir( $dh )) {
+            $row = $this->_getInfo($this->getUrl( $filename ));
+
+            if ($row === false) {
+                continue;
+            }
+
+            if ($associativeArray) {
+                $files['contents'][$filename] = $row;
+            } else {
+                $files['contents'][] = $row;
+            }
+        }
+
+        function naturalSortByName($a, $b) {
+            return strnatcasecmp($a['filename'], $b['filename']);
+        }
+
+        // Some list helpers may disable filename
+        if (isset($files['contents'][0]['filename'])) {
+            usort($files['contents'], 'naturalSortByName');
+        }
+
+        @closedir( $dh );
+        return $files;
+    }
+
+
+    protected function _fileExists($path)
+    {
+        clearstatcache();
+        return (is_array(@lstat($path))) ? true : false;
+    }
+
+
+    protected function _getInfo($url, $useListHelpers=true)
+    {
+        clearstatcache();
+        if ( ! $fileStats = @lstat($url)) {
+            $modTime = '';
+            $size = 0;
+        }
+        else {
+            $modTime = $fileStats['mtime'];
+            $size = $fileStats['size'];
+        }
+
+        $info = array(
+            'type' => filetype($url),
+            'filename' => basename( $url ),
+            'modTime' => $modTime,
+            'size' => $size);
+
+        if ($useListHelpers) {
+            foreach($this->listHelpers as $helper) {
+                call_user_func_array($helper, array(&$info));
+            }
+        }
+
+        return $info;
+    }
+
+
+    public function getInfo($path)
+    {
+
+        try {
+            $this->setPath( $path );
+            $url = $this->getUrl();
+
+            if ( ! $this->_fileExists($url)) {
+                return false;
+            }
+
+            $info = $this->_getInfo($url, false);
+            $info['modifyable'] = @is_writable($url);
+            $info['readable'] = @is_readable($url);
+
+            check( $info );
+            return $info;
+        }
+        catch (Filedrawers_Filesystem_Exception $e) {
+            return false;
+        }
     }
 }
