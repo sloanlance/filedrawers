@@ -48,13 +48,13 @@ class Webservices_V1Controller extends Zend_Controller_Action {
 
     public function preDispatch()
     {
-        $filesystemValidator = new Zend_Validate_InArray( array( 'afs', 'cifs' ));
+        $filesystemValidator = new Zend_Validate_InArray( Zend_Registry::get('config')->filesystem->filesystems->active->toArray());
         $filesystemValidator->setStrict( TRUE );
         $validators = array(
             'filesystem' => array(
                 $filesystemValidator,
                 'presence' => 'optional',
-                'default' => 'afs'
+                'default' => Zend_Registry::get('config')->filesystem->default
             )
         );
         $options = array('inputNamespace' => 'Filedrawers_Validate');
@@ -85,6 +85,10 @@ class Webservices_V1Controller extends Zend_Controller_Action {
 
             $this->_filesystem = new Model_Cifs();
             $this->_filesystem->setShareName( $shareInput->share );
+            Zend_Registry::set('filesystem', $this->_filesystem);
+            break;
+        case 'local':
+            $this->_filesystem = new Model_File();
             Zend_Registry::set('filesystem', $this->_filesystem);
             break;
         case 'afs':

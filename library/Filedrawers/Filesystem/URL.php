@@ -52,13 +52,93 @@ abstract class Filedrawers_Filesystem_URL extends Filedrawers_Filesystem {
 
     public function createDirectory($path, $name)
     {
+        $this->setPath( $path );
         $name = basename($name);
 
-        if ( ! @mkdir($this->getUrl( $name ), 0744, true)) {
+        if ( ! mkdir($this->getUrl( $name ), 0744, true)) {
             throw new Filedrawers_Filesystem_Exception(sprintf(
                 'Unable to create the directory "%s".', $name), 5);
         }
     }
+
+
+    public function remove($path, $files)
+    {
+        $this->setPath( $path );
+        $files = (array)$files;
+        $deletedCount = 0;
+
+        foreach ($files as $file) {
+            if(empty($file)){
+                // otherwise you will start deleting directories
+                continue;
+            }
+
+            $url = $this->getUrl( $file );
+
+            if ( is_dir($url) && ! is_link( $url )) {
+                $this->_removeDir($url);
+                $deletedCount++;
+            } else {
+                if ( ! @unlink( $url )) {
+                    throw new Filedrawers_Filesystem_Exception(sprintf(
+                'Unable to remove the file "%s".', basename($file)), 2);
+                } else {
+                    $deletedCount++;
+                }
+            }
+        }
+
+        if ($deletedCount == 0) {
+            throw new Filedrawers_Filesystem_Exception('No files deleted', 2);
+        }
+    }
+
+
+    // Remove an existing directory
+    // jackylee at eml dot cc
+    protected function _removeDir($url)
+    {
+        $name = basename($url);
+
+        if ( !$handle = @opendir( $url )) {
+            throw new Filedrawers_Filesystem_Exception(sprintf(
+                'Unable to remove "%s" because it no longer exists.',
+                $name), 404);
+        }
+
+        while ( false !== ( $item = readdir( $handle ))) {
+
+            if ( $item == "." || $item == ".." ) {
+                continue;
+            }
+
+            $itemUrl = ltrim( $url, '/' ) .'/'. $item;
+
+            if (@is_dir($itemUrl) && ! @is_link($itemUrl)) {
+                $this->_removeDir($itemUrl);
+            } else {
+                if ( ! @is_writable($itemUrl) || ! @unlink($itemUrl)) {
+                    throw new Filedrawers_Filesystem_Exception(sprintf(
+                        'Unable to remove the file "%s".', basename( $itemUrl )), 5);
+                }
+            }
+        }
+
+        closedir( $handle );
+
+        if (is_writable($url) && $this->_rmdir($url)) {
+        } else {
+            throw new Filedrawers_Filesystem_Exception(sprintf(
+                        'Unable to remove the folder "%s".', $url ), 5);
+        }
+    }
+
+    protected function _rmdir( $url )
+    {
+        return rmdir( $url );
+    }
+
 
 
     public function addListHelper($function)
@@ -109,10 +189,10 @@ abstract class Filedrawers_Filesystem_URL extends Filedrawers_Filesystem {
     }
 
 
-    protected function _fileExists($path)
+    protected function _fileExists($url)
     {
         clearstatcache();
-        return (is_array(@lstat($path))) ? true : false;
+        return (is_array(@lstat($url))) ? true : false;
     }
 
 
@@ -159,7 +239,6 @@ abstract class Filedrawers_Filesystem_URL extends Filedrawers_Filesystem {
             $info['modifyable'] = @is_writable($url);
             $info['readable'] = @is_readable($url);
 
-            check( $info );
             return $info;
         }
         catch (Filedrawers_Filesystem_Exception $e) {
