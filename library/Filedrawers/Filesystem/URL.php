@@ -140,6 +140,45 @@ abstract class Filedrawers_Filesystem_URL extends Filedrawers_Filesystem {
     }
 
 
+    public function rename($oldPath, $newPath)
+    {
+        $this->setPath( $newPath );
+        $newUrl = $this->getUrl();
+        $this->setPath( $oldPath );
+        $oldUrl = $this->getUrl();
+        //
+        // Don't remove this because filedrawers_rename doesn't check for existing files
+        if ($this->_fileExists($newUrl)) {
+            throw new Filedrawers_Filesystem_Exception(sprintf('A file or directory with name "%s" already exists.', basename($newUrl)), 5);
+        }
+
+        if ( ! rename($oldUrl, $newUrl )) {
+            throw new Filedrawers_Filesystem_Exception(sprintf('Unable to rename this file or folder "%s"', basename($newUrl)), 5);
+        }
+    }
+
+
+    public function move($files, $fromPath, $toPath)
+    {
+        $files = (array)$files;
+
+        foreach ( $files as $file ) {
+            if ( empty( $file )) {
+                continue;
+            }
+
+            $from = $fromPath . '/' . $file;
+            $to   = $toPath . '/' . $file;
+
+            try {
+                $this->rename($from, $to);
+            }
+            catch (Filedrawers_Filesystem_Exception $e) {
+                throw new Filedrawers_Filesystem_Exception(sprintf('Unable to move "%s"', $file), 5);
+            }
+        }
+    }
+
 
     public function addListHelper($function)
     {
