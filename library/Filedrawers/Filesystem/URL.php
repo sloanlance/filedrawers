@@ -180,6 +180,96 @@ abstract class Filedrawers_Filesystem_URL extends Filedrawers_Filesystem {
     }
 
 
+    public function duplicate($oldPath, $newPath)
+    {
+        $this->setPath( $oldPath );
+        $oldUrl = $this->getUrl();
+
+        $this->setPath( $newPath );
+        $newUrl = $this->getUrl();
+
+        if ( filetype( $oldUrl ) == 'dir' ) {
+            try {
+                $this->_copyDirectory( $oldPath, $newPath );
+            }
+            catch (Filedrawers_Filesystem_Exception $e) {
+                chdir($this->startCWD);
+                throw new Filedrawers_Filesystem_Exception(sprintf('Unable to copy directory "%s"', $oldPath), 5);
+            }
+        } else {
+            try {
+                $this->_copyFiles( $oldUrl, $newUrl );
+            }
+            catch (Filedrawers_Filesystem_Exception $e) {
+                chdir($this->startCWD);
+                throw new Filedrawers_Filesystem_Exception(sprintf('Unable to copy file "%s"', basename( $oldUrl )), 5);
+            }
+        }
+    }
+
+
+    public function copy($files, $fromPath, $toPath)
+    {
+        $files = (array) $files;
+
+        foreach ( $files as $file ) {
+            if ( empty( $file )) {
+                continue;
+            }
+
+            // Security checks in Filesystem::_copyFiles() and Filesystem::_copyDirectory
+            $from = $fromPath . '/' . $file;
+            $to   = $toPath . '/' . $file;
+
+            try {
+                $this->duplicate($from, $to);
+            } catch (FileDrawers_Filesystem_Exception $e) {
+                throw new FileDrawers_Filesystem_Exception(sprintf('Unable to copy "%S"', $file), 5);
+            }
+        }
+    }
+
+
+    /* A helper function for copy().  Copies an entire directory at once.
+     * Original author: swizec at swizec dot com, php.net
+     */
+    protected function _copyDirectory( $source, $target )
+    {
+        if ( ! @mkdir( $target, 0755 )) {
+            chdir($this->startCWD);
+            throw new Filedrawers_Filesystem_Exception('Copy directory: unable to create new directory', 5);
+        }
+
+        // TODO: Prevent copying directory inside of itself
+
+        $dir = dir( $source );
+
+        while ( false !== ( $entry = $dir->read())) {
+            if ( $entry == '.' || $entry == '..' ) {
+                continue;
+            }
+
+            $sourceUrl = rtrim( $source, '/' ) . '/' . $entry;
+            $targetUrl = rtrim( $target, '/' ) . '/' . $entry;
+
+            if ( filetype( $sourceUrl ) == 'dir' ) {
+                $this->_copyDirectory($sourceUrl, $targetUrl);
+            } else {
+                $this->_copyFiles($sourceUrl, $targetUrl);
+            }
+        }
+
+        $dir->close();
+    }
+
+    protected function _copyFiles($source, $dest)
+    {
+        if ( ! @copy( $source, $dest )) {
+            throw new Filedrawers_Filesystem_Exception(sprintf('Unable to copy "%s".', basename( $source )), 3);
+        }
+    }
+
+
     public function addListHelper($function)
     {
         $this->listHelpers[] = $function;
