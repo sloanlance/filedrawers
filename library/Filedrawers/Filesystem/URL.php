@@ -269,6 +269,34 @@ abstract class Filedrawers_Filesystem_URL extends Filedrawers_Filesystem {
     }
 
 
+    public function getFileHandle($path)
+    {
+        $this->setPath( $path );
+        $url = $this->getUrl();
+
+        clearstatcache();
+
+        if ( $handle = @fopen($url, "rb")) {
+            $stat = @fstat($handle);
+            if ( is_array($stat)) {
+                return $handle;
+            }
+            else {
+                chdir($this->startCWD);
+                throw new Filedrawers_Filesystem_Exception(
+                    'The specified file or directory does not exist or is inaccessible', 404
+                );
+                return;
+            }
+        }
+        else {
+            throw new Filedrawers_Filesystem_Exception(
+                'The specified file or directory does not exist or is inaccessible', 404
+            );
+        }
+    }
+
+
     public function addListHelper($function)
     {
         $this->listHelpers[] = $function;
