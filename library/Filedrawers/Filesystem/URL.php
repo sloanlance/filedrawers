@@ -43,7 +43,7 @@ abstract class Filedrawers_Filesystem_URL extends Filedrawers_Filesystem {
         $url .= '/'. ltrim( $this->_path, '/' );
 
         if ( ! empty( $file )) {
-            $url = rtrim( $url, '/' ) . '/' .$file;
+            $url .= '/'. ltrim( $file, '/' );
         }
 
         return trim( $url );
@@ -290,7 +290,8 @@ abstract class Filedrawers_Filesystem_URL extends Filedrawers_Filesystem {
         }
 
         while ( $filename = readdir( $dh )) {
-            $row = $this->_getInfo($this->getUrl( $filename ));
+            $url = $this->getUrl( $filename );
+            $row = $this->_getInfo( $url );
 
             if ($row === false) {
                 continue;
@@ -316,6 +317,10 @@ abstract class Filedrawers_Filesystem_URL extends Filedrawers_Filesystem {
         return $files;
     }
 
+    public function getHomedir()
+    {
+        return '/';
+    }
 
     protected function _fileExists($url)
     {
