@@ -190,11 +190,10 @@ abstract class Filedrawers_Filesystem_URL extends Filedrawers_Filesystem {
 
         if ( filetype( $oldUrl ) == 'dir' ) {
             try {
-                $this->_copyDirectory( $oldPath, $newPath );
+                $this->_copyDirectory( $oldUrl, $newUrl );
             }
             catch (Filedrawers_Filesystem_Exception $e) {
-                chdir($this->startCWD);
-                throw new Filedrawers_Filesystem_Exception(sprintf('Unable to copy directory "%s"', $oldPath), 5);
+                throw new Filedrawers_Filesystem_Exception(sprintf('Unable to copy directory "%s"', basename( $oldUrl )), 5);
             }
         } else {
             try {
@@ -224,7 +223,7 @@ abstract class Filedrawers_Filesystem_URL extends Filedrawers_Filesystem {
             try {
                 $this->duplicate($from, $to);
             } catch (FileDrawers_Filesystem_Exception $e) {
-                throw new FileDrawers_Filesystem_Exception(sprintf('Unable to copy "%S"', $file), 5);
+                throw new FileDrawers_Filesystem_Exception(sprintf('Unable to copy "%s"', $file), 5);
             }
         }
     }
@@ -236,7 +235,7 @@ abstract class Filedrawers_Filesystem_URL extends Filedrawers_Filesystem {
     protected function _copyDirectory( $source, $target )
     {
         if ( ! @mkdir( $target, 0755 )) {
-            chdir($this->startCWD);
+            //check ( $source, $target );
             throw new Filedrawers_Filesystem_Exception('Copy directory: unable to create new directory', 5);
         }
 
