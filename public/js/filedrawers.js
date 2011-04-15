@@ -5,7 +5,8 @@ currentURL,
 cutCopyURL,
 cutCopyFiles = [],
 clipboardState,
-baseUrl = '';
+baseUrl = '',
+History = YAHOO.util.History;
 
 if (typeof FD == "undefined" || ! FD) {
 	var FD = {};
@@ -81,7 +82,6 @@ FD.DirList = function() {
 	};
 	
 	formatURL = function(elCell, oRecord, oColumn, sData) {	
-		// this works for files.  add code to handle folders.
 		
 		if (oRecord.getData("type") == "dir") {
 			elCell.innerHTML = '<a id="folderLink">' + sData + '</a>';
@@ -105,7 +105,9 @@ FD.DirList = function() {
 	handleTableClick = function(oArgs) {
 					
 		if (oArgs.target.id == "folderLink") {
-			myDataSource.sendRequest("list/?format=json&path=" + currentURL + "/" + oArgs.target.innerHTML, dirTable.onDataReturnInitializeTable, dirTable);
+			//myDataSource.sendRequest("list/?format=json&path=" + currentURL + "/" + oArgs.target.innerHTML, dirTable.onDataReturnInitializeTable, dirTable);
+			var newDir = currentURL + "/" + oArgs.target.innerHTML;
+			History.navigate("dirTable", newDir);
 		}		
 		
 	};
@@ -189,6 +191,7 @@ FD.DirList = function() {
 			myDataSource.doBeforeCallback = hiddenFileFilter;
 					
 			myDataSource.subscribe('responseEvent', function(oDS){  // triggered by data return
+				
 				myJSONdata = YAHOO.lang.JSON.parse(oDS.response.responseText);
 				currentURL = YAHOO.lang.dump(myJSONdata.path);
 				
@@ -442,10 +445,14 @@ FD.DirList = function() {
 			
 			getToken();
 			
-			alert("paste function reached.  action = " + clipboardState + ".  files = " + cutCopyFiles + ".  prevURL = " + cutCopyURL);
+			alert("action = " + clipboardState + ".  files = " + cutCopyFiles + ".  prevURL = " + cutCopyURL);
 			//cutCopyFiles = [];
 			//cutCopyURL = "";
 			FD.cutCopyEvent.fire();
+		},
+		
+		reqSender: function(directory) {
+			myDataSource.sendRequest("list/?format=json&path=" + directory, dirTable.onDataReturnInitializeTable, dirTable);		
 		}
 							
 		/*
@@ -793,5 +800,8 @@ YAHOO.util.Event.addListener(window, "load", function() {
 		//alert(homeURL);
 		myDataSource.sendRequest("list/?format=json", dirTable.onDataReturnInitializeTable, dirTable);
 	});
+	
+	History.register("dirTable", "/afs/umich.edu/user/c/l/cland", dirList.reqSender);
+	History.initialize("yui-history-field", "yui-history-iframe");
 	
 });

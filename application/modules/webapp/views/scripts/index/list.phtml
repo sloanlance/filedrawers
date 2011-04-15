@@ -8,6 +8,7 @@ $this->headScript()->appendFile('yui/build/element/element-min.js');
 $this->headScript()->appendFile('yui/build/datasource/datasource-min.js');
 $this->headScript()->appendFile('yui/build/datatable/datatable-min.js');
 $this->headScript()->appendFile('yui/build/connection/connection-min.js');
+$this->headScript()->appendFile('yui/build/history/history-min.js');
 $this->headScript()->appendFile('yui/build/json/json-min.js');
 $this->headScript()->appendFile('js/filedrawers.js');
 ?>
@@ -225,7 +226,8 @@ $this->headScript()->appendFile('js/filedrawers.js');
 		</div>
 	</form>
 
-
+	<iframe id="yui-history-iframe" src="images/mime/small/0000000dir.gif"></iframe>
+	<input id="yui-history-field" type="hidden">
 
 	</body>
 		

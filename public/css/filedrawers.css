@@ -507,3 +507,12 @@ div.expandItem h2, form.expandItem h2 {
     margin: 0;
     padding: 5px 10px;
 }
+
+#yui-history-iframe {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 1px;
+  height: 1px;
+  visibility: hidden;
+}
