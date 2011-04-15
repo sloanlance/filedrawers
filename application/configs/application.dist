@@ -23,6 +23,9 @@ filedrawers.version="0.5.0"
 
 ;filesystem.forceAfsUserDir=""
 filesystem.root="/afs/"
+filesystem.default="afs"
+filesystem.filesystems.active[]="afs"
+filesystem.filesystems.active[]="cifs"
 
 mime.imagesPath=""
 
@@ -48,4 +51,5 @@ resources.session.saveHandler.options.lifetimeColumn = "lifetime"
 phpSettings.display_startup_errors = 1
 phpSettings.display_errors = 1
 phpSettings.error_reporting = E_ALL
+filesystem.filesystems.active[]="local"
 
