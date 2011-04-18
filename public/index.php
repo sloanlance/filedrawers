@@ -28,7 +28,6 @@ if ( ! extension_loaded( 'filedrawers' )) {
 defined('APPLICATION_PATH')
     || define('APPLICATION_PATH', realpath(dirname(__FILE__) . '/../application'));
 
-// Define application environment
 defined('APPLICATION_ENVIRONMENT')
     || define('APPLICATION_ENVIRONMENT', (getenv('APPLICATION_ENVIRONMENT') ? getenv('APPLICATION_ENVIRONMENT') : 'production'));
 
@@ -41,10 +40,13 @@ set_include_path(implode(PATH_SEPARATOR, array(
 /** Zend_Application */
 require_once 'Zend/Application.php';
 
+require APPLICATION_PATH .'/configs/application.php';
+@include APPLICATION_PATH .'/configs/local.php';
+
 // Create application, bootstrap, and run
 $application = new Zend_Application(
     APPLICATION_ENVIRONMENT,
-    APPLICATION_PATH . '/configs/application.ini'
+    $conf // defined by configs/application.php and configs/local.php
 );
 
 $application->bootstrap()

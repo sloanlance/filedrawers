@@ -17,11 +17,8 @@ class Bootstrap extends Zend_Application_Bootstrap_Bootstrap
 
     protected function _initConfig()
     {
-        $config = new Zend_Config_Ini(
-            APPLICATION_PATH . '/configs/application.ini',
-            APPLICATION_ENVIRONMENT
-        );
-        Zend_Registry::set('config', $config);
+        global $conf;
+        Zend_Registry::set('config', new Zend_Config( $conf ));
     }
 
 
