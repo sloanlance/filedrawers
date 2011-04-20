@@ -396,8 +396,6 @@ FD.DirList = function() {
 			clearTable();
 						
 			FD.cutCopyEvent.fire();
-			
-			alert(cutCopyFiles);
 						
 		},
 		
@@ -427,10 +425,13 @@ FD.DirList = function() {
 				postData += '&formToken=' + YAHOO.lang.JSON.parse(o.responseText).formToken;
 				postData += '&fromPath=' + cutCopyURL;
 				postData += '&toPath=' + currentURL;
-				
-				alert(postData);
 
-				var request = YAHOO.util.Connect.asyncRequest('POST', sUrl, callback, postData);			
+				var request = YAHOO.util.Connect.asyncRequest('POST', sUrl, callback, postData);	
+
+				cutCopyFiles = [];
+				cutCopyURL = "";
+				
+				FD.cutCopyEvent.fire();
 			};
 			
 			var failureHandler = function(o) {
@@ -448,9 +449,7 @@ FD.DirList = function() {
 			getToken();
 			
 			alert("action = " + clipboardState + ".  files = " + cutCopyFiles + ".  prevURL = " + cutCopyURL);
-			//cutCopyFiles = [];
-			//cutCopyURL = "";
-			FD.cutCopyEvent.fire();
+			
 		},
 		
 		reqSender: function(directory) {
