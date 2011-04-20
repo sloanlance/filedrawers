@@ -198,7 +198,8 @@ FD.DirList = function() {
 		
 	
 	return {
-		init: function() {
+		init: function(bookmarkDir) {
+	
                         filedrawersApi = new FD.api();
 			myDataSource = new YAHOO.util.DataSource("webservices/");  // first call
 			myDataSource.responseType = YAHOO.util.DataSource.TYPE_JSON; 
@@ -227,9 +228,11 @@ FD.DirList = function() {
 				changeDirForm.innerHTML = YAHOO.lang.dump(myJSONdata.path);
 
 			}
-			);				
+			);	
+			
+			var initReq = (bookmarkDir) ? "list/?format=json&path=" + bookmarkDir : "list/?format=json";
 					
-			dirTable = new YAHOO.widget.DataTable("content", myColumnDefs, myDataSource, {initialRequest:"list/?format=json"});
+			dirTable = new YAHOO.widget.DataTable("content", myColumnDefs, myDataSource, {initialRequest:initReq});
 			
 			dirTable.subscribe('checkboxClickEvent', handleFileSelection);
 			dirTable.subscribe('click', handleTableClick);
@@ -392,8 +395,6 @@ FD.DirList = function() {
 			clearTable();
 						
 			FD.cutCopyEvent.fire();
-			
-			alert(cutCopyFiles);
 						
 		},
 		
@@ -423,10 +424,13 @@ FD.DirList = function() {
 				postData += '&formToken=' + YAHOO.lang.JSON.parse(o.responseText).formToken;
 				postData += '&fromPath=' + cutCopyURL;
 				postData += '&toPath=' + currentURL;
-				
-				alert(postData);
 
-				var request = YAHOO.util.Connect.asyncRequest('POST', sUrl, callback, postData);			
+				var request = YAHOO.util.Connect.asyncRequest('POST', sUrl, callback, postData);	
+
+				cutCopyFiles = [];
+				cutCopyURL = "";
+				
+				FD.cutCopyEvent.fire();
 			};
 			
 			var failureHandler = function(o) {
@@ -444,9 +448,7 @@ FD.DirList = function() {
 			getToken();
 			
 			alert("action = " + clipboardState + ".  files = " + cutCopyFiles + ".  prevURL = " + cutCopyURL);
-			//cutCopyFiles = [];
-			//cutCopyURL = "";
-			FD.cutCopyEvent.fire();
+			
 		},
 		
 		reqSender: function(directory) {
@@ -771,10 +773,15 @@ FD.FileInspector = function() {
 
 YAHOO.util.Event.addListener(window, "load", function() {
 				
+	var bookmarkDir = History.getBookmarkedState("dirTable");
+	
 	var dirList = new FD.DirList(),
-	dirTable = dirList.init(),
+	dirTable = dirList.init(bookmarkDir),
 	inspector = new FD.FileInspector(),
 	infoBar = new FD.InfoBar();
+	
+	History.register("dirTable", "/afs/umich.edu/user/c/l/cland", dirList.reqSender);
+	History.initialize("yui-history-field", "yui-history-iframe");
 	
 	inspector.evnt.subscribe(dirList.toggleHiddenFilter);
 	inspector.evnt.subscribe(dirList.deleteItems);
@@ -799,7 +806,6 @@ YAHOO.util.Event.addListener(window, "load", function() {
 		myDataSource.sendRequest("list/?format=json", dirTable.onDataReturnInitializeTable, dirTable);
 	});
 	
-	History.register("dirTable", "/afs/umich.edu/user/c/l/cland", dirList.reqSender);
-	History.initialize("yui-history-field", "yui-history-iframe");
+	
 	
 });
