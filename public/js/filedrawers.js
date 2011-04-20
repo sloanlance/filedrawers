@@ -18,6 +18,25 @@ function roundNum( num )
 		Math.pow( 10, 1 );
 }
 
+FD.api = function() {
+    return {
+        post: function( url, callback, postData ) {
+            var getTokenSuccessHandler = function(o) {
+                    postData += '&formToken=' + YAHOO.lang.JSON.parse(o.responseText).formToken;
+                    YAHOO.util.Connect.asyncRequest('POST', url, callback, postData);
+            };
+
+            var getTokenFailureHandler = function(o) {
+                    alert(o.status + " : " + o.statusText);
+            };
+
+            YAHOO.util.Connect.asyncRequest("GET", 'webservices/gettoken?format=json', {
+                    success: getTokenSuccessHandler,
+                    failure: getTokenFailureHandler
+            });
+        }
+    }
+}
 
 // redundant - make dirTable formating use this function.
 FD.Utils = {
@@ -180,7 +199,7 @@ FD.DirList = function() {
 	
 	return {
 		init: function() {
-	
+                        filedrawersApi = new FD.api();
 			myDataSource = new YAHOO.util.DataSource("webservices/");  // first call
 			myDataSource.responseType = YAHOO.util.DataSource.TYPE_JSON; 
 			myDataSource.responseSchema = {
@@ -289,33 +308,12 @@ FD.DirList = function() {
 		},
 
 		createNewFolder: function(e, args) {
-						
-			var successHandler = function(o) {
-			
-				var callback = getAjaxListCallback(dirTable);
-				var sUrl = baseUrl + 'webservices/mkdir/?format=json';
-				
-				var postData = 'folderName=' + args[0];
-				postData += '&formToken=' + YAHOO.lang.JSON.parse(o.responseText).formToken;
-				postData += '&path=' + currentURL;
-				
-				var request = YAHOO.util.Connect.asyncRequest('POST', sUrl, callback, postData);			
-			};
-			
-			var failureHandler = function(o) {
-				alert(o.status + " : " + o.statusText);
-			};
-			
-			var getToken = function() {		
-				YAHOO.util.Connect.asyncRequest("POST", 'webservices/gettoken?format=json', {
-					success: successHandler,
-					failure: failureHandler
-				});
-				return false;
-			};
-			
-			getToken();
-			
+                        var sUrl = baseUrl + 'webservices/mkdir/?format=json';
+                        var callback = getAjaxListCallback(dirTable);
+                        var postData = 'folderName=' + args[0]; // TODO escape or validate user input
+                        postData += '&path=' + currentURL;
+
+                        filedrawersApi.post( sUrl, callback, postData );
 		},
 		
 		renameItem: function(e, action) {
