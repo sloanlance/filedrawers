@@ -324,8 +324,7 @@ FD.DirList = function() {
 
 			var tableState = dirTable.getState();
 
-			showHidden = ! showHidden;
-			
+			showHidden = ! showHidden;			
 
 			var l = document.getElementById( 'hidnFilesCtrl' );
 				if ( showHidden ) {
@@ -355,34 +354,13 @@ FD.DirList = function() {
 			var tableState = dirTable.getState();
 			var callback = getAjaxListCallback(dirTable);	
 		
-			var postData = 'files[]=';
 			var files = [];
 
 			for (var i=0; i < tableState.selectedRows.length; i++) {
 				files.push(dirTable.getRecord(tableState.selectedRows[i]).getData().filename);
 			}
-					
-			postData += files.join('&files[]=');		
-			
-			var successHandler = function(o) {
-				var sUrl = baseUrl + 'webservices/delete/?path=' + currentURL;
-				postData += '&formToken=' + YAHOO.lang.JSON.parse(o.responseText).formToken;
-				var request = YAHOO.util.Connect.asyncRequest('POST', sUrl, callback, postData);				
-			};
-			
-			var failureHandler = function(o) {
-				alert(o.status + " : " + o.statusText);
-			};
-			
-			var getToken = function() {		
-				YAHOO.util.Connect.asyncRequest("POST", 'webservices/gettoken?format=json', {
-					success: successHandler,
-					failure: failureHandler
-				});
-				return false;
-			};
-			
-			getToken();			
+
+			filedrawersApi.post( 'delete', callback, { 'files': files, 'path': currentURL } );				
 		
 		},
 
@@ -416,31 +394,8 @@ FD.DirList = function() {
 		
 		handleNameEditorSave: function(oArgs) {
 		
-			var callback = getAjaxListCallback(this);
-			var sUrl = baseUrl + 'webservices/rename/?format=json';
-
-			var postData = 'oldName=' + oArgs.oldData + '&newName=' + oArgs.newData;
-			postData += '&path=' + currentURL;
-		
-			var successHandler = function(o) {
-			
-				postData += '&formToken=' + YAHOO.lang.JSON.parse(o.responseText).formToken;
-				var request = YAHOO.util.Connect.asyncRequest('POST', sUrl, callback, postData);			
-			};
-			
-			var failureHandler = function(o) {
-				alert(o.status + " : " + o.statusText);
-			};
-			
-			var getToken = function() {		
-				YAHOO.util.Connect.asyncRequest("POST", 'webservices/gettoken?format=json', {
-					success: successHandler,
-					failure: failureHandler
-				});
-				return false;
-			};
-			
-			getToken();
+			var callback = getAjaxListCallback(this);			
+			filedrawersApi.post( 'rename', callback, { 'oldName': oArgs.oldData, 'newName':oArgs.newData, 'path': currentURL } );		
 
 		},
 		
@@ -473,7 +428,28 @@ FD.DirList = function() {
 		pasteItems: function(e, action) {
 			if (action != 'paste') {
 				return;
+			}			
+			
+			var callback = getAjaxListCallback(dirTable);
+				
+			if (clipboardState == "cut") {
+				var pasteAction = 'move';
+			} else if (clipboardState == "copy") {
+				var pasteAction = 'copy';
+			} else {
+				alert("no clipboardState available");
 			}
+			
+			filedrawersApi.post( pasteAction, callback, { 'files': cutCopyFiles, 'fromPath': cutCopyURL, 'toPath': currentURL} );
+			
+			cutCopyFiles = [];
+			cutCopyURL = "";
+				
+			FD.cutCopyEvent.fire();
+			
+			/*
+			
+			
 			
 			var successHandler = function(o) {
 			
@@ -520,6 +496,8 @@ FD.DirList = function() {
 			getToken();
 			
 			alert("action = " + clipboardState + ".  files = " + cutCopyFiles + ".  prevURL = " + cutCopyURL);
+			
+			*/
 			
 		},
 		
