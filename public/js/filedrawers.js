@@ -18,23 +18,90 @@ function roundNum( num )
 		Math.pow( 10, 1 );
 }
 
+function urlEncode( data ) {
+    var query_parts = [];
+    for ( var key in data ) {
+        value = data[ key ];
+        if ( typeof value == 'string' ) {
+            query_parts.push( escape( key ) +'='+ escape( value ));
+        } else if ( typeof value == 'object' ) {
+            if ( value instanceof Array ) {
+                for ( var i in value ) {
+                    query_parts.push( escape( key ) +'[]='+ escape( value[ i ] ));
+                }
+            } else if ( value instanceof String ) {
+                query_parts.push( escape( key ) +'='+ escape( value ));
+            } else {
+                console.warn( key +' is not a String or an Array' );
+            }
+        }
+    }
+
+    return query_parts.join( '&' );
+}
+
 FD.api = function() {
+    var _apiUrl = baseUrl +'webservices/v1/';
+    var _urlParams = { 'format': 'json' };
+    var _dataParams = {};
+    var _getParams = function( type, params ) {
+        var merged_params = type;
+        if ( typeof params == 'object' ) {
+            for ( var key in params ) {
+                merged_params[ key ] = params[ key ];
+            }
+        }
+        return merged_params;
+    };
+    var _setParam = function( type, key, value ) {
+        type[ key ] = value;
+    };
     return {
-        post: function( url, callback, postData ) {
+        getUrlParams: function( params ) {
+            return _getParams( _urlParams, params );
+        },
+        setUrlParam: function( key, value ) {
+            _setParam( _urlParams, key, value );
+        },
+
+        getData: function( params ) {
+            return _getParams( _dataParams, params );
+        },
+        setDataParam: function( key, value ) {
+            _setParam( _dataParams, key, value );
+        },
+
+        getActionUrl: function( action, params ) {
+            if ( typeof params == 'undefined' ) {
+               params = _urlParams;
+            }
+            var query = urlEncode( params );
+            if ( query != '' ) {
+                query = '?'+ query;
+            }
+
+            return _apiUrl + action + query;
+        },
+
+        post: function( action, callback, postData ) {
+            var actionUrl = this.getActionUrl( action );
+            var data = this.getData( postData );
+
             var getTokenSuccessHandler = function(o) {
-                    postData += '&formToken=' + YAHOO.lang.JSON.parse(o.responseText).formToken;
-                    YAHOO.util.Connect.asyncRequest('POST', url, callback, postData);
+                    data[ 'formToken' ] = YAHOO.lang.JSON.parse(o.responseText).formToken;
+                    YAHOO.util.Connect.asyncRequest('POST', actionUrl, callback, urlEncode( data ));
             };
 
             var getTokenFailureHandler = function(o) {
                     alert(o.status + " : " + o.statusText);
             };
 
-            YAHOO.util.Connect.asyncRequest("GET", 'webservices/gettoken?format=json', {
+            YAHOO.util.Connect.asyncRequest("GET", this.getActionUrl( 'gettoken' ), {
                     success: getTokenSuccessHandler,
                     failure: getTokenFailureHandler
             });
-        }
+        },
+
     }
 }
 
@@ -311,12 +378,8 @@ FD.DirList = function() {
 		},
 
 		createNewFolder: function(e, args) {
-                        var sUrl = baseUrl + 'webservices/mkdir/?format=json';
                         var callback = getAjaxListCallback(dirTable);
-                        var postData = 'folderName=' + args[0]; // TODO escape or validate user input
-                        postData += '&path=' + currentURL;
-
-                        filedrawersApi.post( sUrl, callback, postData );
+                        filedrawersApi.post( 'mkdir', callback, { 'folderName': args[ 0 ], 'path': currentURL } );
 		},
 		
 		renameItem: function(e, action) {
