@@ -71,10 +71,13 @@ FD.api = function() {
             _setParam( _dataParams, key, value );
         },
 
-        getActionUrl: function( action, params ) {
+        getActionUrl: function( action, params, merge ) {
             if ( typeof params == 'undefined' ) {
                params = _urlParams;
+            } else if ( typeof merge != 'undefined' && merge ) {
+                params = this.getUrlParams( params );
             }
+
             var query = urlEncode( params );
             if ( query != '' ) {
                 query = '?'+ query;
@@ -191,7 +194,6 @@ FD.DirList = function() {
 	handleTableClick = function(oArgs) {
 					
 		if (oArgs.target.id == "folderLink") {
-			//myDataSource.sendRequest("list/?format=json&path=" + currentURL + "/" + oArgs.target.innerHTML, dirTable.onDataReturnInitializeTable, dirTable);
 			var newDir = currentURL + "/" + oArgs.target.innerHTML;
 			History.navigate("dirTable", newDir);
 		}		
@@ -221,7 +223,7 @@ FD.DirList = function() {
 
 				//tableState.sortedBy = tableInitialSort;
 
-				myDataSource.sendRequest("list/?format=json&path=" + currentURL, {
+				myDataSource.sendRequest( filedrawersApi.getActionUrl( 'list' ), {
 					success  : oTable.onDataReturnInitializeTable,
 					failure  : oTable.onDataReturnInitializeTable,
 					scope    : oTable,
@@ -268,7 +270,7 @@ FD.DirList = function() {
 		init: function(bookmarkDir) {
 	
                         filedrawersApi = new FD.api();
-			myDataSource = new YAHOO.util.DataSource("webservices/");  // first call
+			myDataSource = new YAHOO.util.DataSource( '' );  // first call
 			myDataSource.responseType = YAHOO.util.DataSource.TYPE_JSON; 
 			myDataSource.responseSchema = {
 				resultsList: "contents",
@@ -281,6 +283,7 @@ FD.DirList = function() {
 				
 				myJSONdata = YAHOO.lang.JSON.parse(oDS.response.responseText);
 				currentURL = YAHOO.lang.dump(myJSONdata.path);
+                                //filedrawersApi.setUrlParam( 'path', currentURL );
 				
 				if (!homeURL) {
 					homeURL = currentURL;
@@ -297,7 +300,13 @@ FD.DirList = function() {
 			}
 			);	
 			
-			var initReq = (bookmarkDir) ? "list/?format=json&path=" + bookmarkDir : "list/?format=json";
+                        if ( bookmarkDir ) {
+                            var params = { 'path': bookmarkDir };
+                        } else {
+                            var params = {};
+                        }
+                        var initReq = filedrawersApi.getActionUrl( 'list', params, true );
+
 					
 			dirTable = new YAHOO.widget.DataTable("content", myColumnDefs, myDataSource, {initialRequest:initReq});
 			
@@ -327,7 +336,7 @@ FD.DirList = function() {
 				l.replaceChild( t, l.firstChild );
 			}
 			
-			myDataSource.sendRequest("list/?format=json&path=" + currentURL, dirTable.onDataReturnInitializeTable, dirTable);
+			myDataSource.sendRequest( filedrawersApi.getActionUrl( 'list' ), dirTable.onDataReturnInitializeTable, dirTable);
 			
 			/*						
 			myDataSource.sendRequest(showHidden,{
@@ -515,7 +524,8 @@ FD.DirList = function() {
 		},
 		
 		reqSender: function(directory) {
-			myDataSource.sendRequest("list/?format=json&path=" + directory, dirTable.onDataReturnInitializeTable, dirTable);		
+                               params = { 'path': directory };
+			myDataSource.sendRequest( filedrawersApi.getActionUrl( 'list', params, true ), dirTable.onDataReturnInitializeTable, dirTable);		
 		}
 							
 		/*
@@ -843,7 +853,7 @@ YAHOO.util.Event.addListener(window, "load", function() {
 	inspector = new FD.FileInspector(),
 	infoBar = new FD.InfoBar();
 	
-	History.register("dirTable", "/afs/umich.edu/user/c/l/cland", dirList.reqSender);
+	History.register("dirTable", "", dirList.reqSender);
 	History.initialize("yui-history-field", "yui-history-iframe");
 	
 	inspector.evnt.subscribe(dirList.toggleHiddenFilter);
@@ -866,7 +876,7 @@ YAHOO.util.Event.addListener(window, "load", function() {
 	
 	YAHOO.util.Event.on('homeBtn', 'click', function() {
 		//alert(homeURL);
-		myDataSource.sendRequest("list/?format=json", dirTable.onDataReturnInitializeTable, dirTable);
+		myDataSource.sendRequest( filedrawersApi.getActionUrl( 'list' ), dirTable.onDataReturnInitializeTable, dirTable);
 	});
 	
 	
