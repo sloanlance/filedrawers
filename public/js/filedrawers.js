@@ -98,7 +98,6 @@ FD.api = function() {
         post: function( actionUrl, callback, postData ) {
             var data = this.getData( postData );
 
-            console.log( callback );
             var getTokenSuccessHandler = function(o) {
                     data[ 'formToken' ] = YAHOO.lang.JSON.parse(o.responseText).formToken;
                     YAHOO.util.Connect.asyncRequest('POST', actionUrl, callback, urlEncode( data ));
@@ -232,8 +231,6 @@ FD.DirList = function() {
 
 				//tableState.sortedBy = tableInitialSort;
 
-                                console.log( api.getUrlParams());
-                                console.log( currentURL );
 				myDataSource.sendRequest( api.getActionUrl( 'list' ), {
 					success  : oTable.onDataReturnInitializeTable,
 					failure  : oTable.onDataReturnInitializeTable,
@@ -450,7 +447,6 @@ FD.DirList = function() {
 				alert("no clipboardState available");
 			}
 			
-			console.log( { 'files': cutCopyFiles, 'fromPath': cutCopyURL, 'toPath': currentURL} );
 			api.post( api.getActionUrl( pasteAction, { 'path': cutCopyURL }, true ), callback, { 'files': cutCopyFiles, 'fromPath': cutCopyURL, 'toPath': currentURL} );
 			
 			cutCopyFiles = [];
