@@ -591,7 +591,9 @@ FD.InfoBar = function() {
 	
 	var locationClick = function(e) {
 		YAHOO.util.Event.preventDefault(e);
-		History.navigate("dirTable", e.target.id);
+		if (e.target.href) {
+			History.navigate("dirTable", e.target.id);
+		}
 	}
 
 	YAHOO.util.Event.on('infoBar', 'click', handleClick);
