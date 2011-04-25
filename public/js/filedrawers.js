@@ -298,12 +298,25 @@ FD.DirList = function() {
 				
 				myPerms = YAHOO.lang.dump(myJSONdata.contents[0].perms);
 				
-				var currentDir,
-				changeDirForm = YAHOO.util.Dom.get('changeDirForm'),
-				viewHTML;
-
-				changeDirForm.innerHTML = YAHOO.lang.dump(myJSONdata.path);
-
+				var changeDirForm = YAHOO.util.Dom.get('changeDirForm'),
+				viewHTML,
+				locationParts = currentURL.split("/"),
+				linkPaths = [],
+				locLinks = "";
+				
+				locationParts.splice(0,1);
+				
+				//chop up location and rebuild as links w path info here.
+				for (i=0; i < locationParts.length; i++) {
+					var linkTemp =[];
+					for (j=0; j <= i; j++) {
+						linkTemp += "/" + locationParts[j];
+					}
+					//console.warn(linkPaths[i]);
+					locLinks += '/ <a href="#" id="' + linkTemp + '">' + locationParts[i] + '</a> ';
+				}
+				
+				changeDirForm.innerHTML = locLinks;
 			}
 			);	
 			
@@ -584,7 +597,8 @@ FD.InfoBar = function() {
 	};
 	
 	var locationClick = function(e) {
-		alert("location clicked");
+		YAHOO.util.Event.preventDefault(e);
+		History.navigate("dirTable", e.target.id);
 	}
 
 	YAHOO.util.Event.on('infoBar', 'click', handleClick);
