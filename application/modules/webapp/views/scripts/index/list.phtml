@@ -30,9 +30,14 @@ $this->headScript()->appendFile('js/filedrawers.js');
 			<li><a href="..">Go Up &uarr;</a></li>
 			<li><a href=".">Refresh</a></li>
 		</ul>
-		<div id="notifyArea"> Location:
+		<div id="notifyArea">
+			<select>
+				<option value="AFS">AFS</option>
+				<option value="CIFS">CIFS</option>
+			</select>&nbsp;
+			Location:
 			<form id="changeDirForm">
-				<p>Current directory info goes here</p>
+				---
 			</form>
 		</div>
 		<div class="clear">&nbsp;</div>
