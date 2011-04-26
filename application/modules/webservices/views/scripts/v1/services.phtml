@@ -1,8 +1,10 @@
 <?php echo $this->displayErrors($this->errorMsg); ?>
 <?php if (is_array($this->services)): ?>
 <ul>
-    <? foreach ( $this->services as $service => $label ): ?>
-    <li><?=$service?> ("<?=$label?>")</li>
+    <? foreach ( $this->services[ 'services' ] as $service => $info ): ?>
+    <li><?=$service?>: "<?=$info[ 'label' ]?>"
+    <?=( @$this->services[ 'default' ] == $service ) ? ' (default service)' : '' ?>
+    </li>
     <? endforeach ?>
 </ul>
 <?php endif; ?>

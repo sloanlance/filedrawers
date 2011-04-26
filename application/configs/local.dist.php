@@ -6,8 +6,9 @@ $conf[ 'phpSettings' ][ 'error_reporting' ] = '6143';
 
 $conf[ 'filesystem' ][ 'services' ][ 'default' ] = 'ifs';
 unset( $conf[ 'filesystem' ][ 'services' ][ 'active' ] );
-$conf[ 'filesystem' ][ 'services' ][ 'active' ][ 'ifs' ] = 'IFS';
-$conf[ 'filesystem' ][ 'services' ][ 'active' ][ 'mainstreamStorage' ] = 'Mainstream Storage';
+
+$conf[ 'filesystem' ][ 'services' ][ 'active' ][ 'ifs' ][ 'label' ] = 'IFS';
+//$conf[ 'filesystem' ][ 'services' ][ 'active' ][ 'mainstreamStorage' ][ 'label' ] = 'Mainstream Storage';
 
 $conf[ 'resources' ][ 'frontController' ][ 'params' ][ 'displayExceptions' ] = TRUE;
 

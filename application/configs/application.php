@@ -27,7 +27,7 @@ $conf[ 'filedrawers' ][ 'version' ] = '0.5.0';
 $conf[ 'filesystem' ][ 'forceAfsUserDir' ] = '/afs/umich.edu/user';
 $conf[ 'filesystem' ][ 'root' ] = '/afs/';
 $conf[ 'filesystem' ][ 'services' ][ 'default' ] = 'afs';
-$conf[ 'filesystem' ][ 'services' ][ 'active' ][ 'afs' ] = 'AFS';
+$conf[ 'filesystem' ][ 'services' ][ 'active' ][ 'afs' ][ 'label' ] = 'AFS';
 
 $conf[ 'mime' ][ 'imagesPath' ] = '/usr/local/projects/mfile/images/mime/small';
 
