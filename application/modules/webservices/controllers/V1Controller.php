@@ -69,48 +69,17 @@ class Webservices_V1Controller extends Zend_Controller_Action {
             throw( new Zend_Exception( 'service parameter must be one of: '. implode( ', ', array_keys( $this->_availableServices ))));
         }
 
-        switch ( $input->service ) {
-        case 'cifs':
-            $shareValidator = new Zend_Validate_Regex(array('pattern' => '/.*/'));
-            $validators = array(
-                'share' => array(
-                    $shareValidator,
-                    'presence' => 'required',
-                )
-            );
-            $options = array('inputNamespace' => 'Filedrawers_Validate');
-            $shareInput = new Zend_Filter_Input($this->_baseFilter, $validators, $_GET, $options);
+        $model = 'Model_'. ucfirst( $input->service );
 
-            if ( ! $shareInput->isValid( 'share' )) {
-                $this->view->errorMsg = array( 'share' => array( 'invalid' => 'invalid share specified' ));
-                throw( new Zend_Exception( 'invalid CIFS share name' ));
-            }
-
-
-            $this->_filesystem = new Model_Cifs();
-            $this->_filesystem->setShareName( $shareInput->share );
-            Zend_Registry::set('filesystem', $this->_filesystem);
-            break;
-        case 'local':
-            $this->_filesystem = new Model_File();
-            Zend_Registry::set('filesystem', $this->_filesystem);
-            break;
-        case 'afs':
-        default:
-            $this->_filesystem = new Model_Afs();
-            Zend_Registry::set('filesystem', $this->_filesystem);
-
-            // When we're working on our dev server, our home directories are not
-            // in AFS so we have to find it.  I'm leaving it in for production.
-            // Andrew says our /etc/password is really big.  There will be a delay
-            // getting the home dir until the path is cached by nscd and everytime
-            // the cache is cleared.  I'd like to see this plugin declared in the
-            // ini if possible.
-            $this->_filesystem->setHomeDirHelper(array('Model_UMForceHomeDirectory', 'getHomeDirectory'));
-            $this->_filesystem->addListHelper(array('Model_Afs', 'setPermissions'));
-            break;
+        if ( ! class_exists( $model )) {
+            $this->view->errorMsg = array( 'service' => array( 'invalid' => 'invalid service specified' ));
+            throw( new Zend_Exception( 'service "'. $input->service .'" not found' ));
         }
-        $this->_filesystem->addListHelper(array('Model_Mime', 'setIcon'));
+
+
+        $this->_filesystem = new $model();
+        $this->_filesystem->init();
+        Zend_Registry::set('filesystem', $this->_filesystem);
     }
 
 
