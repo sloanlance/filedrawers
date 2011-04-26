@@ -3,7 +3,8 @@ $conf[ 'phpSettings' ][ 'display_startup_errors' ] = '1';
 $conf[ 'phpSettings' ][ 'display_errors' ] = '1';
 $conf[ 'phpSettings' ][ 'error_reporting' ] = '6143';
 
-$conf[ 'filesystem' ][ 'filesystems' ][ 'active' ] = array ( 'afs', 'cifs' );
+$conf[ 'filesystem' ][ 'filesystems' ][ 'active' ][ 'afs' ] = 'AFS';
+$conf[ 'filesystem' ][ 'filesystems' ][ 'active' ][ 'cifs' ] = 'CIFS';
 
 // $conf[ 'resources' ][ 'db' ][ 'params' ][ 'host' ]     = 'db-host';
 // $conf[ 'resources' ][ 'db' ][ 'params' ][ 'username' ] = 'db-user';

@@ -11,8 +11,10 @@ class Webservices_V1Controller extends Zend_Controller_Action {
     protected $_csrfToken = null;
     protected $_baseFilter = array('*' => 'StringTrim');
     protected $_context = null;
+    protected $_availableServices = array();
 
     public $contexts = array(
+        'services' => array('xml', 'json', 'html'),
         'list' => array('xml', 'json', 'html'),
         'rename' => array('xml', 'json', 'html'),
         'delete' => array('xml', 'json', 'html'),
@@ -32,6 +34,8 @@ class Webservices_V1Controller extends Zend_Controller_Action {
         $this->_csrfToken = new Zend_Form_Element_Hash('formToken');
         $this->_csrfToken->initCsrfToken();
         
+        $this->_availableServices = Zend_Registry::get('config')->filesystem->filesystems->active->toArray();
+
         $this->_context = $this->_helper->getHelper('contextSwitch');
         $this->_context->setContext('xml', array(
             'callbacks' => array('post' => array($this->_helper, 'xmlSerialize'))
@@ -48,7 +52,7 @@ class Webservices_V1Controller extends Zend_Controller_Action {
 
     public function preDispatch()
     {
-        $filesystemValidator = new Zend_Validate_InArray( Zend_Registry::get('config')->filesystem->filesystems->active->toArray());
+        $filesystemValidator = new Zend_Validate_InArray( array_keys( $this->_availableServices ));
         $filesystemValidator->setStrict( TRUE );
         $validators = array(
             'filesystem' => array(
@@ -62,7 +66,7 @@ class Webservices_V1Controller extends Zend_Controller_Action {
 
         if ( ! $input->isValid( 'filesystem' )) {
             $this->view->errorMsg = array( 'filesystem' => array( 'invalid' => 'invalid filesystem specified' ));
-            throw( new Zend_Exception( 'filesystem parameter must be "afs" or "cifs"' ));
+            throw( new Zend_Exception( 'filesystem parameter must be one of: '. implode( ', ', array_keys( $this->_availableServices ))));
         }
 
         switch ( $input->filesystem ) {
@@ -115,6 +119,12 @@ class Webservices_V1Controller extends Zend_Controller_Action {
         if (is_null($this->_context->getCurrentContext()) && $this->_form) {
             $this->view->form = $this->_form;
         }
+    }
+
+
+    public function servicesAction()
+    {
+        $this->view->services = $this->_availableServices;
     }
 
 

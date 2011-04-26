@@ -1,0 +1,8 @@
+<?php echo $this->displayErrors($this->errorMsg); ?>
+<?php if (is_array($this->services)): ?>
+<ul>
+    <? foreach ( $this->services as $service => $label ): ?>
+    <li><?=$service?> ("<?=$label?>")</li>
+    <? endforeach ?>
+</ul>
+<?php endif; ?>
