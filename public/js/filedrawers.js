@@ -72,6 +72,7 @@ FD.api = function() {
         },
 
         getActionUrl: function( action, params, merge ) {
+			YAHOO.util.Dom.setStyle('loading', 'display', 'inline');
             if ( typeof params == 'undefined' ) {
                params = _urlParams;
             } else if ( typeof merge != 'undefined' && merge ) {
@@ -280,6 +281,8 @@ FD.DirList = function() {
 			myDataSource.doBeforeCallback = hiddenFileFilter;
 					
 			myDataSource.subscribe('responseEvent', function(oDS){  // triggered by data return
+			
+				YAHOO.util.Dom.setStyle('loading', 'display', 'none');
 				
 				myJSONdata = YAHOO.lang.JSON.parse(oDS.response.responseText);
 				currentURL = YAHOO.lang.dump(myJSONdata.path);
