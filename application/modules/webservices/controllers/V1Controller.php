@@ -34,7 +34,7 @@ class Webservices_V1Controller extends Zend_Controller_Action {
         $this->_csrfToken = new Zend_Form_Element_Hash('formToken');
         $this->_csrfToken->initCsrfToken();
         
-        $this->_availableServices = Zend_Registry::get('config')->filesystem->filesystems->active->toArray();
+        $this->_availableServices = Zend_Registry::get('config')->filesystem->services->active->toArray();
 
         $this->_context = $this->_helper->getHelper('contextSwitch');
         $this->_context->setContext('xml', array(
