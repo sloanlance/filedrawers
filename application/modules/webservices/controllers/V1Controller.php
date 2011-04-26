@@ -52,11 +52,15 @@ class Webservices_V1Controller extends Zend_Controller_Action {
 
     public function preDispatch()
     {
-        $filesystemValidator = new Zend_Validate_InArray( array_keys( $this->_availableServices ));
-        $filesystemValidator->setStrict( TRUE );
+        if ( in_array( $this->_request->action, array( 'services' ))) {
+            return;
+        }
+
+        $serviceValidator = new Zend_Validate_InArray( array_keys( $this->_availableServices ));
+        $serviceValidator->setStrict( TRUE );
         $validators = array(
             'service' => array(
-                $filesystemValidator,
+                $serviceValidator,
                 'presence' => 'optional',
                 'default' => Zend_Registry::get('config')->filesystem->services->default
             )
@@ -69,15 +73,14 @@ class Webservices_V1Controller extends Zend_Controller_Action {
             throw( new Zend_Exception( 'service parameter must be one of: '. implode( ', ', array_keys( $this->_availableServices ))));
         }
 
-        $model = 'Model_'. ucfirst( $input->service );
+        $service = 'Service_'. ucfirst( $input->service );
 
-        if ( ! class_exists( $model )) {
+        if ( ! class_exists( $service )) {
             $this->view->errorMsg = array( 'service' => array( 'invalid' => 'invalid service specified' ));
             throw( new Zend_Exception( 'service "'. $input->service .'" not found' ));
         }
 
-
-        $this->_filesystem = new $model();
+        $this->_filesystem = new $service();
         $this->_filesystem->init();
         Zend_Registry::set('filesystem', $this->_filesystem);
     }
