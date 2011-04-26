@@ -96,7 +96,14 @@ class Webservices_V1Controller extends Zend_Controller_Action {
 
     public function servicesAction()
     {
-        $this->view->services = $this->_availableServices;
+        $this->view->services = array();
+        foreach( $this->_availableServices as $id => $label ) {
+            $service = 'Service_'. ucfirst( $id );
+
+            if ( class_exists( $service )) {
+                $this->view->services[ $id ] = $label;
+            }
+        }
     }
 
 
