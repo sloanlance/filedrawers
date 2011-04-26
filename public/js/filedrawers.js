@@ -284,7 +284,7 @@ FD.DirList = function() {
 				myJSONdata = YAHOO.lang.JSON.parse(oDS.response.responseText);
 				currentURL = YAHOO.lang.dump(myJSONdata.path);
                                 //filedrawersApi.setUrlParam( 'path', currentURL );
-				
+								
 				if (!homeURL) {
 					homeURL = currentURL;
 				}
@@ -461,58 +461,6 @@ FD.DirList = function() {
 				
 			FD.cutCopyEvent.fire();
 			
-			/*
-			
-			
-			
-			var successHandler = function(o) {
-			
-				var callback = getAjaxListCallback(dirTable);
-				
-				if (clipboardState == "cut") {
-					var sUrl = baseUrl + 'webservices/move/?format=json';
-				} else if (clipboardState == "copy") {
-					var sUrl = baseUrl + 'webservices/copy/?format=json';
-				} else {
-					alert("no clipboardState available");
-				}
-				
-				sUrl += '&path=' + cutCopyURL;
-				
-				var postData = 'files[]=';
-				
-				postData += cutCopyFiles.join('&files[]=');
-				
-				postData += '&formToken=' + YAHOO.lang.JSON.parse(o.responseText).formToken;
-				postData += '&fromPath=' + cutCopyURL;
-				postData += '&toPath=' + currentURL;
-
-				var request = YAHOO.util.Connect.asyncRequest('POST', sUrl, callback, postData);	
-
-				cutCopyFiles = [];
-				cutCopyURL = "";
-				
-				FD.cutCopyEvent.fire();
-			};
-			
-			var failureHandler = function(o) {
-				alert(o.status + " : " + o.statusText);
-			};
-			
-			var getToken = function() {		
-				YAHOO.util.Connect.asyncRequest("POST", 'webservices/gettoken?format=json', {
-					success: successHandler,
-					failure: failureHandler
-				});
-				return false;
-			};
-			
-			getToken();
-			
-			alert("action = " + clipboardState + ".  files = " + cutCopyFiles + ".  prevURL = " + cutCopyURL);
-			
-			*/
-			
 		},
 		
 		reqSender: function(directory) {
@@ -555,24 +503,25 @@ FD.InfoBar = function() {
 	changeDirForm = YAHOO.util.Dom.get('changeDirForm'),
 	viewHTML;
 
-	/*
-	var changeDirView = '<input type="button" name="changeDir" value="Change" />';
-	changeDirForm.innerHTML += changeDirView;
-	viewHTML = changeDirForm.innerHTML;
-	*/
-
 	var update = function(oArgs) {};
 
 	var handleClick = function(e) {
+	
+		YAHOO.util.Event.preventDefault(e);
+	
 		var target = YAHOO.util.Event.getTarget(e);
-
+		
+		if (target.id == "goUp") {
+			var upDir = currentURL.slice( 0, currentURL.lastIndexOf("/") );
+			History.navigate("dirTable", upDir);
+		} else if (target.id == "refresh") {
+			myDataSource.sendRequest( filedrawersApi.getActionUrl( 'list' ), dirTable.onDataReturnInitializeTable, dirTable);
+		}		
+/*
 		if ( ! target.value) {
 			return;
 		}
-
-		YAHOO.util.Event.preventDefault(e);
-		
-		//alert(target.value);
+*/
 
 		if (target.value == 'Change') {
 			viewHTML = changeDirForm.innerHTML;

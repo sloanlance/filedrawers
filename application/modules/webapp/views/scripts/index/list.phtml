@@ -17,7 +17,7 @@ $this->headScript()->appendFile('js/filedrawers.js');
 	<div id="head">
 		<h1>Filedrawers</h1>
 		<ul>
-			<li><a href="#" class="active" id="homeBtn">Home</a></li>
+			<li><a href="" class="active" id="homeBtn">Home</a></li>
 			<li><a href="/make-webspace/">Web Sites</a></li>
 			<li><a href="/help.php">Help</a></li>
 			<li><a href="/cgi-bin/logout?http://mfile.umich.edu/">Logout</a></li>
@@ -26,9 +26,8 @@ $this->headScript()->appendFile('js/filedrawers.js');
 	</div>
 	<div id="infoBar">
 		<ul id="infoMenu">
-			<li>Download</li>
-			<li><a href="..">Go Up &uarr;</a></li>
-			<li><a href=".">Refresh</a></li>
+			<li><a href=".." id="goUp">Go Up &uarr;</a></li>
+			<li><a href="." id="refresh">Refresh</a></li>
 		</ul>
 		<div id="notifyArea">
 			<select>
