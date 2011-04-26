@@ -55,21 +55,21 @@ class Webservices_V1Controller extends Zend_Controller_Action {
         $filesystemValidator = new Zend_Validate_InArray( array_keys( $this->_availableServices ));
         $filesystemValidator->setStrict( TRUE );
         $validators = array(
-            'filesystem' => array(
+            'service' => array(
                 $filesystemValidator,
                 'presence' => 'optional',
-                'default' => Zend_Registry::get('config')->filesystem->default
+                'default' => Zend_Registry::get('config')->filesystem->services->default
             )
         );
         $options = array('inputNamespace' => 'Filedrawers_Validate');
         $input = new Zend_Filter_Input($this->_baseFilter, $validators, $_GET, $options);
 
-        if ( ! $input->isValid( 'filesystem' )) {
-            $this->view->errorMsg = array( 'filesystem' => array( 'invalid' => 'invalid filesystem specified' ));
-            throw( new Zend_Exception( 'filesystem parameter must be one of: '. implode( ', ', array_keys( $this->_availableServices ))));
+        if ( ! $input->isValid( 'service' )) {
+            $this->view->errorMsg = array( 'service' => array( 'invalid' => 'invalid service specified' ));
+            throw( new Zend_Exception( 'service parameter must be one of: '. implode( ', ', array_keys( $this->_availableServices ))));
         }
 
-        switch ( $input->filesystem ) {
+        switch ( $input->service ) {
         case 'cifs':
             $shareValidator = new Zend_Validate_Regex(array('pattern' => '/.*/'));
             $validators = array(
