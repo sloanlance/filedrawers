@@ -248,7 +248,7 @@ FD.DirList = function() {
 
 				myDataSource.sendRequest( filedrawersApi.getActionUrl( 'list' ), {
 					success  : oTable.onDataReturnInitializeTable,
-					failure  : oTable.onDataReturnInitializeTable,
+					failure  : oTable.onDataReturnInitializeTable,  // add errorHandling
 					scope    : oTable,
 					argument : tableState
 				});
@@ -310,6 +310,11 @@ FD.DirList = function() {
 				clearTimeout(timer2);
 				
 				myJSONdata = YAHOO.lang.JSON.parse(oDS.response.responseText);
+				
+				if (YAHOO.lang.dump(myJSONdata.errorMsg) != 'undefined') {
+					console.warn(YAHOO.lang.dump(myJSONdata.errorMsg));
+				}
+				
 				currentURL = YAHOO.lang.dump(myJSONdata.path);
                                 //filedrawersApi.setUrlParam( 'path', currentURL );
 								
