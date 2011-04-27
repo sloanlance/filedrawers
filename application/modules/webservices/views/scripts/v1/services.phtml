@@ -2,8 +2,13 @@
 <?php if (is_array($this->services)): ?>
 <ul>
     <? foreach ( $this->services[ 'services' ] as $service => $info ): ?>
-    <li><?=$service?>: "<?=$info[ 'label' ]?>"
+    <li><?=$service?>
     <?=( @$this->services[ 'default' ] == $service ) ? ' (default service)' : '' ?>
+    <ul>
+    <? foreach( $info as $prop => $val ): ?>
+        <li><strong><?=$prop?></strong>: <?=$val?></li>
+    <? endforeach ?>
+    </ul>
     </li>
     <? endforeach ?>
 </ul>
