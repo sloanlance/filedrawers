@@ -33,8 +33,14 @@ class Webservices_V1Controller extends Zend_Controller_Action {
         $this->_helper->layout->disableLayout();
         $this->_csrfToken = new Zend_Form_Element_Hash('formToken');
         $this->_csrfToken->initCsrfToken();
-        
-        $this->_availableServices = Zend_Registry::get('config')->filesystem->services->active->toArray();
+
+        foreach( Zend_Registry::get('config')->filesystem->active->toArray() as $id ) {
+            $serviceClass = 'Service_'. ucfirst( $id );
+
+            if ( class_exists( $serviceClass )) {
+                $this->_availableServices[ $id ] = $serviceClass;
+            }
+        }
 
         $this->_context = $this->_helper->getHelper('contextSwitch');
         $this->_context->setContext('xml', array(
@@ -62,7 +68,7 @@ class Webservices_V1Controller extends Zend_Controller_Action {
             'service' => array(
                 $serviceValidator,
                 'presence' => 'optional',
-                'default' => Zend_Registry::get('config')->filesystem->services->default
+                'default' => Zend_Registry::get('config')->filesystem->default
             )
         );
         $options = array('inputNamespace' => 'Filedrawers_Validate');
@@ -73,14 +79,7 @@ class Webservices_V1Controller extends Zend_Controller_Action {
             throw( new Zend_Exception( 'service parameter must be one of: '. implode( ', ', array_keys( $this->_availableServices ))));
         }
 
-        $service = 'Service_'. ucfirst( $input->service );
-
-        if ( ! class_exists( $service )) {
-            $this->view->errorMsg = array( 'service' => array( 'invalid' => 'invalid service specified' ));
-            throw( new Zend_Exception( 'service "'. $input->service .'" not found' ));
-        }
-
-        $this->_filesystem = new $service();
+        $this->_filesystem = new $this->_availableServices[ $input->service ]();
         $this->_filesystem->init();
         Zend_Registry::set('filesystem', $this->_filesystem);
     }
@@ -97,16 +96,12 @@ class Webservices_V1Controller extends Zend_Controller_Action {
     public function servicesAction()
     {
         $this->view->services = array();
-        foreach( $this->_availableServices as $id => $info ) {
-            $service = 'Service_'. ucfirst( $id );
-
-            if ( class_exists( $service )) {
-                $this->view->services[ 'services' ][ $id ] = $info;
-            }
+        $serviceInfo = Zend_Registry::get('config')->filesystem->services->toArray();
+        foreach( $this->_availableServices as $id => $serviceClass ) {
+            $this->view->services[ 'services' ][ $id ] = $serviceInfo[ $id ];
         }
 
-        $this->view->services[ 'default' ] = Zend_Registry::get('config')->filesystem->services->default;
-
+        $this->view->services[ 'default' ] = Zend_Registry::get('config')->filesystem->default;
     }
 
 
@@ -301,7 +296,7 @@ class Webservices_V1Controller extends Zend_Controller_Action {
         }
 
         $values = $this->_form->getValidValues($_POST);
-        
+
         $this->_filesystem->move($values['files'], $input->path, $values['toPath']);
         $this->view->status = 'success';
         $this->view->message = 'Successfully moved the files(s) or folder(s).';
@@ -373,7 +368,7 @@ class Webservices_V1Controller extends Zend_Controller_Action {
         }
 
         $values = $this->_form->getValidValues($_POST);
-        
+
         $this->_filesystem->copy($values['files'], $input->path, $values['toPath']);
         $this->view->status = 'success';
         $this->view->message = 'Successfully copied the files(s) or folder(s).';
