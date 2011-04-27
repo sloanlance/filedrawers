@@ -29,16 +29,12 @@ $this->headScript()->appendFile('js/filedrawers.js');
 			<li><a href=".." id="goUp">Go Up &uarr;</a></li>
 			<li><a href="." id="refresh">Refresh</a></li>
 		</ul>
-		<div id="notifyArea">
-			<select>
-				<option value="AFS">AFS</option>
-				<option value="CIFS">CIFS</option>
-			</select>&nbsp;
-			Location:
+		<div id="notifyArea">			
 			<form id="changeDirForm">
-				---
+			Service: AFS&nbsp;&nbsp;
+			Location: ---
 			</form>
-			<span id="loading">&nbsp;<img src="images/ajax-loader.gif" style="position:relative; top:3px;" /></span>
+			<span id="loading"></span>
 		</div>
 		<div class="clear">&nbsp;</div>
 	</div>

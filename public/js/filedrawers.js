@@ -6,6 +6,8 @@ cutCopyURL,
 cutCopyFiles = [],
 clipboardState,
 baseUrl = '',
+timer1,
+timer2,
 History = YAHOO.util.History;
 
 if (typeof FD == "undefined" || ! FD) {
@@ -57,6 +59,23 @@ FD.api = function() {
         type[ key ] = value;
     };
     return {
+	
+		ajaxTimer: function() {
+		
+			YAHOO.util.Dom.get('loading').innerHTML = '&nbsp;<img src="images/ajax-loader.gif" style="position:relative; top:3px;" />'
+			
+			timer1 = setTimeout("filedrawersApi.displayLoading()", 1000);
+			timer2 = setTimeout("filedrawersApi.displayCancel()", 3000);
+		},
+		
+		displayLoading: function() {
+			YAHOO.util.Dom.get('loading').innerHTML += "&nbsp;Loading...";
+		},
+		
+		displayCancel: function() {
+			YAHOO.util.Dom.get('loading').innerHTML += '&nbsp;<input type="button" value="Cancel" />';
+		},
+	
         getUrlParams: function( params ) {
             return _getParams( _urlParams, params );
         },
@@ -73,6 +92,9 @@ FD.api = function() {
 
         getActionUrl: function( action, params, merge ) {
 			YAHOO.util.Dom.setStyle('loading', 'display', 'inline');
+			
+			this.ajaxTimer();
+			
             if ( typeof params == 'undefined' ) {
                params = _urlParams;
             } else if ( typeof merge != 'undefined' && merge ) {
@@ -282,7 +304,10 @@ FD.DirList = function() {
 					
 			myDataSource.subscribe('responseEvent', function(oDS){  // triggered by data return
 			
-				YAHOO.util.Dom.setStyle('loading', 'display', 'none');
+				YAHOO.util.Dom.get('loading').innerHTML = '';
+				
+				clearTimeout(timer1);
+				clearTimeout(timer2);
 				
 				myJSONdata = YAHOO.lang.JSON.parse(oDS.response.responseText);
 				currentURL = YAHOO.lang.dump(myJSONdata.path);
@@ -312,7 +337,8 @@ FD.DirList = function() {
 					locLinks += '/ <a href="#" id="' + linkTemp + '">' + locationParts[i] + '</a> ';
 				}
 				
-				viewHTML = locLinks + '&nbsp;<input type="submit" value="Change" />'
+				viewHTML = 'Service: AFS&nbsp;&nbsp;Location: ' +
+				locLinks + '&nbsp;<input type="submit" value="Change" />'
 				changeDirForm.innerHTML = viewHTML;
 			}
 			);	
@@ -529,6 +555,7 @@ FD.InfoBar = function() {
 		if (target.value == 'Change') {
 			viewHTML = changeDirForm.innerHTML;
 			changeDirForm.innerHTML =
+			'Service: <select><option value="AFS">AFS</option><option value="CIFS">CIFS</option></select>&nbsp;' +
 			'<input type="text" size="40" maxlength="100" value="' +
 			currentURL + '" />' +
 			'<input type="submit" value="Go" />' +
@@ -640,7 +667,7 @@ FD.FileInspector = function() {
 	// called upon instantiation.
 	for (i=0; i<links.length; i++) {
 		action = links[i].hash.match(/#(.*)$/);  // converts link to an array, with original in index 0 and #-less in index 1
-		actions[action[1]] = {ref: links[i]};  // actions becomes an array of objects with char indexes based on action, and links to that action.  example:  actions["cut"] hold href obj for cut
+		actions[action[1]] = {ref: links[i]};  // actions becomes an array of objects with char indexes based on action, and links to that action.  example:  actions["cut"] holds href obj for cut
 	}
 	
 	var updateItemInfo = function(selectedRows) {
@@ -702,8 +729,6 @@ FD.FileInspector = function() {
 			permissions[myPerms.charAt(i)] = true;
 			//alert(myPerms.charAt(i) + " = " + permissions[myPerms.charAt(i)]);
 		}
-		
-		//alert(actions.upload.ref);
 		
 		filesSelected = (numSelected > 0) ? true : false;
 
@@ -823,9 +848,9 @@ YAHOO.util.Event.addListener(window, "load", function() {
 	
 	FD.InspDialogCloseEvent.subscribe(inspector.clearSelection);
 	
-	YAHOO.util.Event.on('homeBtn', 'click', function() {
-		//alert(homeURL);
-		myDataSource.sendRequest( filedrawersApi.getActionUrl( 'list' ), dirTable.onDataReturnInitializeTable, dirTable);
+	YAHOO.util.Event.on('homeBtn', 'click', function(e) {
+		YAHOO.util.Event.preventDefault(e);
+		History.navigate("dirTable", homeURL);
 	});
 	
 	
