@@ -22,7 +22,7 @@ class Model_Cifs extends Filedrawers_Filesystem_URL {
     }
 
 
-    protected function getUrl()
+    public function getUrl()
     {
         return 'smb://'. $this->_shareName .'.m.storage.umich.edu/'. $this->_shareName .'/' . trim( $this->_path, '/' ) .'/';
     }
