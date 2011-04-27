@@ -3,12 +3,13 @@ $conf[ 'phpSettings' ][ 'display_startup_errors' ] = '1';
 $conf[ 'phpSettings' ][ 'display_errors' ] = '1';
 $conf[ 'phpSettings' ][ 'error_reporting' ] = '6143';
 
+$conf[ 'filesystem' ][ 'default' ] = 'ifs';
+$conf[ 'filesystem' ][ 'active' ] = array( 'ifs', 'local' );
+$conf[ 'filesystem' ][ 'services' ][ 'ifs' ]              [ 'label' ] = 'IFS';
+$conf[ 'filesystem' ][ 'services' ][ 'ifs' ]              [ 'forceAfsUserDir' ] = '/afs/umich.edu/user';
+$conf[ 'filesystem' ][ 'services' ][ 'ifs' ]              [ 'root' ] = '/afs/';
+$conf[ 'filesystem' ][ 'services' ][ 'local' ]            [ 'label' ] = 'Local';
 
-$conf[ 'filesystem' ][ 'services' ][ 'default' ] = 'ifs';
-unset( $conf[ 'filesystem' ][ 'services' ][ 'active' ] );
-
-$conf[ 'filesystem' ][ 'services' ][ 'active' ][ 'ifs' ][ 'label' ] = 'IFS';
-//$conf[ 'filesystem' ][ 'services' ][ 'active' ][ 'mainstreamStorage' ][ 'label' ] = 'Mainstream Storage';
 
 $conf[ 'resources' ][ 'frontController' ][ 'params' ][ 'displayExceptions' ] = TRUE;
 

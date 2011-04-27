@@ -14,7 +14,7 @@ abstract class Filedrawers_Filesystem_Mounted extends Filedrawers_Filesystem {
     public function __construct()
     {
         $this->startCWD = getcwd();
-        $this->fsStat   = stat(Zend_Registry::get('config')->filesystem->root);
+        $this->fsStat   = stat(Zend_Registry::get('config')->filesystem->services->afs->root);
     }
 
 
@@ -132,7 +132,7 @@ abstract class Filedrawers_Filesystem_Mounted extends Filedrawers_Filesystem {
         }
 
         if ( ! @filedrawers_rename($oldPath, $newPath,
-                    Zend_Registry::get('config')->filesystem->root)) {
+                    Zend_Registry::get('config')->filesystem->services->afs->root)) {
             chdir($this->startCWD);
             throw new Filedrawers_Filesystem_Exception(sprintf('Unable to rename this file or folder "%s"', basename($newPath)), 5);
         }

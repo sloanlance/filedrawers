@@ -10,7 +10,7 @@ class Model_UMForceHomeDirectory
             $homedir = $userInfo['dir'];
         }
 
-        $forceAfsUserDir = $config->filesystem->forceAfsUserDir;
+        $forceAfsUserDir = $config->filesystem->services->afs->forceAfsUserDir;
 
         if (strpos($homedir, '/home') === 0) {
             $userSuffix = '/' . $userInfo['name'][0] . '/'.$userInfo['name'][1] . '/' . $userInfo['name'];
