@@ -8,4 +8,9 @@
 require_once 'Filedrawers/Filesystem/Exception.php';
 
 abstract class Filedrawers_Filesystem {
+    public function init()
+    {
+        $this->addListHelper(array('Model_Mime', 'setIcon'));
+        return TRUE;
+    }
 }
