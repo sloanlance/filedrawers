@@ -324,7 +324,8 @@ FD.DirList = function() {
 				
 				myPerms = YAHOO.lang.dump(myJSONdata.contents[0].perms);
 				
-				var changeDirForm = YAHOO.util.Dom.get('changeDirForm'),
+				var currentLocationPath = YAHOO.util.Dom.get('currentLocationPath'),
+				changeLocationNewPath = YAHOO.util.Dom.get('changeLocationNewPath'),
 				viewHTML,
 				locationParts = currentURL.split("/"),
 				linkPaths = [],
@@ -342,9 +343,8 @@ FD.DirList = function() {
 					locLinks += '/ <a href="#" id="' + linkTemp + '">' + locationParts[i] + '</a> ';
 				}
 				
-				viewHTML = 'Service: AFS&nbsp;&nbsp;Location: ' +
-				locLinks + '&nbsp;<input type="submit" value="Change" />'
-				changeDirForm.innerHTML = viewHTML;
+				currentLocationPath.innerHTML = locLinks;
+                                changeLocationNewPath.value = currentURL;
 			}
 			);	
 			
@@ -534,7 +534,9 @@ FD.DirList = function() {
 FD.InfoBar = function() {
 
 	var currentDir,
-	changeDirForm = YAHOO.util.Dom.get('changeDirForm'),
+	locationDiv = YAHOO.util.Dom.get('location'),
+        currentLocation = YAHOO.util.Dom.get( 'currentLocation' ),
+        changeLocation  = YAHOO.util.Dom.get( 'changeLocation' ),
 	viewHTML;
 
 	var update = function(oArgs) {};
@@ -557,19 +559,18 @@ FD.InfoBar = function() {
 		}
 */
 
-		if (target.value == 'Change') {
-			viewHTML = changeDirForm.innerHTML;
-			changeDirForm.innerHTML =
-			'Service: <select><option value="AFS">AFS</option><option value="CIFS">CIFS</option></select>&nbsp;' +
-			'<input type="text" size="40" maxlength="100" value="' +
-			currentURL + '" />' +
-			'<input type="submit" value="Go" />' +
-			'<input type="button" value="Cancel" />';
-		} else if (target.value == 'Go') {
+		if (target.id == 'currentLocationChange') {
+                        YAHOO.util.Dom.setStyle( currentLocation, 'display', 'none' );
+                        YAHOO.util.Dom.setStyle( changeLocation, 'display', 'inline' );
+		} else if (target.id == 'changeLocationGo') {
 			//location = baseUrl + '/list' +
-			History.navigate("dirTable", target.parentNode.getElementsByTagName('input')[0].value);
-		} else if (target.value == 'Cancel') {
-			changeDirForm.innerHTML = viewHTML;
+                        YAHOO.util.Dom.setStyle( currentLocation, 'display', 'inline' );
+                        YAHOO.util.Dom.setStyle( changeLocation, 'display', 'none' );
+			History.navigate("dirTable", YAHOO.util.Dom.get( 'newLocation' ).value );
+		} else if (target.id == 'changeLocationCancel') {
+                        YAHOO.util.Dom.setStyle( currentLocation, 'display', 'inline' );
+                        YAHOO.util.Dom.setStyle( changeLocation, 'display', 'none' );
+                        // TODO abort the request
 		}
 	};
 
@@ -585,7 +586,7 @@ FD.InfoBar = function() {
 	}
 
 	YAHOO.util.Event.on('infoBar', 'click', handleClick);
-	YAHOO.util.Event.on('changeDirForm', 'submit', handleSubmit);	
+	YAHOO.util.Event.on('location', 'submit', handleSubmit);
 	YAHOO.util.Event.on('notifyArea', 'click', locationClick);
 
 	var kl = new YAHOO.util.KeyListener(document, {keys:13}, {fn:function(){alert('enter');}});

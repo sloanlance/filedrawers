@@ -30,10 +30,21 @@ $this->headScript()->appendFile('js/filedrawers.js');
 			<li><a href="." id="refresh">Refresh</a></li>
 		</ul>
 		<div id="notifyArea">			
-			<form id="changeDirForm">
-			Service: AFS&nbsp;&nbsp;
-			Location: ---
-			</form>
+			<div id="location">
+                            <span id="currentLocation">
+                                <?//Service: <span id="currentLocationService"></span>?>
+                                Location: <span id="currentLocationPath"></span>
+                                <button id="currentLocationChange">Change</button>
+                            </span>
+                            <form id="changeLocation">
+                                <?//<label for="changeLocationNewService">Service: </label><select name="changeLocationNewService" id="changeLocationNewService"></select>?>
+                                <label for="changeLocationNewPath">Location: </label><input type="text" name="changeLocationNewPath" id="changeLocationNewPath" size="50" />
+                                <span id="changeLocationControls">
+                                    <button id="changeLocationGo" type="submit">Go</button>
+                                    <button id="changeLocationCancel">Cancel</button>
+                                </span>
+                            </form>
+			</div>
 			<span id="loading"></span>
 		</div>
 		<div class="clear">&nbsp;</div>
