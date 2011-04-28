@@ -483,6 +483,12 @@ div.expandItem h2, form.expandItem h2 {
         visibility: hidden;
 }
 
+#location #currentLocationService,
+#location #currentLocationPath {
+        font-weight: bold;
+}
+
+
 #favMenu {
 	margin: 3px 2px 1em 2px;
 	white-space: nowrap;
