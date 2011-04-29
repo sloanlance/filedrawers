@@ -471,9 +471,23 @@ div.expandItem h2, form.expandItem h2 {
 	border: 1px solid #000000;
 }
 
-#changeDirForm {
-	display: inline;
+#location {
+        display: inline;
 }
+
+#location #changeLocation {
+        display: none;
+}
+
+#location #loading {
+        visibility: hidden;
+}
+
+#location #currentLocationService,
+#location #currentLocationPath {
+        font-weight: bold;
+}
+
 
 #favMenu {
 	margin: 3px 2px 1em 2px;

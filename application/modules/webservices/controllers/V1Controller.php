@@ -78,6 +78,7 @@ class Webservices_V1Controller extends Zend_Controller_Action {
             $this->view->errorMsg = array( 'service' => array( 'invalid' => 'invalid service specified' ));
             throw( new Zend_Exception( 'service parameter must be one of: '. implode( ', ', array_keys( $this->_availableServices ))));
         }
+        $this->view->service = $input->service;
 
         $this->_filesystem = new $this->_availableServices[ $input->service ]();
         $this->_filesystem->init();

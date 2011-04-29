@@ -292,7 +292,6 @@ FD.DirList = function() {
 	return {
 		init: function(bookmarkDir) {
 	
-                        filedrawersApi = new FD.api();
 			myDataSource = new YAHOO.util.DataSource( '' );  // first call
 			myDataSource.responseType = YAHOO.util.DataSource.TYPE_JSON; 
 			myDataSource.responseSchema = {
@@ -324,7 +323,8 @@ FD.DirList = function() {
 				
 				myPerms = YAHOO.lang.dump(myJSONdata.contents[0].perms);
 				
-				var changeDirForm = YAHOO.util.Dom.get('changeDirForm'),
+				var currentLocationPath = YAHOO.util.Dom.get('currentLocationPath'),
+				changeLocationNewPath = YAHOO.util.Dom.get('changeLocationNewPath'),
 				viewHTML,
 				locationParts = currentURL.split("/"),
 				linkPaths = [],
@@ -342,9 +342,9 @@ FD.DirList = function() {
 					locLinks += '/ <a href="#" id="' + linkTemp + '">' + locationParts[i] + '</a> ';
 				}
 				
-				viewHTML = 'Service: AFS&nbsp;&nbsp;Location: ' +
-				locLinks + '&nbsp;<input type="submit" value="Change" />'
-				changeDirForm.innerHTML = viewHTML;
+				currentLocationPath.innerHTML = locLinks;
+                                changeLocationNewPath.value = currentURL;
+                                infoBar.setService( myJSONdata.service );
 			}
 			);	
 			
@@ -534,7 +534,9 @@ FD.DirList = function() {
 FD.InfoBar = function() {
 
 	var currentDir,
-	changeDirForm = YAHOO.util.Dom.get('changeDirForm'),
+	locationDiv = YAHOO.util.Dom.get('location'),
+        currentLocation = YAHOO.util.Dom.get( 'currentLocation' ),
+        changeLocation  = YAHOO.util.Dom.get( 'changeLocation' ),
 	viewHTML;
 
 	var update = function(oArgs) {};
@@ -557,19 +559,19 @@ FD.InfoBar = function() {
 		}
 */
 
-		if (target.value == 'Change') {
-			viewHTML = changeDirForm.innerHTML;
-			changeDirForm.innerHTML =
-			'Service: <select><option value="AFS">AFS</option><option value="CIFS">CIFS</option></select>&nbsp;' +
-			'<input type="text" size="40" maxlength="100" value="' +
-			currentURL + '" />' +
-			'<input type="submit" value="Go" />' +
-			'<input type="button" value="Cancel" />';
-		} else if (target.value == 'Go') {
+		if (target.id == 'currentLocationChange') {
+                        YAHOO.util.Dom.setStyle( currentLocation, 'display', 'none' );
+                        YAHOO.util.Dom.setStyle( changeLocation, 'display', 'inline' );
+		} else if (target.id == 'changeLocationGo') {
 			//location = baseUrl + '/list' +
-			History.navigate("dirTable", target.parentNode.getElementsByTagName('input')[0].value);
-		} else if (target.value == 'Cancel') {
-			changeDirForm.innerHTML = viewHTML;
+                        YAHOO.util.Dom.setStyle( currentLocation, 'display', 'inline' );
+                        YAHOO.util.Dom.setStyle( changeLocation, 'display', 'none' );
+                        setService( YAHOO.util.Dom.get( 'changeLocationNewService' ).value );
+			History.navigate("dirTable", YAHOO.util.Dom.get( 'changeLocationNewPath' ).value );
+		} else if (target.id == 'changeLocationCancel') {
+                        YAHOO.util.Dom.setStyle( currentLocation, 'display', 'inline' );
+                        YAHOO.util.Dom.setStyle( changeLocation, 'display', 'none' );
+                        // TODO abort the request
 		}
 	};
 
@@ -582,10 +584,16 @@ FD.InfoBar = function() {
 		if (e.target.href) {
 			History.navigate("dirTable", e.target.id);
 		}
-	}
-
+	};
+    
+        var services = {};
+        var defaultService = '';
+        var setService = function( service ) {
+            YAHOO.util.Dom.get( 'currentLocationService' ).innerHTML = services[ service ].label;
+            filedrawersApi.setUrlParam( 'service', service );
+        };
 	YAHOO.util.Event.on('infoBar', 'click', handleClick);
-	YAHOO.util.Event.on('changeDirForm', 'submit', handleSubmit);	
+	YAHOO.util.Event.on('location', 'submit', handleSubmit);
 	YAHOO.util.Event.on('notifyArea', 'click', locationClick);
 
 	var kl = new YAHOO.util.KeyListener(document, {keys:13}, {fn:function(){alert('enter');}});
@@ -594,7 +602,27 @@ FD.InfoBar = function() {
 		init: function(crntDir) {
 			currentDir = crntDir;
 		},
+                setServiceOptions: function( services ) {
+                    var serviceOptionsHtml;
+                    for ( var id in services ) {
+                        serviceOptionsHtml += '<option value="'+ id +'">'+ services[ id ].label +'</option>';
+                    }
+                    YAHOO.util.Dom.get( 'changeLocationNewService' ).innerHTML = serviceOptionsHtml;
+                },
+                getServices: function() {
+                    var setServiceOptions = this.setServiceOptions;
+                    var callback = { 
+                        'success': function( o ) {
+                            services = YAHOO.lang.JSON.parse(o.responseText).services.services;
+                            defaultService = YAHOO.lang.JSON.parse(o.responseText).services.default;
+                            setServiceOptions( services );
+                        }
+                    };
 
+                    YAHOO.util.Connect.asyncRequest('GET', filedrawersApi.getActionUrl( 'services' ), callback, null );
+
+                },
+                setService:setService,
 		update:update
 	}
 };	
@@ -825,12 +853,14 @@ FD.FileInspector = function() {
 
 YAHOO.util.Event.addListener(window, "load", function() {
 				
+        filedrawersApi = new FD.api(); // TODO does this need to be so widely scoped?
 	var bookmarkDir = History.getBookmarkedState("dirTable");
 	
-	var dirList = new FD.DirList(),
-	dirTable = dirList.init(bookmarkDir),
-	inspector = new FD.FileInspector(),
-	infoBar = new FD.InfoBar();
+	infoBar = new FD.InfoBar(); // TODO does this need to be so widely scoped?
+        infoBar.getServices();
+	var dirList = new FD.DirList();
+	dirTable = dirList.init(bookmarkDir);
+	var inspector = new FD.FileInspector();
 	
 	History.register("dirTable", "", dirList.reqSender);
 	History.initialize("yui-history-field", "yui-history-iframe");
