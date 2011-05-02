@@ -118,8 +118,7 @@ FD.api = function() {
             return _apiUrl + action + query;
         },
 
-        post: function( action, callback, postData ) {
-            var actionUrl = this.getActionUrl( action );
+        post: function( actionUrl, callback, postData ) {
             var data = this.getData( postData );
 
             var getTokenSuccessHandler = function(o) {
@@ -324,7 +323,7 @@ FD.DirList = function() {
 				}
 				
 				currentURL = YAHOO.lang.dump(myJSONdata.path);
-                                //filedrawersApi.setUrlParam( 'path', currentURL );
+                                filedrawersApi.setUrlParam( 'path', currentURL );
 								
 				if (!homeURL) {
 					homeURL = currentURL;
@@ -417,13 +416,13 @@ FD.DirList = function() {
 				files.push(dirTable.getRecord(tableState.selectedRows[i]).getData().filename);
 			}
 
-			filedrawersApi.post( 'delete', callback, { 'files': files, 'path': currentURL } );				
+			filedrawersApi.post( filedrawersApi.getActionUrl( 'delete' ), callback, { 'files': files, 'path': currentURL } );				
 		
 		},
 
 		createNewFolder: function(e, args) {
                         var callback = getAjaxListCallback(dirTable);
-                        filedrawersApi.post( 'mkdir', callback, { 'folderName': args[ 0 ], 'path': currentURL } );
+                        filedrawersApi.post( filedrawersApi.getActionUrl( 'mkdir' ), callback, { 'folderName': args[ 0 ], 'path': currentURL } );
 		},
 		
 		renameItem: function(e, action) {
@@ -452,7 +451,7 @@ FD.DirList = function() {
 		handleNameEditorSave: function(oArgs) {
 		
 			var callback = getAjaxListCallback(this);			
-			filedrawersApi.post( 'rename', callback, { 'oldName': oArgs.oldData, 'newName':oArgs.newData, 'path': currentURL } );		
+			filedrawersApi.post( filedrawersApi.getActionUrl( 'rename' ), callback, { 'oldName': oArgs.oldData, 'newName':oArgs.newData, 'path': currentURL } );		
 
 		},
 		
@@ -497,7 +496,8 @@ FD.DirList = function() {
 				alert("no clipboardState available");
 			}
 			
-			filedrawersApi.post( pasteAction, callback, { 'files': cutCopyFiles, 'fromPath': cutCopyURL, 'toPath': currentURL} );
+			console.log( filedrawersApi.getActionUrl( pasteAction, { 'path': cutCopyURL }, true ));
+			filedrawersApi.post( filedrawersApi.getActionUrl( pasteAction, { 'path': cutCopyURL }, true ), callback, { 'files': cutCopyFiles, 'fromPath': cutCopyURL, 'toPath': currentURL} );
 			
 			cutCopyFiles = [];
 			cutCopyURL = "";
