@@ -1,4 +1,5 @@
-var myJSONdata,
+var api,
+myJSONdata,
 myPerms,
 homeURL,
 currentURL,
@@ -73,8 +74,8 @@ FD.api = function() {
 		
 			YAHOO.util.Dom.get('loading').innerHTML = '&nbsp;<img src="images/ajax-loader.gif" style="position:relative; top:3px;" />'
 			
-			timer1 = setTimeout("filedrawersApi.displayLoading()", 1000);
-			timer2 = setTimeout("filedrawersApi.displayCancel()", 3000);
+			timer1 = setTimeout("api.displayLoading()", 1000);
+			timer2 = setTimeout("api.displayCancel()", 3000);
 		},
 		
 		displayLoading: function() {
@@ -254,7 +255,7 @@ FD.DirList = function() {
 
 				//tableState.sortedBy = tableInitialSort;
 
-				myDataSource.sendRequest( filedrawersApi.getActionUrl( 'list' ), {
+				myDataSource.sendRequest( api.getActionUrl( 'list' ), {
 					success  : oTable.onDataReturnInitializeTable,
 					failure  : oTable.onDataReturnInitializeTable,  // add errorHandling
 					scope    : oTable,
@@ -323,7 +324,7 @@ FD.DirList = function() {
 				}
 				
 				currentURL = YAHOO.lang.dump(myJSONdata.path);
-                                filedrawersApi.setUrlParam( 'path', currentURL );
+                                api.setUrlParam( 'path', currentURL );
 								
 				if (!homeURL) {
 					homeURL = currentURL;
@@ -361,7 +362,7 @@ FD.DirList = function() {
                         } else {
                             var params = {};
                         }
-                        var initReq = filedrawersApi.getActionUrl( 'list', params, true );
+                        var initReq = api.getActionUrl( 'list', params, true );
 
 					
 			dirTable = new YAHOO.widget.DataTable("content", myColumnDefs, myDataSource, {initialRequest:initReq});
@@ -391,7 +392,7 @@ FD.DirList = function() {
 				l.replaceChild( t, l.firstChild );
 			}
 			
-			myDataSource.sendRequest( filedrawersApi.getActionUrl( 'list' ), dirTable.onDataReturnInitializeTable, dirTable);
+			myDataSource.sendRequest( api.getActionUrl( 'list' ), dirTable.onDataReturnInitializeTable, dirTable);
 			
 			/*						
 			myDataSource.sendRequest(showHidden,{
@@ -416,13 +417,13 @@ FD.DirList = function() {
 				files.push(dirTable.getRecord(tableState.selectedRows[i]).getData().filename);
 			}
 
-			filedrawersApi.post( filedrawersApi.getActionUrl( 'delete' ), callback, { 'files': files, 'path': currentURL } );				
+			api.post( api.getActionUrl( 'delete' ), callback, { 'files': files, 'path': currentURL } );				
 		
 		},
 
 		createNewFolder: function(e, args) {
                         var callback = getAjaxListCallback(dirTable);
-                        filedrawersApi.post( filedrawersApi.getActionUrl( 'mkdir' ), callback, { 'folderName': args[ 0 ], 'path': currentURL } );
+                        api.post( api.getActionUrl( 'mkdir' ), callback, { 'folderName': args[ 0 ], 'path': currentURL } );
 		},
 		
 		renameItem: function(e, action) {
@@ -451,7 +452,7 @@ FD.DirList = function() {
 		handleNameEditorSave: function(oArgs) {
 		
 			var callback = getAjaxListCallback(this);			
-			filedrawersApi.post( filedrawersApi.getActionUrl( 'rename' ), callback, { 'oldName': oArgs.oldData, 'newName':oArgs.newData, 'path': currentURL } );		
+			api.post( api.getActionUrl( 'rename' ), callback, { 'oldName': oArgs.oldData, 'newName':oArgs.newData, 'path': currentURL } );		
 
 		},
 		
@@ -496,8 +497,7 @@ FD.DirList = function() {
 				alert("no clipboardState available");
 			}
 			
-			console.log( filedrawersApi.getActionUrl( pasteAction, { 'path': cutCopyURL }, true ));
-			filedrawersApi.post( filedrawersApi.getActionUrl( pasteAction, { 'path': cutCopyURL }, true ), callback, { 'files': cutCopyFiles, 'fromPath': cutCopyURL, 'toPath': currentURL} );
+			api.post( api.getActionUrl( pasteAction, { 'path': cutCopyURL }, true ), callback, { 'files': cutCopyFiles, 'fromPath': cutCopyURL, 'toPath': currentURL} );
 			
 			cutCopyFiles = [];
 			cutCopyURL = "";
@@ -508,7 +508,7 @@ FD.DirList = function() {
 		
 		reqSender: function(directory) {
                                params = { 'path': directory };
-			myDataSource.sendRequest( filedrawersApi.getActionUrl( 'list', params, true ), dirTable.onDataReturnInitializeTable, dirTable);		
+			myDataSource.sendRequest( api.getActionUrl( 'list', params, true ), dirTable.onDataReturnInitializeTable, dirTable);		
 		}
 							
 		/*
@@ -560,7 +560,7 @@ FD.InfoBar = function() {
 			var upDir = currentURL.slice( 0, currentURL.lastIndexOf("/") );
 			History.navigate("dirTable", upDir);
 		} else if (target.id == "refresh") {
-			myDataSource.sendRequest( filedrawersApi.getActionUrl( 'list' ), dirTable.onDataReturnInitializeTable, dirTable);
+			myDataSource.sendRequest( api.getActionUrl( 'list' ), dirTable.onDataReturnInitializeTable, dirTable);
 		}		
 /*
 		if ( ! target.value) {
@@ -599,7 +599,7 @@ FD.InfoBar = function() {
         var defaultService = '';
         var setService = function( service ) {
             YAHOO.util.Dom.get( 'currentLocationService' ).innerHTML = services[ service ].label;
-            filedrawersApi.setUrlParam( 'service', service );
+            api.setUrlParam( 'service', service );
         };
 	YAHOO.util.Event.on('infoBar', 'click', handleClick);
 	YAHOO.util.Event.on('location', 'submit', handleSubmit);
@@ -628,7 +628,7 @@ FD.InfoBar = function() {
                         }
                     };
 
-                    YAHOO.util.Connect.asyncRequest('GET', filedrawersApi.getActionUrl( 'services' ), callback, null );
+                    YAHOO.util.Connect.asyncRequest('GET', api.getActionUrl( 'services' ), callback, null );
 
                 },
                 setService:setService,
@@ -862,7 +862,7 @@ FD.FileInspector = function() {
 
 YAHOO.util.Event.addListener(window, "load", function() {
 				
-        filedrawersApi = new FD.api(); // TODO does this need to be so widely scoped?
+        api = new FD.api();
 	var bookmarkDir = History.getBookmarkedState("dirTable");
 	
 	infoBar = new FD.InfoBar(); // TODO does this need to be so widely scoped?
