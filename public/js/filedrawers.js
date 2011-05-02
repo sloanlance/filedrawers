@@ -47,12 +47,21 @@ FD.api = function() {
     var _urlParams = { 'format': 'json' };
     var _dataParams = {};
     var _getParams = function( type, params ) {
-        var merged_params = type;
+        var merged_params = {};
+        var key;
+
         if ( typeof params == 'object' ) {
-            for ( var key in params ) {
+            for ( key in type ) {
+                merged_params[ key ] = type[ key ];
+            }
+
+            for ( key in params ) {
                 merged_params[ key ] = params[ key ];
             }
+        } else {
+            return type
         }
+
         return merged_params;
     };
     var _setParam = function( type, key, value ) {
