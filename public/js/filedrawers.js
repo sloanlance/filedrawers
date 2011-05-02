@@ -236,6 +236,9 @@ FD.DirList = function() {
 	
 	var getAjaxListCallback = function(oTable) {
 	
+		console.warn("errorMsg = " + YAHOO.lang.dump(myJSONdata.errorMsg));
+		console.warn("message = " + YAHOO.lang.dump(myJSONdata.message));
+		
 		var tableState = oTable.getState();
 
 		return callback = {
@@ -304,14 +307,15 @@ FD.DirList = function() {
 			myDataSource.subscribe('responseEvent', function(oDS){  // triggered by data return
 			
 				YAHOO.util.Dom.get('loading').innerHTML = '';
-				
+				YAHOO.util.Dom.setStyle('loading', 'display', 'none');
 				clearTimeout(timer1);
 				clearTimeout(timer2);
 				
 				myJSONdata = YAHOO.lang.JSON.parse(oDS.response.responseText);
-				
+						
 				if (YAHOO.lang.dump(myJSONdata.errorMsg) != 'undefined') {
-					console.warn(YAHOO.lang.dump(myJSONdata.errorMsg));
+					//console.warn(YAHOO.lang.dump(myJSONdata.errorMsg));
+					YAHOO.util.Dom.get('error').innerHTML = YAHOO.lang.dump(myJSONdata.errorMsg);
 				}
 				
 				currentURL = YAHOO.lang.dump(myJSONdata.path);

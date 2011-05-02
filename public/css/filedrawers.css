@@ -424,11 +424,13 @@ div.expandItem h2, form.expandItem h2 {
 }
 
 #error {
-	margin-left: 15%;
-	margin-right: 20%;
-	margin-top: 120px;
-	background: #ffff99;
-	padding: 0px 10px 10px 20px;
+	padding: 5px;	
+	position:relative;
+	left: 220px;
+	top: 105px;
+	width:600px;
+	margin-bottom:10px;
+	background: #ffff99;	
 	color: #882222;
 	border: 1px dashed #000000;
 }
