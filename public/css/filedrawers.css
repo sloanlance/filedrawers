@@ -423,7 +423,7 @@ div.expandItem h2, form.expandItem h2 {
 	margin: 4px 4px 4px auto;
 }
 
-#error {
+#feedback {
 	padding: 5px;	
 	position:relative;
 	left: 220px;

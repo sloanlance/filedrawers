@@ -70,22 +70,6 @@ FD.api = function() {
     };
     return {
 	
-		ajaxTimer: function() {
-		
-			YAHOO.util.Dom.get('loading').innerHTML = '&nbsp;<img src="images/ajax-loader.gif" style="position:relative; top:3px;" />'
-			
-			timer1 = setTimeout("api.displayLoading()", 1000);
-			timer2 = setTimeout("api.displayCancel()", 3000);
-		},
-		
-		displayLoading: function() {
-			YAHOO.util.Dom.get('loading').innerHTML += "&nbsp;Loading...";
-		},
-		
-		displayCancel: function() {
-			YAHOO.util.Dom.get('loading').innerHTML += '&nbsp;<input type="button" value="Cancel" />';
-		},
-	
         getUrlParams: function( params ) {
             return _getParams( _urlParams, params );
         },
@@ -101,9 +85,8 @@ FD.api = function() {
         },
 
         getActionUrl: function( action, params, merge ) {
-			YAHOO.util.Dom.setStyle('loading', 'display', 'inline');
-			
-			this.ajaxTimer();
+						
+			userFeedback.startTimer(action);
 			
             if ( typeof params == 'undefined' ) {
                params = _urlParams;
@@ -138,6 +121,64 @@ FD.api = function() {
         },
 
     }
+}
+
+FD.UserFeedback = function() {
+	
+	return {
+	
+		startTimer: function(action) {
+			if (action != 'services') {
+				YAHOO.util.Dom.setStyle('loading', 'display', 'inline');
+				YAHOO.util.Dom.get('loading').innerHTML = '&nbsp;<img src="images/ajax-loader.gif" style="position:relative; top:3px;" />'
+				timer1 = setTimeout("userFeedback.displayLoading()", 1000);
+			}
+			if (action == 'list') {
+				timer2 = setTimeout("userFeedback.displayCancel()", 3000);
+			}
+		},
+		
+		displayLoading: function() {
+			YAHOO.util.Dom.get('loading').innerHTML += "&nbsp;Loading...";
+		},
+		
+		displayCancel: function() {
+			YAHOO.util.Dom.get('loading').innerHTML += '&nbsp;<input type="button" value="Cancel" />';
+		},
+		
+		stopTimer: function() {
+			YAHOO.util.Dom.get('loading').innerHTML = '';
+			YAHOO.util.Dom.setStyle('loading', 'display', 'none');
+			clearTimeout(timer1);
+			clearTimeout(timer2);
+		},
+		
+		displayFeedback: function(o) {
+			
+			myJSONdata = YAHOO.lang.JSON.parse(o.responseText);
+			
+			if (!myJSONdata.errorMsg && !myJSONdata.message) {
+				return;
+			}
+						
+			console.warn("errorMsg = " + myJSONdata.errorMsg + "  |  message = " + myJSONdata.message);
+			
+			if (myJSONdata.errorMsg) {
+				YAHOO.util.Dom.get('feedback').innerHTML = YAHOO.lang.dump(myJSONdata.errorMsg);
+				//YAHOO.util.Dom.setStyle('feedback', 'display', 'block');
+			} else if (myJSONdata.message) {
+				YAHOO.util.Dom.get('feedback').innerHTML = YAHOO.lang.dump(myJSONdata.message);
+				//YAHOO.util.Dom.setStyle('feedback', 'display', 'block');
+			}
+			
+			/*
+			else {
+				YAHOO.util.Dom.get('feedback').innerHTML = '';
+				YAHOO.util.Dom.setStyle('feedback', 'display', 'none');
+			}
+			*/
+		}		
+	}
 }
 
 // redundant - make dirTable formating use this function.
@@ -245,14 +286,13 @@ FD.DirList = function() {
 	
 	var getAjaxListCallback = function(oTable) {
 	
-		console.warn("errorMsg = " + YAHOO.lang.dump(myJSONdata.errorMsg));
-		console.warn("message = " + YAHOO.lang.dump(myJSONdata.message));
-		
 		var tableState = oTable.getState();
-
+		
 		return callback = {
 			success: function (o) {
-				
+			
+				userFeedback.displayFeedback(o);
+								
 				//myDataSource.responseSchema = responseSchema;
 				myDataSource.doBeforeCallback = hiddenFileFilter;
 
@@ -269,7 +309,7 @@ FD.DirList = function() {
 			timeout: 3000
 		};
 	};
-	
+		
 	var hiddenFileFilter = function (req, raw, res, cb) {
 
 		var data     = res.results || [],
@@ -311,21 +351,16 @@ FD.DirList = function() {
 				fields: ["type","filename","modTime","size","mimeImage","perms","mimeType"]
 			};
 
+							
 			myDataSource.doBeforeCallback = hiddenFileFilter;
-					
+								
 			myDataSource.subscribe('responseEvent', function(oDS){  // triggered by data return
 			
-				YAHOO.util.Dom.get('loading').innerHTML = '';
-				YAHOO.util.Dom.setStyle('loading', 'display', 'none');
-				clearTimeout(timer1);
-				clearTimeout(timer2);
+				userFeedback.stopTimer();
+				
+				userFeedback.displayFeedback(oDS.response);
 				
 				myJSONdata = YAHOO.lang.JSON.parse(oDS.response.responseText);
-						
-				if (YAHOO.lang.dump(myJSONdata.errorMsg) != 'undefined') {
-					//console.warn(YAHOO.lang.dump(myJSONdata.errorMsg));
-					YAHOO.util.Dom.get('error').innerHTML = YAHOO.lang.dump(myJSONdata.errorMsg);
-				}
 				
 				currentURL = YAHOO.lang.dump(myJSONdata.path);
                                 api.setUrlParam( 'path', currentURL );
@@ -867,6 +902,7 @@ FD.FileInspector = function() {
 YAHOO.util.Event.addListener(window, "load", function() {
 				
         api = new FD.api();
+		userFeedback = new FD.UserFeedback();
 	var bookmarkDir = History.getBookmarkedState("dirTable");
 	
 	infoBar = new FD.InfoBar(); // TODO does this need to be so widely scoped?
@@ -891,6 +927,17 @@ YAHOO.util.Event.addListener(window, "load", function() {
 	dirTable.subscribe('rowUnselectEvent', inspector.update);
 	dirTable.subscribe('initEvent', inspector.update);
 	dirTable.subscribe('editorSaveEvent', dirList.handleNameEditorSave);
+	
+	//stops dirTable "Data error." behavior when path does not exist
+	dirTable.doBeforeLoadData = function(oRequest, oResponse, oPayload) {
+		//console.warn(oResponse);
+		if (!oResponse.error) {
+			return true;
+		}
+	};
+	
+	// TODO add errorChecking to myDataSource.doBeforeCallback = hiddenFileFilter
+	// to catch error on initial load, where path in URL doesn't exist.
 	
 	FD.NewFolderDialog.evnt.subscribe(dirList.createNewFolder);
 	
