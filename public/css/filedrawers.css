@@ -433,6 +433,7 @@ div.expandItem h2, form.expandItem h2 {
 	background: #ffff99;	
 	color: #882222;
 	border: 1px dashed #000000;
+	display: none;
 }
 
 #viewfile {

@@ -154,7 +154,7 @@ FD.UserFeedback = function() {
 		},
 		
 		displayFeedback: function(o) {
-			
+		
 			myJSONdata = YAHOO.lang.JSON.parse(o.responseText);
 			
 			if (!myJSONdata.errorMsg && !myJSONdata.message) {
@@ -165,19 +165,17 @@ FD.UserFeedback = function() {
 			
 			if (myJSONdata.errorMsg) {
 				YAHOO.util.Dom.get('feedback').innerHTML = YAHOO.lang.dump(myJSONdata.errorMsg);
-				//YAHOO.util.Dom.setStyle('feedback', 'display', 'block');
+				YAHOO.util.Dom.setStyle('feedback', 'display', 'block');
 			} else if (myJSONdata.message) {
 				YAHOO.util.Dom.get('feedback').innerHTML = YAHOO.lang.dump(myJSONdata.message);
-				//YAHOO.util.Dom.setStyle('feedback', 'display', 'block');
+				YAHOO.util.Dom.setStyle('feedback', 'display', 'block');
 			}
-			
-			/*
-			else {
-				YAHOO.util.Dom.get('feedback').innerHTML = '';
-				YAHOO.util.Dom.setStyle('feedback', 'display', 'none');
-			}
-			*/
-		}		
+		},
+
+		hideFeedback: function() {
+			YAHOO.util.Dom.get('feedback').innerHTML = '';
+			YAHOO.util.Dom.setStyle('feedback', 'display', 'none');
+		}
 	}
 }
 
@@ -268,6 +266,7 @@ FD.DirList = function() {
 					
 		if (oArgs.target.id == "folderLink") {
 			var newDir = currentURL + "/" + oArgs.target.innerHTML;
+			userFeedback.hideFeedback();
 			History.navigate("dirTable", newDir);
 		}		
 		
@@ -275,13 +274,13 @@ FD.DirList = function() {
 	
 	var myColumnDefs = [
 		{key:"checked",label:"", width:"30", formatter:YAHOO.widget.DataTable.formatCheckbox},
-		{key:"type", sortable:true, resizeable:true},
+		//{key:"type", sortable:true, resizeable:true},
 		{key:"filename", label:"Name", formatter:formatURL, sortable:true, resizeable:true, editor: new YAHOO.widget.TextboxCellEditor({disableBtns:true})},
 		{key:"modTime", label:"Last Modified", formatter:formatDate, sortable:true, sortOptions:{defaultDir:YAHOO.widget.DataTable.CLASS_DESC}},
 		{key:"size", label:"Size", formatter:formatBytes, sortable:true, resizeable:true},
 		{key:"mimeImage", label:"Type", formatter:formatType, sortable:true, resizeable:true},
 		//{key:"perms", sortable:true, resizeable:true},
-		{key:"mimeType", sortable:true, resizeable:true}
+		//{key:"mimeType", sortable:true, resizeable:true}
 	];
 	
 	var getAjaxListCallback = function(oTable) {
@@ -513,6 +512,9 @@ FD.DirList = function() {
 				cutCopyFiles.push(dirTable.getRecord(tableState.selectedRows[i]).getData().filename);
 			}
 			
+			YAHOO.util.Dom.get('feedback').innerHTML = "Added " + tableState.selectedRows.length + " item(s) to the clipboard.";
+			YAHOO.util.Dom.setStyle('feedback', 'display', 'block');
+			
 			cutCopyURL = currentURL;
 			
 			clearTable();
@@ -597,8 +599,10 @@ FD.InfoBar = function() {
 		
 		if (target.id == "goUp") {
 			var upDir = currentURL.slice( 0, currentURL.lastIndexOf("/") );
+			userFeedback.hideFeedback();
 			History.navigate("dirTable", upDir);
 		} else if (target.id == "refresh") {
+			userFeedback.hideFeedback();
 			myDataSource.sendRequest( api.getActionUrl( 'list' ), dirTable.onDataReturnInitializeTable, dirTable);
 		}		
 /*
@@ -615,6 +619,7 @@ FD.InfoBar = function() {
                         YAHOO.util.Dom.setStyle( currentLocation, 'display', 'inline' );
                         YAHOO.util.Dom.setStyle( changeLocation, 'display', 'none' );
                         setService( YAHOO.util.Dom.get( 'changeLocationNewService' ).value );
+						userFeedback.hideFeedback();
 			History.navigate("dirTable", YAHOO.util.Dom.get( 'changeLocationNewPath' ).value );
 		} else if (target.id == 'changeLocationCancel') {
                         YAHOO.util.Dom.setStyle( currentLocation, 'display', 'inline' );
@@ -630,6 +635,7 @@ FD.InfoBar = function() {
 	var locationClick = function(e) {
 		YAHOO.util.Event.preventDefault(e);
 		if (e.target.href) {
+			userFeedback.hideFeedback();
 			History.navigate("dirTable", e.target.id);
 		}
 	};
@@ -945,6 +951,7 @@ YAHOO.util.Event.addListener(window, "load", function() {
 	
 	YAHOO.util.Event.on('homeBtn', 'click', function(e) {
 		YAHOO.util.Event.preventDefault(e);
+		userFeedback.hideFeedback();
 		History.navigate("dirTable", homeURL);
 	});
 	
