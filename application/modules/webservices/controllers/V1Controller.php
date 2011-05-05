@@ -64,11 +64,17 @@ class Webservices_V1Controller extends Zend_Controller_Action {
 
         $serviceValidator = new Zend_Validate_InArray( array_keys( $this->_availableServices ));
         $serviceValidator->setStrict( TRUE );
+        $wappverValidator = new Zend_Validate_Int();
         $validators = array(
             'service' => array(
                 $serviceValidator,
                 'presence' => 'optional',
                 'default' => Zend_Registry::get('config')->filesystem->default
+            ),
+            'wappver' => array(
+                $wappverValidator,
+                'presence' => 'optional',
+                'default' => 0
             )
         );
         $options = array('inputNamespace' => 'Filedrawers_Validate');
@@ -79,6 +85,19 @@ class Webservices_V1Controller extends Zend_Controller_Action {
             throw( new Zend_Exception( 'service parameter must be one of: '. implode( ', ', array_keys( $this->_availableServices ))));
         }
         $this->view->service = $input->service;
+
+        if ( ! $input->isValid( 'wappver' )) {
+            $this->view->errorMsg = array( 'wappver' => array( 'invalid' => 'invalid wappver flag' ));
+            throw( new Zend_Exception( 'wappver (Web App Version) parameter must be an integer.' ));
+        }
+        if ( (int) $input->wappver > 0 ) {
+            if ( $input->wappver != Zend_Registry::get( 'webAppVersion' )) {
+                // TODO there are better ways to do this:
+                $this->view->errorMsg = '<a href="" >Refresh</a> to get an updated version of the interface.';
+            }
+
+            $this->view->webAppVersion = Zend_Registry::get( 'webAppVersion' );
+        }
 
         $this->_filesystem = new $this->_availableServices[ $input->service ]();
         $this->_filesystem->init();
