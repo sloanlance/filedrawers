@@ -161,7 +161,7 @@ FD.UserFeedback = function() {
 				return;
 			}
 						
-			console.warn("errorMsg = " + myJSONdata.errorMsg + "  |  message = " + myJSONdata.message);
+			//console.warn("errorMsg = " + myJSONdata.errorMsg + "  |  message = " + myJSONdata.message);
 			
 			if (myJSONdata.errorMsg) {
 				YAHOO.util.Dom.get('feedback').innerHTML = YAHOO.lang.dump(myJSONdata.errorMsg);
@@ -403,7 +403,7 @@ FD.DirList = function() {
                         var initReq = api.getActionUrl( 'list', params, true );
 
 					
-			dirTable = new YAHOO.widget.DataTable("content", myColumnDefs, myDataSource, {initialRequest:initReq});
+			dirTable = new YAHOO.widget.ScrollingDataTable("content", myColumnDefs, myDataSource, {initialRequest:initReq});
 			
 			dirTable.subscribe('checkboxClickEvent', handleFileSelection);
 			dirTable.subscribe('click', handleTableClick);
@@ -482,7 +482,7 @@ FD.DirList = function() {
 				dirTable.onEditorBlurEvent = blurEvent;
 			};
 
-			var td = trs[0].getElementsByTagName('td')[2];
+			var td = trs[0].getElementsByTagName('td')[1];
 						
 			dirTable.showCellEditor(td);
 		},
@@ -791,7 +791,7 @@ FD.FileInspector = function() {
 	
 	// makes menu options active or inactive based on the permissions
 	var update = function(oArgs) {
-	
+		
 		var numSelected,
 		i,
 		permissions = {
@@ -953,8 +953,5 @@ YAHOO.util.Event.addListener(window, "load", function() {
 		YAHOO.util.Event.preventDefault(e);
 		userFeedback.hideFeedback();
 		History.navigate("dirTable", homeURL);
-	});
-	
-	
-	
+	});	
 });
