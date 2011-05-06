@@ -5,7 +5,7 @@
  * All rights reserved.
  */
 
-class Model_Cifs extends Filedrawers_Filesystem_URL {
+class Filedrawers_Filesystem_Url_Cifs extends Filedrawers_Filesystem_Url {
 
     protected $_dirHandle;
     protected $_shareName;

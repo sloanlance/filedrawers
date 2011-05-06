@@ -5,5 +5,5 @@
  * All rights reserved.
  */
 
-class Service_Ifs extends Model_Afs {
+class Service_Ifs extends Filedrawers_Filesystem_Mounted_Afs {
 }
