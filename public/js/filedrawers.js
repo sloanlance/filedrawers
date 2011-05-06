@@ -85,8 +85,6 @@ FD.api = function() {
         },
 
         getActionUrl: function( action, params, merge ) {
-						
-			userFeedback.startTimer(action);
 			
             if ( typeof params == 'undefined' ) {
                params = _urlParams;
@@ -104,6 +102,8 @@ FD.api = function() {
 
         post: function( actionUrl, callback, postData ) {
             var data = this.getData( postData );
+			
+			userFeedback.startTimer("post");
 
             var getTokenSuccessHandler = function(o) {
                     data[ 'formToken' ] = YAHOO.lang.JSON.parse(o.responseText).formToken;
@@ -129,8 +129,7 @@ FD.UserFeedback = function() {
 	
 		startTimer: function(action) {
 			if (action != 'services') {
-				YAHOO.util.Dom.setStyle('loading', 'display', 'inline');
-				YAHOO.util.Dom.get('loading').innerHTML = '&nbsp;<img src="images/ajax-loader.gif" style="position:relative; top:3px;" />'
+				YAHOO.util.Dom.setStyle('spinner', 'display', 'inline');
 				timer1 = setTimeout("userFeedback.displayLoading()", 1000);
 			}
 			if (action == 'list') {
@@ -139,16 +138,17 @@ FD.UserFeedback = function() {
 		},
 		
 		displayLoading: function() {
-			YAHOO.util.Dom.get('loading').innerHTML += "&nbsp;Loading...";
+			YAHOO.util.Dom.setStyle('loadingTxt', 'display', 'inline');
 		},
 		
 		displayCancel: function() {
-			YAHOO.util.Dom.get('loading').innerHTML += '&nbsp;<input type="button" value="Cancel" />';
+			YAHOO.util.Dom.setStyle('cancelBtn', 'display', 'inline');
 		},
 		
 		stopTimer: function() {
-			YAHOO.util.Dom.get('loading').innerHTML = '';
-			YAHOO.util.Dom.setStyle('loading', 'display', 'none');
+			YAHOO.util.Dom.setStyle('spinner', 'display', 'none');
+			YAHOO.util.Dom.setStyle('loadingTxt', 'display', 'none');
+			YAHOO.util.Dom.setStyle('cancelBtn', 'display', 'none');
 			clearTimeout(timer1);
 			clearTimeout(timer2);
 		},
@@ -173,7 +173,6 @@ FD.UserFeedback = function() {
 		},
 
 		hideFeedback: function() {
-			YAHOO.util.Dom.get('feedback').innerHTML = '';
 			YAHOO.util.Dom.setStyle('feedback', 'display', 'none');
 		}
 	}
@@ -403,7 +402,8 @@ FD.DirList = function() {
                         var initReq = api.getActionUrl( 'list', params, true );
 
 					
-			dirTable = new YAHOO.widget.ScrollingDataTable("content", myColumnDefs, myDataSource, {initialRequest:initReq});
+			dirTable = new YAHOO.widget.DataTable("content", myColumnDefs, myDataSource, {initialRequest:initReq});
+			userFeedback.startTimer("list");
 			
 			dirTable.subscribe('checkboxClickEvent', handleFileSelection);
 			dirTable.subscribe('click', handleTableClick);
@@ -431,6 +431,7 @@ FD.DirList = function() {
 			}
 			
 			myDataSource.sendRequest( api.getActionUrl( 'list' ), dirTable.onDataReturnInitializeTable, dirTable);
+			userFeedback.startTimer("list");
 			
 			/*						
 			myDataSource.sendRequest(showHidden,{
@@ -549,7 +550,8 @@ FD.DirList = function() {
 		
 		reqSender: function(directory) {
                                params = { 'path': directory };
-			myDataSource.sendRequest( api.getActionUrl( 'list', params, true ), dirTable.onDataReturnInitializeTable, dirTable);		
+			myDataSource.sendRequest( api.getActionUrl( 'list', params, true ), dirTable.onDataReturnInitializeTable, dirTable);
+			userFeedback.startTimer("list");			
 		}
 							
 		/*
@@ -604,6 +606,7 @@ FD.InfoBar = function() {
 		} else if (target.id == "refresh") {
 			userFeedback.hideFeedback();
 			myDataSource.sendRequest( api.getActionUrl( 'list' ), dirTable.onDataReturnInitializeTable, dirTable);
+			userFeedback.startTimer("list");
 		}		
 /*
 		if ( ! target.value) {
