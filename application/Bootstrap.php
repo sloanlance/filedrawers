@@ -11,7 +11,8 @@ class Bootstrap extends Zend_Application_Bootstrap_Bootstrap
             )
         );
         $moduleLoader->addResourceType( 'controller', 'modules/webservices/controllers', 'Webservices' );
-        $moduleLoader->addResourceType( 'service', 'services', 'Service' );
+        $moduleLoader->addResourceType( 'form', 'modules/webservices/forms', 'Forms' );
+        $moduleLoader->addResourceType( 'service', '../services', 'Service' );
         return $moduleLoader;
     }
 
