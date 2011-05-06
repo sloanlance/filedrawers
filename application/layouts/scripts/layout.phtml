@@ -31,4 +31,7 @@
 </div>
 <?php echo $this->layout()->content;?>
 </body>
+<script type="text/javascript">
+var webAppVersion = <?= ( int ) Zend_Registry::get( 'webAppVersion' ) ?>;
+</script>
 </html>

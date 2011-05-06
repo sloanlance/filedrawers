@@ -16,6 +16,17 @@ class Bootstrap extends Zend_Application_Bootstrap_Bootstrap
     }
 
 
+    protected function _initWebAppVersion()
+    {
+        $version = 'N/A';
+        $version_file = APPLICATION_PATH .'/modules/webapp/VERSION';
+        if ( is_readable( $version_file ) and is_file( $version_file )) {
+            $version_parts = file( $version_file );
+            $version = trim( $version_parts[ 0 ] );
+        }
+        Zend_Registry::set('webAppVersion', $version);
+    }
+
     protected function _initConfig()
     {
         global $conf;

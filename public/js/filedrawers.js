@@ -45,7 +45,7 @@ function urlEncode( data ) {
 
 FD.api = function() {
     var _apiUrl = baseUrl +'webservices/v1/';
-    var _urlParams = { 'format': 'json' };
+    var _urlParams = { 'format': 'json', 'wappver': webAppVersion.toString() };
     var _dataParams = {};
     var _getParams = function( type, params ) {
         var merged_params = {};
