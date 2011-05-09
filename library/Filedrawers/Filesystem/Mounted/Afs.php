@@ -12,16 +12,10 @@ class Filedrawers_Filesystem_Mounted_Afs extends Filedrawers_Filesystem_Mounted
             return $rc;
         }
 
-        // When we're working on our dev server, our home directories are not
-        // in AFS so we have to find it.  I'm leaving it in for production.
-        // Andrew says our /etc/password is really big.  There will be a delay
-        // getting the home dir until the path is cached by nscd and everytime
-        // the cache is cleared.  I'd like to see this plugin declared in the
-        // ini if possible.
-        $this->setHomeDirHelper(array('Model_UMForceHomeDirectory', 'getHomeDirectory'));
         $this->addListHelper(array('Filedrawers_Filesystem_Mounted_Afs', 'setPermissions'));
         return TRUE;
     }
+
 
 
     // Change the ACL for a given path

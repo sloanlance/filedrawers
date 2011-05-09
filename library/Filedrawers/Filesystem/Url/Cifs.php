@@ -34,12 +34,6 @@ class Filedrawers_Filesystem_Url_Cifs extends Filedrawers_Filesystem_Url {
     }
 
 
-    public function getHomedir()
-    {
-        return '/';
-    }
-
-
     public function listDirectory($path, $associativeArray=false)
     {
         $this->setPath( $path );

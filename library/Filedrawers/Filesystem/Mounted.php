@@ -9,7 +9,6 @@ abstract class Filedrawers_Filesystem_Mounted extends Filedrawers_Filesystem {
     protected $fsStat = null;
     protected $startCWD = null;
     protected $helpers = array();
-    protected $homeDirHelper = null; 
 
     public function __construct()
     {
@@ -379,32 +378,6 @@ abstract class Filedrawers_Filesystem_Mounted extends Filedrawers_Filesystem {
         @closedir( $dh );
         @chdir( $this->startCWD );
         return $files;                                    
-    }
-
-
-    public function setHomeDirHelper($function)
-    {
-        $this->homeDirHelper = $function;
-    }
-
-
-    public function getHomedir()
-    {
-        $homedir = null;
-
-        if ($this->homeDirHelper) {
-            call_user_func_array($this->homeDirHelper, array(&$homedir));
-            return $homedir;
-        }
-
-        $userInfo = posix_getpwnam(Zend_Auth::getInstance()->getIdentity());
-
-        if ( ! empty($userInfo['dir']) && is_dir($userInfo['dir'])) {
-            return $userInfo['dir'];
-        }
-        else {
-            throw new Filedrawers_Filesystem_Exception("No home directory", 3);
-        }
     }
 
 

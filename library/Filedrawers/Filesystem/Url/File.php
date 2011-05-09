@@ -13,4 +13,11 @@ class Filedrawers_Filesystem_Url_File extends Filedrawers_Filesystem_Url {
         $url_parts = parse_url( $url );
         return rmdir( $url_parts[ 'path' ] );
     }
+
+    public function getHomedir()
+    {
+        return Filedrawers_Filesystem::getHomedir();
+    }
+
+
 }
