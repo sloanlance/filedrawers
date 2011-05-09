@@ -5,7 +5,7 @@
  * All rights reserved.
  */
 
-class Model_File extends Filedrawers_Filesystem_URL {
+class Filedrawers_Filesystem_Url_File extends Filedrawers_Filesystem_Url {
     protected $scheme = 'file';
 
     protected function _rmdir( $url )
@@ -13,4 +13,11 @@ class Model_File extends Filedrawers_Filesystem_URL {
         $url_parts = parse_url( $url );
         return rmdir( $url_parts[ 'path' ] );
     }
+
+    public function getHomedir()
+    {
+        return Filedrawers_Filesystem::getHomedir();
+    }
+
+
 }

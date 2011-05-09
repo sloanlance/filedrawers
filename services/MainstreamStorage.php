@@ -5,7 +5,7 @@
  * All rights reserved.
  */
 
-class Service_MainstreamStorage extends Model_Cifs {
+class Service_MainstreamStorage extends Filedrawers_Filesystem_Url_Cifs {
     public function getUrl()
     {
         return 'smb://'. $this->_shareName .'.m.storage.umich.edu/'. trim( $this->_path, '/' ) .'/';

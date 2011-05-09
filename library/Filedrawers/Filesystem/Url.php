@@ -5,7 +5,7 @@
  * All rights reserved.
  */
 
-abstract class Filedrawers_Filesystem_URL extends Filedrawers_Filesystem {
+abstract class Filedrawers_Filesystem_Url extends Filedrawers_Filesystem {
     protected $_scheme = 'file';
     protected $_host = '';
     protected $_port = NULL;
