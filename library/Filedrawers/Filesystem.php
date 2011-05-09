@@ -13,4 +13,15 @@ abstract class Filedrawers_Filesystem {
         $this->addListHelper(array('Model_Mime', 'setIcon'));
         return TRUE;
     }
+
+    public function getHomedir()
+    {
+        $userInfo = posix_getpwnam(Zend_Auth::getInstance()->getIdentity());
+
+        if ( ! empty($userInfo['dir']) && is_dir($userInfo['dir'])) {
+            return $userInfo['dir'];
+        } else {
+            return '/';
+        }
+    }
 }

@@ -5,7 +5,7 @@
  * All rights reserved.
  */
 
-class Model_Cifs extends Filedrawers_Filesystem_URL {
+class Filedrawers_Filesystem_Url_Cifs extends Filedrawers_Filesystem_Url {
 
     protected $_dirHandle;
     protected $_shareName;
@@ -22,33 +22,15 @@ class Model_Cifs extends Filedrawers_Filesystem_URL {
     }
 
 
-    public function getUrl()
-    {
-        return 'smb://'. $this->_shareName .'.m.storage.umich.edu/'. $this->_shareName .'/' . trim( $this->_path, '/' ) .'/';
-    }
-
-
     public function setShareName( $shareName )
     {
         $this->_shareName = $shareName;
     }
 
 
-    public function setPath( $path )
-    {
-        $this->_path = $path;
-    }
-
-
     public function addListHelper($function)
     {
         $this->listHelpers[] = $function;
-    }
-
-
-    public function getHomedir()
-    {
-        return '/';
     }
 
 

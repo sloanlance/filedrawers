@@ -15,7 +15,7 @@ $conf[ 'resources' ][ 'frontController' ][ 'plugins' ][ 'cosign' ] = 'CoSign_Con
 $conf[ 'resources' ][ 'view' ] = array ( '' );
 $conf[ 'resources' ][ 'view' ][ 'doctype' ] = 'XHTML1_TRANSITIONAL';
 $conf[ 'resources' ][ 'layout' ][ 'layout' ] = 'layout';
-$conf[ 'resources' ][ 'layout' ][ 'layoutpath' ] = APPLICATION_PATH .'/layouts/scripts';
+$conf[ 'resources' ][ 'layout' ][ 'layoutpath' ] = APPLICATION_PATH .'/modules/webapp/layouts/scripts/';
 $conf[ 'resources' ][ 'frontController' ][ 'params' ][ 'displayExceptions' ] = FALSE;
 
 $conf[ 'autoloadernamespaces' ][ 'filedrawers' ] = 'Filedrawers_';

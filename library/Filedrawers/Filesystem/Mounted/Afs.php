@@ -4,7 +4,7 @@
  * Copyright (c) 2010 Regents of the University of Michigan.
  * All rights reserved.
  */
-class Model_Afs extends Filedrawers_Filesystem_Mounted
+class Filedrawers_Filesystem_Mounted_Afs extends Filedrawers_Filesystem_Mounted
 {
     public function init()
     {
@@ -12,16 +12,10 @@ class Model_Afs extends Filedrawers_Filesystem_Mounted
             return $rc;
         }
 
-        // When we're working on our dev server, our home directories are not
-        // in AFS so we have to find it.  I'm leaving it in for production.
-        // Andrew says our /etc/password is really big.  There will be a delay
-        // getting the home dir until the path is cached by nscd and everytime
-        // the cache is cleared.  I'd like to see this plugin declared in the
-        // ini if possible.
-        $this->setHomeDirHelper(array('Model_UMForceHomeDirectory', 'getHomeDirectory'));
-        $this->addListHelper(array('Model_Afs', 'setPermissions'));
+        $this->addListHelper(array('Filedrawers_Filesystem_Mounted_Afs', 'setPermissions'));
         return TRUE;
     }
+
 
 
     // Change the ACL for a given path
@@ -115,7 +109,7 @@ class Model_Afs extends Filedrawers_Filesystem_Mounted
     public static function setPermissions(&$row)
     {
         if ($row['filename'] == '.') {
-            $row['perms'] = Model_Afs::getCallerAccess($row['filename']);
+            $row['perms'] = Filedrawers_Filesystem_Mounted_Afs::getCallerAccess($row['filename']);
         } else {
             return;
         }

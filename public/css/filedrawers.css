@@ -423,14 +423,17 @@ div.expandItem h2, form.expandItem h2 {
 	margin: 4px 4px 4px auto;
 }
 
-#error {
-	margin-left: 15%;
-	margin-right: 20%;
-	margin-top: 120px;
-	background: #ffff99;
-	padding: 0px 10px 10px 20px;
+#feedback {
+	padding: 5px;	
+	position:relative;
+	left: 220px;
+	top: 105px;
+	width:600px;
+	margin-bottom:10px;
+	background: #ffff99;	
 	color: #882222;
 	border: 1px dashed #000000;
+	display: none;
 }
 
 #viewfile {
@@ -471,9 +474,23 @@ div.expandItem h2, form.expandItem h2 {
 	border: 1px solid #000000;
 }
 
-#changeDirForm {
-	display: inline;
+#location {
+        display: inline;
 }
+
+#location #changeLocation {
+        display: none;
+}
+
+#location #loading {
+        visibility: hidden;
+}
+
+#location #currentLocationService,
+#location #currentLocationPath {
+        font-weight: bold;
+}
+
 
 #favMenu {
 	margin: 3px 2px 1em 2px;
@@ -515,4 +532,18 @@ div.expandItem h2, form.expandItem h2 {
   width: 1px;
   height: 1px;
   visibility: hidden;
+}
+
+#spinner  {
+	display: none;
+	position:relative;
+	top:3px;
+}
+
+#loadingTxt {
+	display: none;
+}
+
+#cancelBtn {
+	display: none;
 }

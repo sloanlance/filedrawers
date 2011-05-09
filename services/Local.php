@@ -5,5 +5,5 @@
  * All rights reserved.
  */
 
-class Service_Local extends Model_File {
+class Service_Local extends Filedrawers_Filesystem_Url_File {
 }

@@ -1,4 +1,5 @@
-var myJSONdata,
+var api,
+myJSONdata,
 myPerms,
 homeURL,
 currentURL,
@@ -6,6 +7,8 @@ cutCopyURL,
 cutCopyFiles = [],
 clipboardState,
 baseUrl = '',
+timer1,
+timer2,
 History = YAHOO.util.History;
 
 if (typeof FD == "undefined" || ! FD) {
@@ -42,21 +45,31 @@ function urlEncode( data ) {
 
 FD.api = function() {
     var _apiUrl = baseUrl +'webservices/v1/';
-    var _urlParams = { 'format': 'json' };
+    var _urlParams = { 'format': 'json', 'wappver': webAppVersion.toString() };
     var _dataParams = {};
     var _getParams = function( type, params ) {
-        var merged_params = type;
+        var merged_params = {};
+        var key;
+
         if ( typeof params == 'object' ) {
-            for ( var key in params ) {
+            for ( key in type ) {
+                merged_params[ key ] = type[ key ];
+            }
+
+            for ( key in params ) {
                 merged_params[ key ] = params[ key ];
             }
+        } else {
+            return type
         }
+
         return merged_params;
     };
     var _setParam = function( type, key, value ) {
         type[ key ] = value;
     };
     return {
+	
         getUrlParams: function( params ) {
             return _getParams( _urlParams, params );
         },
@@ -72,7 +85,7 @@ FD.api = function() {
         },
 
         getActionUrl: function( action, params, merge ) {
-			YAHOO.util.Dom.setStyle('loading', 'display', 'inline');
+			
             if ( typeof params == 'undefined' ) {
                params = _urlParams;
             } else if ( typeof merge != 'undefined' && merge ) {
@@ -87,9 +100,10 @@ FD.api = function() {
             return _apiUrl + action + query;
         },
 
-        post: function( action, callback, postData ) {
-            var actionUrl = this.getActionUrl( action );
+        post: function( actionUrl, callback, postData ) {
             var data = this.getData( postData );
+			
+			userFeedback.startTimer("post");
 
             var getTokenSuccessHandler = function(o) {
                     data[ 'formToken' ] = YAHOO.lang.JSON.parse(o.responseText).formToken;
@@ -107,6 +121,61 @@ FD.api = function() {
         },
 
     }
+}
+
+FD.UserFeedback = function() {
+	
+	return {
+	
+		startTimer: function(action) {
+			if (action != 'services') {
+				YAHOO.util.Dom.setStyle('spinner', 'display', 'inline');
+				timer1 = setTimeout("userFeedback.displayLoading()", 1000);
+			}
+			if (action == 'list') {
+				timer2 = setTimeout("userFeedback.displayCancel()", 3000);
+			}
+		},
+		
+		displayLoading: function() {
+			YAHOO.util.Dom.setStyle('loadingTxt', 'display', 'inline');
+		},
+		
+		displayCancel: function() {
+			YAHOO.util.Dom.setStyle('cancelBtn', 'display', 'inline');
+		},
+		
+		stopTimer: function() {
+			YAHOO.util.Dom.setStyle('spinner', 'display', 'none');
+			YAHOO.util.Dom.setStyle('loadingTxt', 'display', 'none');
+			YAHOO.util.Dom.setStyle('cancelBtn', 'display', 'none');
+			clearTimeout(timer1);
+			clearTimeout(timer2);
+		},
+		
+		displayFeedback: function(o) {
+		
+			myJSONdata = YAHOO.lang.JSON.parse(o.responseText);
+			
+			if (!myJSONdata.errorMsg && !myJSONdata.message) {
+				return;
+			}
+						
+			//console.warn("errorMsg = " + myJSONdata.errorMsg + "  |  message = " + myJSONdata.message);
+			
+			if (myJSONdata.errorMsg) {
+				YAHOO.util.Dom.get('feedback').innerHTML = YAHOO.lang.dump(myJSONdata.errorMsg);
+				YAHOO.util.Dom.setStyle('feedback', 'display', 'block');
+			} else if (myJSONdata.message) {
+				YAHOO.util.Dom.get('feedback').innerHTML = YAHOO.lang.dump(myJSONdata.message);
+				YAHOO.util.Dom.setStyle('feedback', 'display', 'block');
+			}
+		},
+
+		hideFeedback: function() {
+			YAHOO.util.Dom.setStyle('feedback', 'display', 'none');
+		}
+	}
 }
 
 // redundant - make dirTable formating use this function.
@@ -196,6 +265,7 @@ FD.DirList = function() {
 					
 		if (oArgs.target.id == "folderLink") {
 			var newDir = currentURL + "/" + oArgs.target.innerHTML;
+			userFeedback.hideFeedback();
 			History.navigate("dirTable", newDir);
 		}		
 		
@@ -203,30 +273,32 @@ FD.DirList = function() {
 	
 	var myColumnDefs = [
 		{key:"checked",label:"", width:"30", formatter:YAHOO.widget.DataTable.formatCheckbox},
-		{key:"type", sortable:true, resizeable:true},
+		//{key:"type", sortable:true, resizeable:true},
 		{key:"filename", label:"Name", formatter:formatURL, sortable:true, resizeable:true, editor: new YAHOO.widget.TextboxCellEditor({disableBtns:true})},
 		{key:"modTime", label:"Last Modified", formatter:formatDate, sortable:true, sortOptions:{defaultDir:YAHOO.widget.DataTable.CLASS_DESC}},
 		{key:"size", label:"Size", formatter:formatBytes, sortable:true, resizeable:true},
 		{key:"mimeImage", label:"Type", formatter:formatType, sortable:true, resizeable:true},
 		//{key:"perms", sortable:true, resizeable:true},
-		{key:"mimeType", sortable:true, resizeable:true}
+		//{key:"mimeType", sortable:true, resizeable:true}
 	];
 	
 	var getAjaxListCallback = function(oTable) {
 	
 		var tableState = oTable.getState();
-
+		
 		return callback = {
 			success: function (o) {
-				
+			
+				userFeedback.displayFeedback(o);
+								
 				//myDataSource.responseSchema = responseSchema;
 				myDataSource.doBeforeCallback = hiddenFileFilter;
 
 				//tableState.sortedBy = tableInitialSort;
 
-				myDataSource.sendRequest( filedrawersApi.getActionUrl( 'list' ), {
+				myDataSource.sendRequest( api.getActionUrl( 'list' ), {
 					success  : oTable.onDataReturnInitializeTable,
-					failure  : oTable.onDataReturnInitializeTable,
+					failure  : oTable.onDataReturnInitializeTable,  // add errorHandling
 					scope    : oTable,
 					argument : tableState
 				});
@@ -235,7 +307,7 @@ FD.DirList = function() {
 			timeout: 3000
 		};
 	};
-	
+		
 	var hiddenFileFilter = function (req, raw, res, cb) {
 
 		var data     = res.results || [],
@@ -270,7 +342,6 @@ FD.DirList = function() {
 	return {
 		init: function(bookmarkDir) {
 	
-                        filedrawersApi = new FD.api();
 			myDataSource = new YAHOO.util.DataSource( '' );  // first call
 			myDataSource.responseType = YAHOO.util.DataSource.TYPE_JSON; 
 			myDataSource.responseSchema = {
@@ -278,15 +349,19 @@ FD.DirList = function() {
 				fields: ["type","filename","modTime","size","mimeImage","perms","mimeType"]
 			};
 
+							
 			myDataSource.doBeforeCallback = hiddenFileFilter;
-					
+								
 			myDataSource.subscribe('responseEvent', function(oDS){  // triggered by data return
 			
-				YAHOO.util.Dom.setStyle('loading', 'display', 'none');
+				userFeedback.stopTimer();
+				
+				userFeedback.displayFeedback(oDS.response);
 				
 				myJSONdata = YAHOO.lang.JSON.parse(oDS.response.responseText);
+				
 				currentURL = YAHOO.lang.dump(myJSONdata.path);
-                                //filedrawersApi.setUrlParam( 'path', currentURL );
+                                api.setUrlParam( 'path', currentURL );
 								
 				if (!homeURL) {
 					homeURL = currentURL;
@@ -294,7 +369,8 @@ FD.DirList = function() {
 				
 				myPerms = YAHOO.lang.dump(myJSONdata.contents[0].perms);
 				
-				var changeDirForm = YAHOO.util.Dom.get('changeDirForm'),
+				var currentLocationPath = YAHOO.util.Dom.get('currentLocationPath'),
+				changeLocationNewPath = YAHOO.util.Dom.get('changeLocationNewPath'),
 				viewHTML,
 				locationParts = currentURL.split("/"),
 				linkPaths = [],
@@ -312,8 +388,9 @@ FD.DirList = function() {
 					locLinks += '/ <a href="#" id="' + linkTemp + '">' + locationParts[i] + '</a> ';
 				}
 				
-				viewHTML = locLinks + '&nbsp;<input type="submit" value="Change" />'
-				changeDirForm.innerHTML = viewHTML;
+				currentLocationPath.innerHTML = locLinks;
+                                changeLocationNewPath.value = currentURL;
+                                infoBar.setService( myJSONdata.service );
 			}
 			);	
 			
@@ -322,10 +399,11 @@ FD.DirList = function() {
                         } else {
                             var params = {};
                         }
-                        var initReq = filedrawersApi.getActionUrl( 'list', params, true );
+                        var initReq = api.getActionUrl( 'list', params, true );
 
 					
 			dirTable = new YAHOO.widget.DataTable("content", myColumnDefs, myDataSource, {initialRequest:initReq});
+			userFeedback.startTimer("list");
 			
 			dirTable.subscribe('checkboxClickEvent', handleFileSelection);
 			dirTable.subscribe('click', handleTableClick);
@@ -352,7 +430,8 @@ FD.DirList = function() {
 				l.replaceChild( t, l.firstChild );
 			}
 			
-			myDataSource.sendRequest( filedrawersApi.getActionUrl( 'list' ), dirTable.onDataReturnInitializeTable, dirTable);
+			myDataSource.sendRequest( api.getActionUrl( 'list' ), dirTable.onDataReturnInitializeTable, dirTable);
+			userFeedback.startTimer("list");
 			
 			/*						
 			myDataSource.sendRequest(showHidden,{
@@ -377,13 +456,13 @@ FD.DirList = function() {
 				files.push(dirTable.getRecord(tableState.selectedRows[i]).getData().filename);
 			}
 
-			filedrawersApi.post( 'delete', callback, { 'files': files, 'path': currentURL } );				
+			api.post( api.getActionUrl( 'delete' ), callback, { 'files': files, 'path': currentURL } );				
 		
 		},
 
 		createNewFolder: function(e, args) {
                         var callback = getAjaxListCallback(dirTable);
-                        filedrawersApi.post( 'mkdir', callback, { 'folderName': args[ 0 ], 'path': currentURL } );
+                        api.post( api.getActionUrl( 'mkdir' ), callback, { 'folderName': args[ 0 ], 'path': currentURL } );
 		},
 		
 		renameItem: function(e, action) {
@@ -404,7 +483,7 @@ FD.DirList = function() {
 				dirTable.onEditorBlurEvent = blurEvent;
 			};
 
-			var td = trs[0].getElementsByTagName('td')[2];
+			var td = trs[0].getElementsByTagName('td')[1];
 						
 			dirTable.showCellEditor(td);
 		},
@@ -412,7 +491,7 @@ FD.DirList = function() {
 		handleNameEditorSave: function(oArgs) {
 		
 			var callback = getAjaxListCallback(this);			
-			filedrawersApi.post( 'rename', callback, { 'oldName': oArgs.oldData, 'newName':oArgs.newData, 'path': currentURL } );		
+			api.post( api.getActionUrl( 'rename' ), callback, { 'oldName': oArgs.oldData, 'newName':oArgs.newData, 'path': currentURL } );		
 
 		},
 		
@@ -433,6 +512,9 @@ FD.DirList = function() {
 			for (var i=0; i < tableState.selectedRows.length; i++) {
 				cutCopyFiles.push(dirTable.getRecord(tableState.selectedRows[i]).getData().filename);
 			}
+			
+			YAHOO.util.Dom.get('feedback').innerHTML = "Added " + tableState.selectedRows.length + " item(s) to the clipboard.";
+			YAHOO.util.Dom.setStyle('feedback', 'display', 'block');
 			
 			cutCopyURL = currentURL;
 			
@@ -457,7 +539,7 @@ FD.DirList = function() {
 				alert("no clipboardState available");
 			}
 			
-			filedrawersApi.post( pasteAction, callback, { 'files': cutCopyFiles, 'fromPath': cutCopyURL, 'toPath': currentURL} );
+			api.post( api.getActionUrl( pasteAction, { 'path': cutCopyURL }, true ), callback, { 'files': cutCopyFiles, 'fromPath': cutCopyURL, 'toPath': currentURL} );
 			
 			cutCopyFiles = [];
 			cutCopyURL = "";
@@ -468,7 +550,8 @@ FD.DirList = function() {
 		
 		reqSender: function(directory) {
                                params = { 'path': directory };
-			myDataSource.sendRequest( filedrawersApi.getActionUrl( 'list', params, true ), dirTable.onDataReturnInitializeTable, dirTable);		
+			myDataSource.sendRequest( api.getActionUrl( 'list', params, true ), dirTable.onDataReturnInitializeTable, dirTable);
+			userFeedback.startTimer("list");			
 		}
 							
 		/*
@@ -503,7 +586,9 @@ FD.DirList = function() {
 FD.InfoBar = function() {
 
 	var currentDir,
-	changeDirForm = YAHOO.util.Dom.get('changeDirForm'),
+	locationDiv = YAHOO.util.Dom.get('location'),
+        currentLocation = YAHOO.util.Dom.get( 'currentLocation' ),
+        changeLocation  = YAHOO.util.Dom.get( 'changeLocation' ),
 	viewHTML;
 
 	var update = function(oArgs) {};
@@ -516,9 +601,12 @@ FD.InfoBar = function() {
 		
 		if (target.id == "goUp") {
 			var upDir = currentURL.slice( 0, currentURL.lastIndexOf("/") );
+			userFeedback.hideFeedback();
 			History.navigate("dirTable", upDir);
 		} else if (target.id == "refresh") {
-			myDataSource.sendRequest( filedrawersApi.getActionUrl( 'list' ), dirTable.onDataReturnInitializeTable, dirTable);
+			userFeedback.hideFeedback();
+			myDataSource.sendRequest( api.getActionUrl( 'list' ), dirTable.onDataReturnInitializeTable, dirTable);
+			userFeedback.startTimer("list");
 		}		
 /*
 		if ( ! target.value) {
@@ -526,18 +614,20 @@ FD.InfoBar = function() {
 		}
 */
 
-		if (target.value == 'Change') {
-			viewHTML = changeDirForm.innerHTML;
-			changeDirForm.innerHTML =
-			'<input type="text" size="40" maxlength="100" value="' +
-			currentURL + '" />' +
-			'<input type="submit" value="Go" />' +
-			'<input type="button" value="Cancel" />';
-		} else if (target.value == 'Go') {
+		if (target.id == 'currentLocationChange') {
+                        YAHOO.util.Dom.setStyle( currentLocation, 'display', 'none' );
+                        YAHOO.util.Dom.setStyle( changeLocation, 'display', 'inline' );
+		} else if (target.id == 'changeLocationGo') {
 			//location = baseUrl + '/list' +
-			History.navigate("dirTable", target.parentNode.getElementsByTagName('input')[0].value);
-		} else if (target.value == 'Cancel') {
-			changeDirForm.innerHTML = viewHTML;
+                        YAHOO.util.Dom.setStyle( currentLocation, 'display', 'inline' );
+                        YAHOO.util.Dom.setStyle( changeLocation, 'display', 'none' );
+                        setService( YAHOO.util.Dom.get( 'changeLocationNewService' ).value );
+						userFeedback.hideFeedback();
+			History.navigate("dirTable", YAHOO.util.Dom.get( 'changeLocationNewPath' ).value );
+		} else if (target.id == 'changeLocationCancel') {
+                        YAHOO.util.Dom.setStyle( currentLocation, 'display', 'inline' );
+                        YAHOO.util.Dom.setStyle( changeLocation, 'display', 'none' );
+                        // TODO abort the request
 		}
 	};
 
@@ -548,12 +638,19 @@ FD.InfoBar = function() {
 	var locationClick = function(e) {
 		YAHOO.util.Event.preventDefault(e);
 		if (e.target.href) {
+			userFeedback.hideFeedback();
 			History.navigate("dirTable", e.target.id);
 		}
-	}
-
+	};
+    
+        var services = {};
+        var defaultService = '';
+        var setService = function( service ) {
+            YAHOO.util.Dom.get( 'currentLocationService' ).innerHTML = services[ service ].label;
+            api.setUrlParam( 'service', service );
+        };
 	YAHOO.util.Event.on('infoBar', 'click', handleClick);
-	YAHOO.util.Event.on('changeDirForm', 'submit', handleSubmit);	
+	YAHOO.util.Event.on('location', 'submit', handleSubmit);
 	YAHOO.util.Event.on('notifyArea', 'click', locationClick);
 
 	var kl = new YAHOO.util.KeyListener(document, {keys:13}, {fn:function(){alert('enter');}});
@@ -562,7 +659,27 @@ FD.InfoBar = function() {
 		init: function(crntDir) {
 			currentDir = crntDir;
 		},
+                setServiceOptions: function( services ) {
+                    var serviceOptionsHtml;
+                    for ( var id in services ) {
+                        serviceOptionsHtml += '<option value="'+ id +'">'+ services[ id ].label +'</option>';
+                    }
+                    YAHOO.util.Dom.get( 'changeLocationNewService' ).innerHTML = serviceOptionsHtml;
+                },
+                getServices: function() {
+                    var setServiceOptions = this.setServiceOptions;
+                    var callback = { 
+                        'success': function( o ) {
+                            services = YAHOO.lang.JSON.parse(o.responseText).services.services;
+                            defaultService = YAHOO.lang.JSON.parse(o.responseText).services.default;
+                            setServiceOptions( services );
+                        }
+                    };
 
+                    YAHOO.util.Connect.asyncRequest('GET', api.getActionUrl( 'services' ), callback, null );
+
+                },
+                setService:setService,
 		update:update
 	}
 };	
@@ -640,7 +757,7 @@ FD.FileInspector = function() {
 	// called upon instantiation.
 	for (i=0; i<links.length; i++) {
 		action = links[i].hash.match(/#(.*)$/);  // converts link to an array, with original in index 0 and #-less in index 1
-		actions[action[1]] = {ref: links[i]};  // actions becomes an array of objects with char indexes based on action, and links to that action.  example:  actions["cut"] hold href obj for cut
+		actions[action[1]] = {ref: links[i]};  // actions becomes an array of objects with char indexes based on action, and links to that action.  example:  actions["cut"] holds href obj for cut
 	}
 	
 	var updateItemInfo = function(selectedRows) {
@@ -677,7 +794,7 @@ FD.FileInspector = function() {
 	
 	// makes menu options active or inactive based on the permissions
 	var update = function(oArgs) {
-	
+		
 		var numSelected,
 		i,
 		permissions = {
@@ -702,8 +819,6 @@ FD.FileInspector = function() {
 			permissions[myPerms.charAt(i)] = true;
 			//alert(myPerms.charAt(i) + " = " + permissions[myPerms.charAt(i)]);
 		}
-		
-		//alert(actions.upload.ref);
 		
 		filesSelected = (numSelected > 0) ? true : false;
 
@@ -795,12 +910,15 @@ FD.FileInspector = function() {
 
 YAHOO.util.Event.addListener(window, "load", function() {
 				
+        api = new FD.api();
+		userFeedback = new FD.UserFeedback();
 	var bookmarkDir = History.getBookmarkedState("dirTable");
 	
-	var dirList = new FD.DirList(),
-	dirTable = dirList.init(bookmarkDir),
-	inspector = new FD.FileInspector(),
-	infoBar = new FD.InfoBar();
+	infoBar = new FD.InfoBar(); // TODO does this need to be so widely scoped?
+        infoBar.getServices();
+	var dirList = new FD.DirList();
+	dirTable = dirList.init(bookmarkDir);
+	var inspector = new FD.FileInspector();
 	
 	History.register("dirTable", "", dirList.reqSender);
 	History.initialize("yui-history-field", "yui-history-iframe");
@@ -819,15 +937,24 @@ YAHOO.util.Event.addListener(window, "load", function() {
 	dirTable.subscribe('initEvent', inspector.update);
 	dirTable.subscribe('editorSaveEvent', dirList.handleNameEditorSave);
 	
+	//stops dirTable "Data error." behavior when path does not exist
+	dirTable.doBeforeLoadData = function(oRequest, oResponse, oPayload) {
+		//console.warn(oResponse);
+		if (!oResponse.error) {
+			return true;
+		}
+	};
+	
+	// TODO add errorChecking to myDataSource.doBeforeCallback = hiddenFileFilter
+	// to catch error on initial load, where path in URL doesn't exist.
+	
 	FD.NewFolderDialog.evnt.subscribe(dirList.createNewFolder);
 	
 	FD.InspDialogCloseEvent.subscribe(inspector.clearSelection);
 	
-	YAHOO.util.Event.on('homeBtn', 'click', function() {
-		//alert(homeURL);
-		myDataSource.sendRequest( filedrawersApi.getActionUrl( 'list' ), dirTable.onDataReturnInitializeTable, dirTable);
-	});
-	
-	
-	
+	YAHOO.util.Event.on('homeBtn', 'click', function(e) {
+		YAHOO.util.Event.preventDefault(e);
+		userFeedback.hideFeedback();
+		History.navigate("dirTable", homeURL);
+	});	
 });

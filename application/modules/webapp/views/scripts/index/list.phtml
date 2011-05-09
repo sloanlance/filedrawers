@@ -29,16 +29,25 @@ $this->headScript()->appendFile('js/filedrawers.js');
 			<li><a href=".." id="goUp">Go Up &uarr;</a></li>
 			<li><a href="." id="refresh">Refresh</a></li>
 		</ul>
-		<div id="notifyArea">
-			<select>
-				<option value="AFS">AFS</option>
-				<option value="CIFS">CIFS</option>
-			</select>&nbsp;
-			Location:
-			<form id="changeDirForm">
-				---
-			</form>
-			<span id="loading">&nbsp;<img src="images/ajax-loader.gif" style="position:relative; top:3px;" /></span>
+		<div id="notifyArea">			
+			<div id="location">
+                            <span id="currentLocation">
+                                Service: <span id="currentLocationService"></span>
+                                Location: <span id="currentLocationPath"></span>
+                                <button id="currentLocationChange">Change</button>
+                            </span>
+                            <form id="changeLocation">
+                                <label for="changeLocationNewService">Service: </label><select name="changeLocationNewService" id="changeLocationNewService"></select>
+                                <label for="changeLocationNewPath">Location: </label><input type="text" name="changeLocationNewPath" id="changeLocationNewPath" size="50" />
+                                <span id="changeLocationControls">
+                                    <button id="changeLocationGo" type="submit">Go</button>
+                                    <button id="changeLocationCancel">Cancel</button>
+                                </span>
+                            </form>
+			</div>
+			<span id="spinner">&nbsp;<img src="images/ajax-loader.gif" /></span>
+			<span id="loadingTxt">&nbsp;Loading...</span>
+			<span id="cancelBtn">&nbsp;<input type="button" value="Cancel" /></span>
 		</div>
 		<div class="clear">&nbsp;</div>
 	</div>
@@ -66,7 +75,8 @@ $this->headScript()->appendFile('js/filedrawers.js');
 		</div>
 		<div id="version"> filedrawers version: insert version number</div>
 	</div>
-	<div id="content">
+	<div id="feedback"></div><div class="clear"></div>
+	<div id="content">		
 		<div id="fileList"></div>
 	</div>
 	<div id="favorites" class="expandItem">
