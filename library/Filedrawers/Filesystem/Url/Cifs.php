@@ -5,6 +5,8 @@
  * All rights reserved.
  */
 
+require_once( "CifsStream.php" );
+
 class Filedrawers_Filesystem_Url_Cifs extends Filedrawers_Filesystem_Url {
 
     protected $_dirHandle;
@@ -19,6 +21,7 @@ class Filedrawers_Filesystem_Url_Cifs extends Filedrawers_Filesystem_Url {
 
         putenv( 'KRB5CCNAME='. $_SERVER[ 'KRB5CCNAME' ] );
         putenv( 'KRB5_CONFIG='. '/etc/krb5-no-default_enctypes.conf' );
+		stream_wrapper_register( "smb", "CifsStream" );
     }
 
 
@@ -31,72 +34,6 @@ class Filedrawers_Filesystem_Url_Cifs extends Filedrawers_Filesystem_Url {
     public function addListHelper($function)
     {
         $this->listHelpers[] = $function;
-    }
-
-
-    public function listDirectory($path, $associativeArray=false)
-    {
-        $this->setPath( $path );
-
-        // Open the path and read its contents
-        if ( !$dh = @smbclient_opendir( $this->getUrl())) {
-            chdir($this->startCWD);
-            throw new Filedrawers_Filesystem_Exception(sprintf('Unable to view: %s', $path), 5);
-        }
-
-        while ( $fileinfo = smbclient_readdir( $dh )) {
-            $row = $this->_getInfo($fileinfo);
-
-            if ($row === false) {
-                continue;
-            }
-
-            if ($associativeArray) {
-                $files['contents'][$fileinfo[ 'name' ]] = $row;
-            } else {
-                $files['contents'][] = $row;
-            }
-        }
-
-        function naturalSortByName($a, $b) {
-            return strnatcasecmp($a['filename'], $b['filename']);
-        }
-
-        // Some list helpers may disable filename
-        if (isset($files['contents'][0]['filename'])) {
-            usort($files['contents'], 'naturalSortByName');
-        }
-
-        @smbclient_closedir( $dh );
-        return $files;
-    }
-
-
-    protected function _getInfo($fileinfo, $useListHelpers=true)
-    {
-        clearstatcache();
-        if ( ! $fileStats = smbclient_stat( $this->getUrl() . $fileinfo[ 'name' ] )) {
-            $modTime = '';
-            $size = 0;
-        }
-        else {
-            $modTime = $fileStats['mtime'];
-            $size = $fileStats['size'];
-        }
-
-        $info = array(
-            'type' => $fileinfo[ 'type' ],
-            'filename' => $fileinfo[ 'name' ],
-            'modTime' => $modTime,
-            'size' => $size);
-
-        if ($useListHelpers) {
-            foreach($this->listHelpers as $helper) {
-                call_user_func_array($helper, array(&$info));
-            }
-        }
-
-        return $info;
     }
 
 }
