@@ -76,9 +76,23 @@ $this->headScript()->appendFile('js/filedrawers.js');
 		<div id="version"> filedrawers version: insert version number</div>
 	</div>
 	<div id="feedback"></div><div class="clear"></div>
-	<div id="content">		
-		<div id="fileList"></div>
-	</div>
+	
+	<div id="contentHolder">
+		<div id="content">		
+			<div id="fileList"></div>
+		</div>
+		<div id="favsList">
+			<h3>Favorites</h3>
+			<ul>
+				<li><a id="folderLink" href="/afs/umich.edu/user/c/l/cland/westboro">westboro</a></li>
+				<li><a id="folderLink" href="/afs/umich.edu/user/c/l/cland/photo">photo</a></li>
+				<li><a id="folderLink" href="/afs/umich.edu/user/c/l/cland/folderTest">folderTest</a></li>
+				<li><a id="folderLink" href="/afs/umich.edu/user/c/l/cland/westboro/anotherTest">anotherTest</a></li>
+			</ul>
+		</div>
+		<div class="clear">&nbsp;</div>
+	</div>	
+	
 	<div id="favorites" class="expandItem">
 		<div class="hd"> <a href="#close">[X]</a>
 			<h2>My Favorite Locations</h2>

@@ -957,4 +957,13 @@ YAHOO.util.Event.addListener(window, "load", function() {
 		userFeedback.hideFeedback();
 		History.navigate("dirTable", homeURL);
 	});	
+	
+	YAHOO.util.Event.on('favsList', 'click', function(e) {
+		if (e.target.href) {	
+			YAHOO.util.Event.preventDefault(e);
+			userFeedback.hideFeedback();
+			History.navigate("dirTable", e.target.getAttribute("href"));
+			//console.warn(e.target.getAttribute("href"));
+		}
+	});
 });
