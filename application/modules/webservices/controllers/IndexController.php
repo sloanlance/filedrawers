@@ -6,7 +6,6 @@
  */
 
 class Webservices_IndexController extends Webservices_FDController {
-    protected $_availableServices = array();
 
     public $contexts = array(
         'services' => array('xml', 'json', 'html'),
@@ -22,15 +21,10 @@ class Webservices_IndexController extends Webservices_FDController {
         'uploadfinish' => array('xml', 'json', 'html')
     );
 
-    public function init()
-    {
-	parent::init();
-    }
-
-
+    
     public function preDispatch()
     {
-        parent::init(); 
+        parent::preDispatch(); 
     }
 
 
