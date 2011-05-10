@@ -53,6 +53,10 @@ class CifsStream {
 	{
 		return ( @smbclient_closedir( $this->_dirHandle ) );
 	}
+	public function rename( $oldPath, $newPath ) 
+	{
+		return( @smbclient_rename( $oldPath, $newPath ) ); 
+	}
 }
 
 ?>
