@@ -18,23 +18,7 @@ class CifsStream {
 
 	public function url_stat( $url, $flags )
 	{
-        $stat = array();
-        $stat['dev'] = 0;
-        $stat['ino'] = 0;
-        $stat['mode'] = 0777;
-        $stat['nlink'] = 0;
-        $stat['uid'] = 0;
-        $stat['gid'] = 0;
-        $stat['rdev'] = 0;
-        $stat['size'] = 0;
-        $stat['atime'] = 0;
-        $stat['mtime'] = 0;
-        $stat['ctime'] = 0;
-        $stat['blksize'] = -1;
-        $stat['blocks'] = -1;
-		
-		$cifsStat = @smbclient_stat( $url );
-		return( $cifsStat );
+		return( @smbclient_stat( $url ) );
 	}
 
 	public function dir_opendir ( $url, $options ) {
@@ -56,6 +40,16 @@ class CifsStream {
 	public function rename( $oldPath, $newPath ) 
 	{
 		return( @smbclient_rename( $oldPath, $newPath ) ); 
+	}
+	public function unlink( $path )
+	{
+		//smbclient_unlink appears to return 0 on success
+		return ( @smbclient_unlink( $path ) !== false );
+	}
+	public function rmdir( $path )
+	{
+		//smbclient_rmdir appears to return 0 on success
+		return( @smbclient_rmdir( $path ) !== false );
 	}
 }
 
