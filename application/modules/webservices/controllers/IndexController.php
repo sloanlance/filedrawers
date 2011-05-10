@@ -5,7 +5,7 @@
  * All rights reserved.
  */
 
-class Webservices_V1Controller extends Zend_Controller_Action {
+class Webservices_IndexController extends Zend_Controller_Action {
     protected $_filesystem = null;
     protected $_form = null;
     protected $_csrfToken = null;
@@ -47,12 +47,6 @@ class Webservices_V1Controller extends Zend_Controller_Action {
             'callbacks' => array('post' => array($this->_helper, 'xmlSerialize'))
         ));
         $this->_context->initContext();
-
-        Zend_Controller_Action_HelperBroker::getStaticHelper('viewRenderer')->setNoController( TRUE );
-
-        $this->_view = Zend_Controller_Front::getInstance()->getParam('bootstrap')->getResource('view');
-        $this->_view->setScriptPath( null );
-        $this->_view->addScriptPath( APPLICATION_PATH .'/modules/webservices/views/scripts/v1/' );
     }
 
 
