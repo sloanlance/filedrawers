@@ -5,7 +5,7 @@
  * All rights reserved.
  */
 
-class Webservices_FavoritesController extends Zend_Controller_Action
+class Webservices_FavoritesController extends Webservices_FD_Controller 
 {
     protected $_filesystem = null;
     protected $_favoritesPath = null;
@@ -93,4 +93,3 @@ class Webservices_FavoritesController extends Zend_Controller_Action
         }
     }
 }
-
