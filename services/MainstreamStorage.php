@@ -6,9 +6,13 @@
  */
 
 class Service_MainstreamStorage extends Filedrawers_Filesystem_Url_Cifs {
-    public function getUrl()
+    public function getUrl( $filename = null )
     {
-        return 'smb://'. $this->_shareName .'.m.storage.umich.edu/'. trim( $this->_path, '/' ) .'/';
+        $url = 'smb://'. $this->_shareName .'.m.storage.umich.edu/'. trim( $this->_path, '/' ) .'/';
+        if ( ! empty( $filename )) {
+            $url .= '/'. ltrim( $filename, '/' );
+        }
+		return( $url );
     }
 
 
@@ -55,3 +59,4 @@ class Service_MainstreamStorage extends Filedrawers_Filesystem_Url_Cifs {
         }
     }
 }
+
