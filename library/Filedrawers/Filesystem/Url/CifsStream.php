@@ -51,6 +51,11 @@ class CifsStream {
 		//smbclient_rmdir appears to return 0 on success
 		return( @smbclient_rmdir( $path ) !== false );
 	}
+	public function mkdir( $path, $mode, $recursive = false )
+	{
+		check( $path );
+		return ( @smbclient_mkdir( $path, $mode ) !== false ); 
+	}
 }
 
 ?>
