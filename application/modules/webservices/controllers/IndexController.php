@@ -7,20 +7,21 @@
 
 class Webservices_IndexController extends Webservices_FDController {
 
-    public $contexts = array(
-        'services' => array('xml', 'json', 'html'),
-        'list' => array('xml', 'json', 'html'),
-        'rename' => array('xml', 'json', 'html'),
-        'delete' => array('xml', 'json', 'html'),
-        'move' => array('xml', 'json', 'html'),
-        'duplicate' => array('xml', 'json', 'html'),
-        'copy' => array('xml', 'json', 'html'),
-        'mkdir' => array('xml', 'json', 'html'),
-        'gettoken' => array('xml', 'json', 'html'),
-        'uploadstatus' => array('xml', 'json', 'html'),
-        'uploadfinish' => array('xml', 'json', 'html')
-    );
-
+    public function init()
+    {
+        $this->contexts['services'] = array('xml', 'json', 'html');
+        $this->contexts['list'] = array('xml', 'json', 'html');
+        $this->contexts['rename'] = array('xml', 'json', 'html');
+        $this->contexts['delete'] = array('xml', 'json', 'html'); 
+        $this->contexts['move'] = array('xml', 'json', 'html');
+        $this->contexts['duplicate'] = array('xml', 'json', 'html');
+        $this->contexts['copy'] = array('xml', 'json', 'html');
+        $this->contexts['mkdir'] = array('xml', 'json', 'html');
+        $this->contexts['gettoken'] = array('xml', 'json', 'html');
+        $this->contexts['uploadstatus'] = array('xml', 'json', 'html');  
+        $this->contexts['uploadfinish'] = array('xml', 'json', 'html');
+	 parent::init(); 
+    }
     
     public function preDispatch()
     {

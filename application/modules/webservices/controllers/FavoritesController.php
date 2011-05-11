@@ -9,12 +9,18 @@ class Webservices_FavoritesController extends Webservices_FDController
 {
     protected $_favoritesPath = null;
 
-    public $contexts = array(
-        'list' => array('xml', 'json', 'html'),
-        'add' => array('xml', 'json', 'html'),
-        'rename' => array('xml', 'json', 'html'),
-        'delete' => array('xml', 'json', 'html')
-    );
+
+
+    public function init()
+    {
+      $this->contexts['list'] = array('xml', 'json', 'html');
+      $this->contexts['add'] = array('xml', 'json', 'html');
+      $this->contexts['rename'] = array('xml', 'json', 'html');
+      $this->contexts['delete'] = array('xml', 'json', 'html');
+      parent::init(); 
+      $this->_favoritesPath = $this->_filesystem->getHomeDir() . '/Favorites';
+
+    }
 
     public function listAction()
     {
@@ -39,8 +45,6 @@ class Webservices_FavoritesController extends Webservices_FDController
             return;
         }
 
-        $files = $this->_filesystem->listDirectory($this->_favoritesPath);
-        $this->view->contents = $files['contents'];
     }
 
 }
