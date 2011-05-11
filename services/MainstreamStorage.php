@@ -38,7 +38,7 @@ class Service_MainstreamStorage extends Filedrawers_Filesystem_Url_Cifs {
             $fake = array_map( 'strtolower', $fake );
             sort( $fake );
             foreach( $fake as $share ) {
-                $rc[ 'contents' ][] = array( 'type' => 'share', 'filename' => $share );
+                $rc[ 'contents' ][] = array( 'type' => 'dir', 'filename' => $share );
             }
             return $rc;
         } else {
