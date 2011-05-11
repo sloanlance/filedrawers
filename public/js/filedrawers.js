@@ -340,8 +340,8 @@ FD.DirList = function() {
 		
 	
 	return {
-		init: function(bookmarkDir) {
-	
+		init: function(bookmarkDir, bookmarkService) {
+			
 			myDataSource = new YAHOO.util.DataSource( '' );  // first call
 			myDataSource.responseType = YAHOO.util.DataSource.TYPE_JSON; 
 			myDataSource.responseSchema = {
@@ -394,7 +394,11 @@ FD.DirList = function() {
 			}
 			);	
 			
-                        if ( bookmarkDir ) {
+                        if ( bookmarkService ) {
+							infoBar.setService(bookmarkService);
+						}
+						
+						if ( bookmarkDir ) {
                             var params = { 'path': bookmarkDir };
                         } else {
                             var params = {};
@@ -549,10 +553,10 @@ FD.DirList = function() {
 		},
 		
 		reqSender: function(directory) {
-                               params = { 'path': directory };
+            params = { 'path': directory };
 			myDataSource.sendRequest( api.getActionUrl( 'list', params, true ), dirTable.onDataReturnInitializeTable, dirTable);
 			userFeedback.startTimer("list");			
-		}
+		},
 							
 		/*
 		var myCallback = function() {
@@ -615,18 +619,24 @@ FD.InfoBar = function() {
 */
 
 		if (target.id == 'currentLocationChange') {
-                        YAHOO.util.Dom.setStyle( currentLocation, 'display', 'none' );
-                        YAHOO.util.Dom.setStyle( changeLocation, 'display', 'inline' );
+            YAHOO.util.Dom.setStyle( currentLocation, 'display', 'none' );
+            YAHOO.util.Dom.setStyle( changeLocation, 'display', 'inline' );
 		} else if (target.id == 'changeLocationGo') {
-			//location = baseUrl + '/list' +
-                        YAHOO.util.Dom.setStyle( currentLocation, 'display', 'inline' );
-                        YAHOO.util.Dom.setStyle( changeLocation, 'display', 'none' );
-                        setService( YAHOO.util.Dom.get( 'changeLocationNewService' ).value );
-						userFeedback.hideFeedback();
-			History.navigate("dirTable", YAHOO.util.Dom.get( 'changeLocationNewPath' ).value );
+			YAHOO.util.Dom.setStyle( currentLocation, 'display', 'inline' );
+            YAHOO.util.Dom.setStyle( changeLocation, 'display', 'none' );
+            setService( YAHOO.util.Dom.get( 'changeLocationNewService' ).value );
+			userFeedback.hideFeedback();
+			
+			var newState = { "dirTable": YAHOO.util.Dom.get( 'changeLocationNewPath' ).value, "currentLocationService": YAHOO.util.Dom.get( 'changeLocationNewService' ).value };
+			
+			console.warn(newState);
+			
+			//History.navigate("dirTable", YAHOO.util.Dom.get( 'changeLocationNewPath' ).value );
+			History.multiNavigate( newState );
+			
 		} else if (target.id == 'changeLocationCancel') {
-                        YAHOO.util.Dom.setStyle( currentLocation, 'display', 'inline' );
-                        YAHOO.util.Dom.setStyle( changeLocation, 'display', 'none' );
+            YAHOO.util.Dom.setStyle( currentLocation, 'display', 'inline' );
+            YAHOO.util.Dom.setStyle( changeLocation, 'display', 'none' );
                         // TODO abort the request
 		}
 	};
@@ -647,6 +657,7 @@ FD.InfoBar = function() {
         var defaultService = '';
         var setService = function( service ) {
             YAHOO.util.Dom.get( 'currentLocationService' ).innerHTML = services[ service ].label;
+			//YAHOO.util.Dom.get( 'currentLocationService' ).innerHTML = service;
             api.setUrlParam( 'service', service );
         };
 	YAHOO.util.Event.on('infoBar', 'click', handleClick);
@@ -679,6 +690,7 @@ FD.InfoBar = function() {
                     YAHOO.util.Connect.asyncRequest('GET', api.getActionUrl( 'services' ), callback, null );
 
                 },
+				
                 setService:setService,
 		update:update
 	}
@@ -913,14 +925,17 @@ YAHOO.util.Event.addListener(window, "load", function() {
         api = new FD.api();
 		userFeedback = new FD.UserFeedback();
 	var bookmarkDir = History.getBookmarkedState("dirTable");
+	var bookmarkService = History.getBookmarkedState("currentLocationService");
 	
 	infoBar = new FD.InfoBar(); // TODO does this need to be so widely scoped?
         infoBar.getServices();
 	var dirList = new FD.DirList();
-	dirTable = dirList.init(bookmarkDir);
+	dirTable = dirList.init(bookmarkDir, bookmarkService);
 	var inspector = new FD.FileInspector();
 	
 	History.register("dirTable", "", dirList.reqSender);
+	History.register("currentLocationService", "", infoBar.setService);
+	
 	History.initialize("yui-history-field", "yui-history-iframe");
 	
 	inspector.evnt.subscribe(dirList.toggleHiddenFilter);
@@ -963,7 +978,6 @@ YAHOO.util.Event.addListener(window, "load", function() {
 			YAHOO.util.Event.preventDefault(e);
 			userFeedback.hideFeedback();
 			History.navigate("dirTable", e.target.getAttribute("href"));
-			//console.warn(e.target.getAttribute("href"));
 		}
 	});
 });
