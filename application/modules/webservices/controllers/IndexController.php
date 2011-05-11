@@ -333,6 +333,7 @@ class Webservices_IndexController extends Webservices_FDController {
         }
 
         $values = $this->_form->getValidValues($_POST);
+		check( $values );
         $this->_filesystem->createDirectory($values['path'], $values['folderName']);
         $this->view->status = 'success';
         $this->view->message = 'Successfully created the directory.';
