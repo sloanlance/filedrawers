@@ -14,33 +14,33 @@ abstract class Webservices_FDController extends Zend_Controller_Action
     // abstract protected function ???();
 
     // Common methods
-    public function init() {
-		$this->_helper->layout->disableLayout();
-	        $this->_csrfToken = new Zend_Form_Element_Hash('formToken');
-	        $this->_csrfToken->initCsrfToken();
-	
-	        foreach( Zend_Registry::get('config')->filesystem->active->toArray() as $id ) {
-	            $serviceClass = 'Service_'. ucfirst( $id );
-	
-	            if ( class_exists( $serviceClass )) {
-	                $this->_availableServices[ $id ] = $serviceClass;
-	            }
-	        }
-	
-	        $this->_context = $this->_helper->getHelper('contextSwitch');
-	        $this->_context->setContext('xml', array(
-	            'callbacks' => array('post' => array($this->_helper, 'xmlSerialize'))
-	        ));
-	        $this->_context->initContext();
-    }
+   public function init() 
+   {
+	$this->_helper->layout->disableLayout();
+        $this->_csrfToken = new Zend_Form_Element_Hash('formToken');
+        $this->_csrfToken->initCsrfToken();
+        	
+        foreach( Zend_Registry::get('config')->filesystem->active->toArray() as $id ) {
+            $serviceClass = 'Service_'. ucfirst( $id );
 
+            if ( class_exists( $serviceClass )) {
+                $this->_availableServices[ $id ] = $serviceClass;
+            }
+        }
+	
+        $this->_context = $this->_helper->getHelper('contextSwitch');
+        $this->_context->setContext('xml', array(
+            'callbacks' => array('post' => array($this->_helper, 'xmlSerialize'))
+        ));
+        $this->_context->initContext();
+    }
 
 	public function preDispatch()
     {
 	 if ( in_array( $this->_request->action, array( 'services' ))) {
             return;
         }
-
+	echo("here");
         $serviceValidator = new Zend_Validate_InArray( array_keys( $this->_availableServices ));
         $serviceValidator->setStrict( TRUE );
         $wappverValidator = new Zend_Validate_Int();
@@ -82,7 +82,6 @@ abstract class Webservices_FDController extends Zend_Controller_Action
         $this->_filesystem->init();
         Zend_Registry::set('filesystem', $this->_filesystem);
     }
-    
     
 }
 

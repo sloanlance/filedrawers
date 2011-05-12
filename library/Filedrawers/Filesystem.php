@@ -24,4 +24,23 @@ abstract class Filedrawers_Filesystem {
             return '/';
         }
     }
+
+
+    public function listFavs()
+    {
+    }
+
+
+    public function addFavs()
+    {
+    }
+
+    public function renameFavs()
+    {
+    }
+
+    public function deleteFavs()
+    {
+    }
+
 }
