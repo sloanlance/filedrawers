@@ -9,6 +9,7 @@ require_once 'Filedrawers/Filesystem/Exception.php';
 
 abstract class Filedrawers_Filesystem {
 
+    public static $pathSeparator = '/';
 	protected $ILLEGAL_DIR_CHARS =  "/~ \t\n\r\0\x0B.";
 
     public function init()
@@ -26,5 +27,24 @@ abstract class Filedrawers_Filesystem {
         } else {
             return '/';
         }
+    }
+
+    public static function pathConcat()
+    {
+        $args = func_get_args();
+        $path = '';
+        if (substr($args[ 0 ], 0, 1) == self::$pathSeparator) {
+            $path .= self::$pathSeparator;
+        }
+
+        $pathParts = array();
+        foreach($args as $part) {
+            $part = trim($part, self::$pathSeparator);
+            if ( ! empty($part)) {
+                $pathParts[] = trim($part, self::$pathSeparator);
+            }
+        }
+
+        return $path .= implode(self::$pathSeparator, $pathParts);
     }
 }
