@@ -685,6 +685,8 @@ FD.InfoBar = function() {
         var services = {};
         var defaultService = '';
         var setService = function( service ) {
+			console.warn(service);
+			console.warn(services);
             YAHOO.util.Dom.get( 'currentLocationService' ).innerHTML = services[ service ].label;
 			//YAHOO.util.Dom.get( 'currentLocationService' ).innerHTML = service;
             api.setUrlParam( 'service', service );
@@ -963,7 +965,15 @@ YAHOO.util.Event.addListener(window, "load", function() {
 	var inspector = new FD.FileInspector();
 	
 	History.register("dirTable", "", dirList.reqSender);
-	History.register("currentLocationService", "", infoBar.setService);
+	
+	var initService;
+	if (bookmarkService) {
+		initService = bookmarkService;
+	} else {
+		initService = "ifs";
+	}
+	
+	History.register("currentLocationService", initService, infoBar.setService);
 	
 	History.initialize("yui-history-field", "yui-history-iframe");
 	
