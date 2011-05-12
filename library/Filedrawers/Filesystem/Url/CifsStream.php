@@ -53,7 +53,6 @@ class CifsStream {
 	}
 	public function mkdir( $path, $mode, $recursive = false )
 	{
-		check( $path );
 		return ( @smbclient_mkdir( $path, $mode ) !== false ); 
 	}
 }
