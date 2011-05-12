@@ -658,8 +658,6 @@ FD.InfoBar = function() {
 			
 			var newState = { "dirTable": YAHOO.util.Dom.get( 'changeLocationNewPath' ).value, "currentLocationService": YAHOO.util.Dom.get( 'changeLocationNewService' ).value };
 			
-			console.warn(newState);
-			
 			//History.navigate("dirTable", YAHOO.util.Dom.get( 'changeLocationNewPath' ).value );
 			History.multiNavigate( newState );
 			
@@ -685,9 +683,10 @@ FD.InfoBar = function() {
         var services = {};
         var defaultService = '';
         var setService = function( service ) {
-			console.warn(service);
-			console.warn(services);
-            YAHOO.util.Dom.get( 'currentLocationService' ).innerHTML = services[ service ].label;
+			// workaround for no value on history.register
+            if (typeof services[ service ] != 'undefined') {
+				YAHOO.util.Dom.get( 'currentLocationService' ).innerHTML = services[ service ].label;
+			}
 			//YAHOO.util.Dom.get( 'currentLocationService' ).innerHTML = service;
             api.setUrlParam( 'service', service );
         };
@@ -709,10 +708,11 @@ FD.InfoBar = function() {
                     YAHOO.util.Dom.get( 'changeLocationNewService' ).innerHTML = serviceOptionsHtml;
                 },
                 getServices: function() {
+					
                     var setServiceOptions = this.setServiceOptions;
                     var callback = { 
                         'success': function( o ) {
-                            services = YAHOO.lang.JSON.parse(o.responseText).services.services;
+							services = YAHOO.lang.JSON.parse(o.responseText).services.services;
                             defaultService = YAHOO.lang.JSON.parse(o.responseText).services.default;
                             setServiceOptions( services );
                         }
