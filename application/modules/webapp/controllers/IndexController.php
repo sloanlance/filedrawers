@@ -26,10 +26,9 @@ class IndexController extends Zend_Controller_Action
 
     public function listAction()
     {
-        $path = $this->_request->getUserParam('path');
-
-        if (empty($path)){
-            //$path = $this->_filesystem->getHomeDir();
+        $path = $this->_request->getParam('path');
+        if ( ! empty($path)){
+            $this->_redirect( '#dirTable='. $path, array( 'exit' => TRUE, 'prependBase' => TRUE, 'code' => 301 ));
         }
 
         /*
@@ -44,8 +43,6 @@ class IndexController extends Zend_Controller_Action
 
         $this->view->uploadForm = $uploadForm;
          */
-
-        $this->view->path  = $path;
     }
 
 

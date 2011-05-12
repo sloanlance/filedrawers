@@ -53,7 +53,7 @@ abstract class Filedrawers_Filesystem_Url extends Filedrawers_Filesystem {
     public function createDirectory($path, $name)
     {
         $this->setPath( $path );
-        $name = basename($name);
+		$name = trim( $name, $this->ILLEGAL_DIR_CHARS );
 
         if ( ! mkdir($this->getUrl( $name ), 0744, true)) {
             throw new Filedrawers_Filesystem_Exception(sprintf(

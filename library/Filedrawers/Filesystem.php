@@ -8,6 +8,9 @@
 require_once 'Filedrawers/Filesystem/Exception.php';
 
 abstract class Filedrawers_Filesystem {
+
+	protected $ILLEGAL_DIR_CHARS =  "/~ \t\n\r\0\x0B.";
+
     public function init()
     {
         $this->addListHelper(array('Model_Mime', 'setIcon'));

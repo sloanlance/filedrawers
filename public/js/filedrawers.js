@@ -43,6 +43,35 @@ function urlEncode( data ) {
     return query_parts.join( '&' );
 }
 
+function pathConcat()
+{
+    var sep = '/';
+
+    var path = '';
+    if ( arguments[ 0 ].charAt( 0 ) == sep ) {
+        path = path.concat( sep );
+    }
+
+    var pathParts = [];
+    var part;
+
+    for ( var i = 0; i < arguments.length; i++ ) {
+        part = arguments[ i ];
+        if ( part.charAt( 0 ) == sep ) {
+            part = part.slice( 1 );
+        }
+        if ( part.charAt( part.length - 1 ) == sep ) {
+            part = part.slice( 0, part.length - 1 );
+        }
+
+        if ( part != '' ) {
+            pathParts.push( part );
+        }
+    }
+
+    return path.concat( pathParts.join( '/' ));
+}
+
 FD.api = function() {
     var _apiUrl = baseUrl +'webservices/';
     var _urlParams = { 'format': 'json', 'wappver': webAppVersion.toString() };
@@ -264,7 +293,7 @@ FD.DirList = function() {
 	handleTableClick = function(oArgs) {
 					
 		if (oArgs.target.id == "folderLink") {
-			var newDir = currentURL + "/" + oArgs.target.innerHTML;
+			var newDir = pathConcat( currentURL, oArgs.target.innerHTML );
 			userFeedback.hideFeedback();
 			History.navigate("dirTable", newDir);
 		}		
@@ -957,4 +986,13 @@ YAHOO.util.Event.addListener(window, "load", function() {
 		userFeedback.hideFeedback();
 		History.navigate("dirTable", homeURL);
 	});	
+	
+	YAHOO.util.Event.on('favsList', 'click', function(e) {
+		if (e.target.href) {	
+			YAHOO.util.Event.preventDefault(e);
+			userFeedback.hideFeedback();
+			History.navigate("dirTable", e.target.getAttribute("href"));
+			//console.warn(e.target.getAttribute("href"));
+		}
+	});
 });
