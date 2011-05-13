@@ -239,8 +239,12 @@ FD.DirList = function() {
 	var showHidden = false;
 		
 	formatDate = function(elCell, oRecord, oColumn, oData) {
-		var oDate = new Date(oData*1000);
-		var str = (oDate.getMonth() + 1) + '/' + oDate.getDate() + '/' + oDate.getFullYear();
+		if (oData) {
+			var oDate = new Date(oData*1000);
+			var str = (oDate.getMonth() + 1) + '/' + oDate.getDate() + '/' + oDate.getFullYear();
+		} else {
+			str = "";
+		}
 		elCell.innerHTML = str;
 	}
 	
@@ -257,9 +261,9 @@ FD.DirList = function() {
 		} else if ( bytes > 0 ) {
 			str = bytes + ' B';
 		} else if ( true /*readPriv*/ ) { // size unknown - file is probably not readable
-			str = 'empty';
+			str = '';
 		} else {
-			str = '-';
+			str = '';
 		}
 
 		elCell.innerHTML = str;
@@ -796,6 +800,8 @@ FD.FileInspector = function() {
 	evnt = new YAHOO.util.CustomEvent("Inspector Event"),
 	links = temp.getElementsByTagName('a'),
 	i;
+	
+	YAHOO.util.Dom.get('versionNumber').innerHTML = webAppVersion;
 	
 	// called upon instantiation.
 	for (i=0; i<links.length; i++) {
