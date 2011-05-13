@@ -29,6 +29,18 @@ abstract class Filedrawers_Filesystem {
         }
     }
 
+	public function listFavs()
+	{
+	}
+	
+	public function addFavs()
+	{
+	}
+
+	public function deleteFavs()
+	{
+	}
+
     public static function pathConcat()
     {
         $args = func_get_args();
