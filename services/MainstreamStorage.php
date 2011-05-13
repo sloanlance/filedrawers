@@ -10,7 +10,7 @@ class Service_MainstreamStorage extends Filedrawers_Filesystem_Url_Cifs {
     {
         $url = 'smb://'. $this->_shareName .'.m.storage.umich.edu/'. trim( $this->_path, '/' ) .'/';
         if ( ! empty( $filename )) {
-            $url .= '/'. ltrim( $filename, '/' );
+            $url .= ltrim( $filename, '/' );
         }
 		return( $url );
     }
@@ -57,6 +57,23 @@ class Service_MainstreamStorage extends Filedrawers_Filesystem_Url_Cifs {
         } else {
             return parent::getInfo( $path );
         }
+    }
+	private function mkdir_tree( $path )
+	{
+		if ( !is_dir( dirname( $this->getUrl( $path ) ) ) )
+		{
+			$this->mkdir_tree( dirname( $path ) );
+		}
+        if ( ! mkdir($this->getUrl( $path), 0744 )) {
+            throw new Filedrawers_Filesystem_Exception(sprintf(
+                'Unable to create the directory "%s".', $name), 5);
+        }
+	}
+    public function createDirectory($path, $name)
+    {
+        $this->setPath( $path );
+		$name = trim( $name, $this->ILLEGAL_DIR_CHARS );
+		$this->mkdir_tree( $name ); 
     }
 }
 

@@ -30,4 +30,33 @@ class Service_Ifs extends Filedrawers_Filesystem_Mounted_Afs {
 
         return $homedir;
     }
+
+    public function listFavs( )
+    {
+        $myFavs = array( 'count' => 0 );
+		$homedir = $this->getHomedir(); 
+        $favoritesPath = $homedir . '/Favorites/';
+        $files = $this->listDirectory( $favoritesPath );
+    
+        for ( $i = 0, $c = 0; $i < count($files['contents']); $i++) {
+            foreach( $files['contents'][$i] as $key => $value ) {
+                if ( $key == 'filename' ) {
+                    if ( ( is_link( $favoritesPath .$value )) ) {
+                        $myFavs['contents'][$c]['service'] = 'IFS';
+                        $myFavs['contents'][$c]['name'] = $value;
+                        $myFavs['contents'][$c]['path'] = readlink( $favoritesPath .$value );
+                        $c++;
+                    } elseif ( !(is_dir($favoritesPath .$value))) {
+						$myFavs['contents'][$c]['service'] = 'IFS';
+						$myFavs['contents'][$c]['name'] = $value;
+						$myFavs['contents'][$c]['path'] = $homedir;
+						$c++;
+					} 
+                }
+            }
+        }
+        $myFavs['count'] = $c;
+        return $myFavs;
+    }
+
 }
