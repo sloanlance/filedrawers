@@ -19,7 +19,7 @@ abstract class Filedrawers_Filesystem_Mounted extends Filedrawers_Filesystem {
 
     public function createDirectory($path, $name)
     {
-        $name = basename($name);
+		$name = trim( $name, $this->ILLEGAL_DIR_CHARS );
         $this->localizePath($path);
 
         if ( ! @mkdir(trim($name), 0744, true)) {
