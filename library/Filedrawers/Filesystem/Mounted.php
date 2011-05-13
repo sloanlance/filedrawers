@@ -459,5 +459,11 @@ abstract class Filedrawers_Filesystem_Mounted extends Filedrawers_Filesystem {
             return false;
         }
     }
+
+	public function listFavs( )
+	{
+	}
+
+
 }
 
