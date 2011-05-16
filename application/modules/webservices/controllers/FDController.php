@@ -7,35 +7,32 @@ abstract class Webservices_FDController extends Zend_Controller_Action
 	protected $_csrfToken = null;
 	protected $_baseFilter = array('*' => 'StringTrim');
 	protected $_context = null;
-	public $contexts = array();
  	protected $_availableServices = array();
-              	
-    // Force Extending class to define this method
-    // abstract protected function ???();
+        public $contexts = array();      	
 
     // Common methods
     public function init() {
-		$this->_helper->layout->disableLayout();
-	        $this->_csrfToken = new Zend_Form_Element_Hash('formToken');
-	        $this->_csrfToken->initCsrfToken();
+	$this->_helper->layout->disableLayout();
+        $this->_csrfToken = new Zend_Form_Element_Hash('formToken');
+        $this->_csrfToken->initCsrfToken();
 	
-	        foreach( Zend_Registry::get('config')->filesystem->active->toArray() as $id ) {
-	            $serviceClass = 'Service_'. ucfirst( $id );
+        foreach( Zend_Registry::get('config')->filesystem->active->toArray() as $id ) {
+            $serviceClass = 'Service_'. ucfirst( $id );
+
+            if ( class_exists( $serviceClass )) {
+                $this->_availableServices[ $id ] = $serviceClass;
+            }
+        }
 	
-	            if ( class_exists( $serviceClass )) {
-	                $this->_availableServices[ $id ] = $serviceClass;
-	            }
-	        }
-	
-	        $this->_context = $this->_helper->getHelper('contextSwitch');
-	        $this->_context->setContext('xml', array(
-	            'callbacks' => array('post' => array($this->_helper, 'xmlSerialize'))
-	        ));
-	        $this->_context->initContext();
+        $this->_context = $this->_helper->getHelper('contextSwitch');
+        $this->_context->setContext('xml', array(
+            'callbacks' => array('post' => array($this->_helper, 'xmlSerialize'))
+        ));
+        $this->_context->initContext();
     }
 
 
-	public function preDispatch()
+    public function preDispatch()
     {
 	 if ( in_array( $this->_request->action, array( 'services' ))) {
             return;
@@ -64,7 +61,7 @@ abstract class Webservices_FDController extends Zend_Controller_Action
             throw( new Zend_Exception( 'service parameter must be one of: '. implode( ', ', array_keys( $this->_availableServices ))));
         }
         $this->view->service = $input->service;
-
+        
         if ( ! $input->isValid( 'wappver' )) {
             $this->view->errorMsg = array( 'wappver' => array( 'invalid' => 'invalid wappver flag' ));
             throw( new Zend_Exception( 'wappver (Web App Version) parameter must be an integer.' ));
@@ -77,12 +74,13 @@ abstract class Webservices_FDController extends Zend_Controller_Action
 
             $this->view->webAppVersion = Zend_Registry::get( 'webAppVersion' );
         }
-
-        $this->_filesystem = new $this->_availableServices[ $input->service ]();
-        $this->_filesystem->init();
-        Zend_Registry::set('filesystem', $this->_filesystem);
+        
+	if ($input->service !== NULL){ 
+            $this->_filesystem = new $this->_availableServices[ $input->service ]();
+            $this->_filesystem->init();
+            Zend_Registry::set('filesystem', $this->_filesystem); 
+        }
     }
-    
     
 }
 

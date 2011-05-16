@@ -29,17 +29,6 @@ abstract class Filedrawers_Filesystem {
         }
     }
 
-	public function listFavs()
-	{
-	}
-	
-	public function addFavs()
-	{
-	}
-
-	public function deleteFavs()
-	{
-	}
 
     public static function pathConcat()
     {
@@ -58,5 +47,22 @@ abstract class Filedrawers_Filesystem {
         }
 
         return $path .= implode(self::$pathSeparator, $pathParts);
+    }
+
+    public function listFavs()
+    {
+    }
+
+
+    public function addFavs()
+    {
+    }
+
+    public function renameFavs()
+    {
+    }
+
+    public function deleteFavs()
+    {
     }
 }

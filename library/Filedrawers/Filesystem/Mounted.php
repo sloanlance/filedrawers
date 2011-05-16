@@ -345,13 +345,13 @@ abstract class Filedrawers_Filesystem_Mounted extends Filedrawers_Filesystem {
         $path = (is_file($path)) ? dirname($path) : $path;
         $this->localizePath( $path );
         $files['path'] = $path;
-
+        
         // Open the path and read its contents
         if ( !$dh = @opendir( '.' )) {
             chdir($this->startCWD);
             throw new Filedrawers_Filesystem_Exception(sprintf('Unable to view: %s', $path), 5);
         }
-
+        
         while ( $filename = readdir( $dh )) {
             $row = $this->_getInfo($filename);
 
@@ -460,10 +460,7 @@ abstract class Filedrawers_Filesystem_Mounted extends Filedrawers_Filesystem {
         }
     }
 
-	public function listFavs( )
-	{
-	}
-
-
+    public function listFavs( )
+    {
+    }
 }
-
