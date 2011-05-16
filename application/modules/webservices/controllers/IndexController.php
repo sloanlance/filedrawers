@@ -7,26 +7,20 @@
 
 class Webservices_IndexController extends Webservices_FDController {
 
-	
-	public $contexts = array(
-        'services' => array('xml', 'json', 'html'),
-        'list' => array('xml', 'json', 'html'),
-        'rename' => array('xml', 'json', 'html'),
-        'delete' => array('xml', 'json', 'html'),
-        'move' => array('xml', 'json', 'html'),
-        'duplicate' => array('xml', 'json', 'html'),
-        'copy' => array('xml', 'json', 'html'),
-        'mkdir' => array('xml', 'json', 'html'),
-        'gettoken' => array('xml', 'json', 'html'),
-        'uploadstatus' => array('xml', 'json', 'html'),
-        'uploadfinish' => array('xml', 'json', 'html')
-    );
-
-
-
     public function init()
     {
-        parent::init(); 
+        $this->contexts['services'] = array('xml', 'json', 'html');
+        $this->contexts['list'] = array('xml', 'json', 'html');
+        $this->contexts['rename'] = array('xml', 'json', 'html');
+        $this->contexts['delete'] = array('xml', 'json', 'html'); 
+        $this->contexts['move'] = array('xml', 'json', 'html');
+        $this->contexts['duplicate'] = array('xml', 'json', 'html');
+        $this->contexts['copy'] = array('xml', 'json', 'html');
+        $this->contexts['mkdir'] = array('xml', 'json', 'html');
+        $this->contexts['gettoken'] = array('xml', 'json', 'html');
+        $this->contexts['uploadstatus'] = array('xml', 'json', 'html');  
+        $this->contexts['uploadfinish'] = array('xml', 'json', 'html');
+	 parent::init(); 
     }
     
     public function preDispatch()
@@ -42,7 +36,8 @@ class Webservices_IndexController extends Webservices_FDController {
         }
     }
 
-    public function serviceAction()
+
+    public function servicesAction()
     {
         $this->view->services = array();
         $serviceInfo = Zend_Registry::get('config')->filesystem->services->toArray();
@@ -52,6 +47,7 @@ class Webservices_IndexController extends Webservices_FDController {
 
         $this->view->services[ 'default' ] = Zend_Registry::get('config')->filesystem->default;
     }
+
 
     public function indexAction() {
         $this->_helper->layout->enableLayout();
@@ -337,7 +333,6 @@ class Webservices_IndexController extends Webservices_FDController {
         }
 
         $values = $this->_form->getValidValues($_POST);
-		check( $values );
         $this->_filesystem->createDirectory($values['path'], $values['folderName']);
         $this->view->status = 'success';
         $this->view->message = 'Successfully created the directory.';
