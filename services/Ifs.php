@@ -41,16 +41,11 @@ class Service_Ifs extends Filedrawers_Filesystem_Mounted_Afs {
         for ( $i = 0, $c = 0; $i < count($files['contents']); $i++) {
             foreach( $files['contents'][$i] as $key => $value ) {
                 if ( $key == 'filename' ) {
-                    if ( ( is_link( $favoritesPath .$value )) ) {
+					if ( is_dir($favoritesPath .$value) && ( is_link( $favoritesPath .$value )) ) {
                         $myFavs['contents'][$c]['service'] = 'IFS';
                         $myFavs['contents'][$c]['name'] = $value;
-                        $myFavs['contents'][$c]['path'] = readlink( $favoritesPath .$value );
+                        $myFavs['contents'][$c]['path'] = realpath( $favoritesPath .$value );
                         $c++;
-                    } elseif ( !(is_dir($favoritesPath .$value))) {
-						$myFavs['contents'][$c]['service'] = 'IFS';
-						$myFavs['contents'][$c]['name'] = $value;
-						$myFavs['contents'][$c]['path'] = $homedir;
-						$c++;
 					} 
                 }
             }
@@ -58,5 +53,24 @@ class Service_Ifs extends Filedrawers_Filesystem_Mounted_Afs {
         $myFavs['count'] = $c;
         return $myFavs;
     }
+
+	public function addFavs( $path, $name )
+	{
+		//adding file or directory
+		$name = trim( $name, $this->ILLEGAL_DIR_CHARS );
+		$homedir = $this->getHomedir();
+		$favoritesPath = $homedir . '/Favorites/';
+
+	}
+
+	public function deleteFavs( $path, $name ) {
+		if ( is_link( $path ) ) {
+			if ( @unlink($path) ) {
+				throw new Filedrawers_Filesystem_Exception(sprintf(
+                        'Unable to remove the file "%s".', $path), 5);
+			}
+		}
+	}
+
 
 }
