@@ -37,7 +37,7 @@ class Filedrawers_Validate_FilePath extends Zend_Validate_Abstract
                 $this->_error(self::NO_CONTEXT);
                 return false;
             }
-            $value = $context[$this->_options['pathContext']] . '/' . $value;
+            $value = $filesystem->pathConcat($context[$this->_options['pathContext']], $value);
         }
 
         $info = $filesystem->getInfo($value);
