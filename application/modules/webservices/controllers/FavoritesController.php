@@ -63,8 +63,8 @@ class Webservices_FavoritesController extends Webservices_FDController
 	public function getFavs()
 	{
 		$favs = $this->_filesystem->listFavs();
-               // $this->view->message = 'Test List Favs.';
-               // $this->view->contents = $favs;
+                $this->view->message = 'Test List Favs.';
+                $this->view->contents = $favs;
 	}
 
 
