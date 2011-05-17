@@ -963,8 +963,35 @@ FD.FileInspector = function() {
 	
 }
 
+FD.Favorites = function() {
+	
+	var myFavsSource = new YAHOO.util.DataSource(homeURL + "webservices/favorites/list?format=json");
+	myFavsSource.responseType = YAHOO.util.DataSource.TYPE_JSON; 
+	myFavsSource.responseSchema = {
+		fields: ["service","name","path"]
+	};
+	
+	myFavsSource.subscribe('responseEvent', function(oDS){
+		console.log(oDS);
+	});
+	
+	
+	/*
+	var oDS = new YAHOO.util.XHRDataSource(homeURL + "webservices/favorites/list?format=json");
+	oDS.responseType = YAHOO.util.XHRDataSource.TYPE_JSON;
+	oDS.responseSchema = {
+		fields: ["service","name","path"]
+	};
+	*/
+	
+	
+	
+}
+
 YAHOO.util.Event.addListener(window, "load", function() {
-				
+
+	favorites = new FD.Favorites();	
+	
         api = new FD.api();
 		userFeedback = new FD.UserFeedback();
 	var bookmarkDir = History.getBookmarkedState("dirTable");
