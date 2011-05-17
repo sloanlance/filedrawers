@@ -965,33 +965,35 @@ FD.FileInspector = function() {
 
 FD.Favorites = function() {
 	
-	var myFavsSource = new YAHOO.util.DataSource(homeURL + "webservices/favorites/list?format=json");
-	myFavsSource.responseType = YAHOO.util.DataSource.TYPE_JSON; 
-	myFavsSource.responseSchema = {
-		fields: ["service","name","path"]
-	};
+	myFavsSource = new YAHOO.util.DataSource("webservices/favorites/");
 	
-	myFavsSource.subscribe('responseEvent', function(oDS){
-		console.log(oDS);
-	});
-	
-	
-	/*
-	var oDS = new YAHOO.util.XHRDataSource(homeURL + "webservices/favorites/list?format=json");
-	oDS.responseType = YAHOO.util.XHRDataSource.TYPE_JSON;
-	oDS.responseSchema = {
-		fields: ["service","name","path"]
-	};
+	// doesn't seem like this stuff is need for 'list', but perhaps once Favs gets more complex...
+	/*	
+		myFavsSource.responseType = YAHOO.util.DataSource.TYPE_JSON; 
+		myFavsSource.responseSchema = {
+			fields: ["service","name","path"]
+		};
 	*/
 	
-	
+	myFavsSource.subscribe('responseEvent', function(oDS){
+		
+		myFavs = YAHOO.lang.JSON.parse(oDS.response.responseText);
+				
+		var linksListHTML = '<ul>';	
+		for ( i=0; i < myFavs.contents.count; i++ ) {
+			linksListHTML += '<li><a id="folderLink" href="' + myFavs.contents.contents[i].path + '">' + myFavs.contents.contents[i].name + '</a></li>';
+		}		
+		linksListHTML += '</ul>';
+		
+		YAHOO.util.Dom.get('favsLinks').innerHTML = linksListHTML;
+	});
+
+	myFavsSource.sendRequest( "list?format=json" );
 	
 }
 
 YAHOO.util.Event.addListener(window, "load", function() {
 
-	favorites = new FD.Favorites();	
-	
         api = new FD.api();
 		userFeedback = new FD.UserFeedback();
 	var bookmarkDir = History.getBookmarkedState("path");
@@ -1003,6 +1005,7 @@ YAHOO.util.Event.addListener(window, "load", function() {
 	dirTable = dirList.init(bookmarkDir, bookmarkService);
 	var inspector = new FD.FileInspector();
 	
+	favorites = new FD.Favorites();	
 	History.register("path", "", dirList.reqSender);
 	
 	var initService;
@@ -1057,5 +1060,5 @@ YAHOO.util.Event.addListener(window, "load", function() {
 			userFeedback.hideFeedback();
 			History.navigate("path", e.target.getAttribute("href"));
 		}
-	});
+	});	
 });
