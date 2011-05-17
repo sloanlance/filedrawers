@@ -397,4 +397,15 @@ abstract class Filedrawers_Filesystem_Url extends Filedrawers_Filesystem {
             return false;
         }
     }
+
+    public function listFavs()
+        {
+           /* service:name:path: */
+           $favoritesPath = $this->getHomedir() . '/Favorites';
+           $files = $this->listDirectory( $favoritesPath );
+            
+           return $files;
+                
+        }
+
 }

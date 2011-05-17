@@ -43,8 +43,37 @@ function urlEncode( data ) {
     return query_parts.join( '&' );
 }
 
+function pathConcat()
+{
+    var sep = '/';
+
+    var path = '';
+    if ( arguments[ 0 ].charAt( 0 ) == sep ) {
+        path = path.concat( sep );
+    }
+
+    var pathParts = [];
+    var part;
+
+    for ( var i = 0; i < arguments.length; i++ ) {
+        part = arguments[ i ];
+        if ( part.charAt( 0 ) == sep ) {
+            part = part.slice( 1 );
+        }
+        if ( part.charAt( part.length - 1 ) == sep ) {
+            part = part.slice( 0, part.length - 1 );
+        }
+
+        if ( part != '' ) {
+            pathParts.push( part );
+        }
+    }
+
+    return path.concat( pathParts.join( '/' ));
+}
+
 FD.api = function() {
-    var _apiUrl = baseUrl +'webservices/v1/';
+    var _apiUrl = baseUrl +'webservices/';
     var _urlParams = { 'format': 'json', 'wappver': webAppVersion.toString() };
     var _dataParams = {};
     var _getParams = function( type, params ) {
@@ -210,8 +239,12 @@ FD.DirList = function() {
 	var showHidden = false;
 		
 	formatDate = function(elCell, oRecord, oColumn, oData) {
-		var oDate = new Date(oData*1000);
-		var str = (oDate.getMonth() + 1) + '/' + oDate.getDate() + '/' + oDate.getFullYear();
+		if (oData) {
+			var oDate = new Date(oData*1000);
+			var str = (oDate.getMonth() + 1) + '/' + oDate.getDate() + '/' + oDate.getFullYear();
+		} else {
+			str = "";
+		}
 		elCell.innerHTML = str;
 	}
 	
@@ -228,9 +261,9 @@ FD.DirList = function() {
 		} else if ( bytes > 0 ) {
 			str = bytes + ' B';
 		} else if ( true /*readPriv*/ ) { // size unknown - file is probably not readable
-			str = 'empty';
+			str = '';
 		} else {
-			str = '-';
+			str = '';
 		}
 
 		elCell.innerHTML = str;
@@ -264,7 +297,7 @@ FD.DirList = function() {
 	handleTableClick = function(oArgs) {
 					
 		if (oArgs.target.id == "folderLink") {
-			var newDir = currentURL + "/" + oArgs.target.innerHTML;
+			var newDir = pathConcat( currentURL, oArgs.target.innerHTML );
 			userFeedback.hideFeedback();
 			History.navigate("dirTable", newDir);
 		}		
@@ -340,8 +373,8 @@ FD.DirList = function() {
 		
 	
 	return {
-		init: function(bookmarkDir) {
-	
+		init: function(bookmarkDir, bookmarkService) {
+			
 			myDataSource = new YAHOO.util.DataSource( '' );  // first call
 			myDataSource.responseType = YAHOO.util.DataSource.TYPE_JSON; 
 			myDataSource.responseSchema = {
@@ -394,7 +427,11 @@ FD.DirList = function() {
 			}
 			);	
 			
-                        if ( bookmarkDir ) {
+                        if ( bookmarkService ) {
+							infoBar.setService(bookmarkService);
+						}
+						
+						if ( bookmarkDir ) {
                             var params = { 'path': bookmarkDir };
                         } else {
                             var params = {};
@@ -549,10 +586,10 @@ FD.DirList = function() {
 		},
 		
 		reqSender: function(directory) {
-                               params = { 'path': directory };
+            params = { 'path': directory };
 			myDataSource.sendRequest( api.getActionUrl( 'list', params, true ), dirTable.onDataReturnInitializeTable, dirTable);
 			userFeedback.startTimer("list");			
-		}
+		},
 							
 		/*
 		var myCallback = function() {
@@ -615,18 +652,22 @@ FD.InfoBar = function() {
 */
 
 		if (target.id == 'currentLocationChange') {
-                        YAHOO.util.Dom.setStyle( currentLocation, 'display', 'none' );
-                        YAHOO.util.Dom.setStyle( changeLocation, 'display', 'inline' );
+            YAHOO.util.Dom.setStyle( currentLocation, 'display', 'none' );
+            YAHOO.util.Dom.setStyle( changeLocation, 'display', 'inline' );
 		} else if (target.id == 'changeLocationGo') {
-			//location = baseUrl + '/list' +
-                        YAHOO.util.Dom.setStyle( currentLocation, 'display', 'inline' );
-                        YAHOO.util.Dom.setStyle( changeLocation, 'display', 'none' );
-                        setService( YAHOO.util.Dom.get( 'changeLocationNewService' ).value );
-						userFeedback.hideFeedback();
-			History.navigate("dirTable", YAHOO.util.Dom.get( 'changeLocationNewPath' ).value );
+			YAHOO.util.Dom.setStyle( currentLocation, 'display', 'inline' );
+            YAHOO.util.Dom.setStyle( changeLocation, 'display', 'none' );
+            setService( YAHOO.util.Dom.get( 'changeLocationNewService' ).value );
+			userFeedback.hideFeedback();
+			
+			var newState = { "dirTable": YAHOO.util.Dom.get( 'changeLocationNewPath' ).value, "currentLocationService": YAHOO.util.Dom.get( 'changeLocationNewService' ).value };
+			
+			//History.navigate("dirTable", YAHOO.util.Dom.get( 'changeLocationNewPath' ).value );
+			History.multiNavigate( newState );
+			
 		} else if (target.id == 'changeLocationCancel') {
-                        YAHOO.util.Dom.setStyle( currentLocation, 'display', 'inline' );
-                        YAHOO.util.Dom.setStyle( changeLocation, 'display', 'none' );
+            YAHOO.util.Dom.setStyle( currentLocation, 'display', 'inline' );
+            YAHOO.util.Dom.setStyle( changeLocation, 'display', 'none' );
                         // TODO abort the request
 		}
 	};
@@ -642,16 +683,26 @@ FD.InfoBar = function() {
 			History.navigate("dirTable", e.target.id);
 		}
 	};
-    
+
+        var serviceChange = function(e) {
+            YAHOO.util.Event.preventDefault(e);
+            YAHOO.util.Dom.get('changeLocationNewPath').value = services[e.target.value].home;
+        };
+
         var services = {};
         var defaultService = '';
         var setService = function( service ) {
-            YAHOO.util.Dom.get( 'currentLocationService' ).innerHTML = services[ service ].label;
+			// workaround for no value on history.register
+            if (typeof services[ service ] != 'undefined') {
+				YAHOO.util.Dom.get( 'currentLocationService' ).innerHTML = services[ service ].label;
+			}
+			//YAHOO.util.Dom.get( 'currentLocationService' ).innerHTML = service;
             api.setUrlParam( 'service', service );
         };
 	YAHOO.util.Event.on('infoBar', 'click', handleClick);
 	YAHOO.util.Event.on('location', 'submit', handleSubmit);
 	YAHOO.util.Event.on('notifyArea', 'click', locationClick);
+        YAHOO.util.Event.on('changeLocationNewService', 'change', serviceChange);
 
 	var kl = new YAHOO.util.KeyListener(document, {keys:13}, {fn:function(){alert('enter');}});
 
@@ -667,10 +718,11 @@ FD.InfoBar = function() {
                     YAHOO.util.Dom.get( 'changeLocationNewService' ).innerHTML = serviceOptionsHtml;
                 },
                 getServices: function() {
+					
                     var setServiceOptions = this.setServiceOptions;
                     var callback = { 
                         'success': function( o ) {
-                            services = YAHOO.lang.JSON.parse(o.responseText).services.services;
+							services = YAHOO.lang.JSON.parse(o.responseText).services.services;
                             defaultService = YAHOO.lang.JSON.parse(o.responseText).services.default;
                             setServiceOptions( services );
                         }
@@ -679,6 +731,7 @@ FD.InfoBar = function() {
                     YAHOO.util.Connect.asyncRequest('GET', api.getActionUrl( 'services' ), callback, null );
 
                 },
+				
                 setService:setService,
 		update:update
 	}
@@ -753,6 +806,8 @@ FD.FileInspector = function() {
 	evnt = new YAHOO.util.CustomEvent("Inspector Event"),
 	links = temp.getElementsByTagName('a'),
 	i;
+	
+	YAHOO.util.Dom.get('versionNumber').innerHTML = webAppVersion;
 	
 	// called upon instantiation.
 	for (i=0; i<links.length; i++) {
@@ -913,14 +968,25 @@ YAHOO.util.Event.addListener(window, "load", function() {
         api = new FD.api();
 		userFeedback = new FD.UserFeedback();
 	var bookmarkDir = History.getBookmarkedState("dirTable");
+	var bookmarkService = History.getBookmarkedState("currentLocationService");
 	
 	infoBar = new FD.InfoBar(); // TODO does this need to be so widely scoped?
         infoBar.getServices();
 	var dirList = new FD.DirList();
-	dirTable = dirList.init(bookmarkDir);
+	dirTable = dirList.init(bookmarkDir, bookmarkService);
 	var inspector = new FD.FileInspector();
 	
 	History.register("dirTable", "", dirList.reqSender);
+	
+	var initService;
+	if (bookmarkService) {
+		initService = bookmarkService;
+	} else {
+		initService = "ifs";
+	}
+	
+	History.register("currentLocationService", initService, infoBar.setService);
+	
 	History.initialize("yui-history-field", "yui-history-iframe");
 	
 	inspector.evnt.subscribe(dirList.toggleHiddenFilter);
@@ -957,4 +1023,12 @@ YAHOO.util.Event.addListener(window, "load", function() {
 		userFeedback.hideFeedback();
 		History.navigate("dirTable", homeURL);
 	});	
+	
+	YAHOO.util.Event.on('favsList', 'click', function(e) {
+		if (e.target.href) {	
+			YAHOO.util.Event.preventDefault(e);
+			userFeedback.hideFeedback();
+			History.navigate("dirTable", e.target.getAttribute("href"));
+		}
+	});
 });
