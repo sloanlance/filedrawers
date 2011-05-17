@@ -683,7 +683,12 @@ FD.InfoBar = function() {
 			History.navigate("dirTable", e.target.id);
 		}
 	};
-    
+
+        var serviceChange = function(e) {
+            YAHOO.util.Event.preventDefault(e);
+            YAHOO.util.Dom.get('changeLocationNewPath').value = services[e.target.value].home;
+        };
+
         var services = {};
         var defaultService = '';
         var setService = function( service ) {
@@ -697,6 +702,7 @@ FD.InfoBar = function() {
 	YAHOO.util.Event.on('infoBar', 'click', handleClick);
 	YAHOO.util.Event.on('location', 'submit', handleSubmit);
 	YAHOO.util.Event.on('notifyArea', 'click', locationClick);
+        YAHOO.util.Event.on('changeLocationNewService', 'change', serviceChange);
 
 	var kl = new YAHOO.util.KeyListener(document, {keys:13}, {fn:function(){alert('enter');}});
 
