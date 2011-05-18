@@ -275,7 +275,6 @@ abstract class Filedrawers_Filesystem_Url extends Filedrawers_Filesystem {
         $url = $this->getUrl();
 
         clearstatcache();
-		check( $path );
 
         if ( $handle = @fopen($url, "rb")) {
             return $handle;
