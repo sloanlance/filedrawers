@@ -92,7 +92,7 @@ class Zend_View_Helper_PartialLoop extends Zend_View_Helper_Partial
 
             $content .= $this->partial($name, $module, $item);
         }
-
+       
         return $content;
     }
 }

@@ -72,8 +72,27 @@ class Service_MainstreamStorage extends Filedrawers_Filesystem_Url_Cifs {
     public function createDirectory($path, $name)
     {
         $this->setPath( $path );
-		$name = trim( $name, $this->ILLEGAL_DIR_CHARS );
-		$this->mkdir_tree( $name ); 
+	$name = trim( $name, $this->ILLEGAL_DIR_CHARS );
+	$this->mkdir_tree( $name ); 
+    }
+
+    public function listFavs()
+    {
+     $ms_list = Model_UserFavs::fetchAll();
+      return $ms_list;
+    }
+    
+    public function addFavs()
+    {
+      $data = array(
+            'username'   => 'testnam1',
+            'servicename' => 'test_servicename',
+            'location' => 'testloc',
+            'filename' => 'testfile.txt'
+         );
+         
+       Model_UserFavs::insertFavs($data);
+ 
     }
 }
 

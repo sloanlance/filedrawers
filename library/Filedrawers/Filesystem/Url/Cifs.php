@@ -36,4 +36,20 @@ class Filedrawers_Filesystem_Url_Cifs extends Filedrawers_Filesystem_Url {
         $this->listHelpers[] = $function;
     }
 
+    public function listFavs()
+    {
+    }
+
+    public function addFavs()
+    {
+    }
+
+    public function renameFavs()
+    {
+    }
+
+    public function deleteFavs()
+    {
+    }
+
 }
