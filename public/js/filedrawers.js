@@ -92,7 +92,7 @@ FD.api = function() {
             return type
         }
 
-        return merged_params;
+    return merged_params;
     };
     var _setParam = function( type, key, value ) {
         type[ key ] = value;
@@ -967,7 +967,7 @@ FD.Favorites = function() {
 	
 	myFavsSource = new YAHOO.util.DataSource("webservices/favorites/");
 	
-	// doesn't seem like this stuff is need for 'list', but perhaps once Favs gets more complex...
+	// doesn't seem like this stuff is needed for 'list', but perhaps once Favs gets more complex...
 	/*	
 		myFavsSource.responseType = YAHOO.util.DataSource.TYPE_JSON; 
 		myFavsSource.responseSchema = {
@@ -981,21 +981,39 @@ FD.Favorites = function() {
 				
 		var linksListHTML = '<ul>';	
 		for ( i=0; i < myFavs.contents.count; i++ ) {
-			linksListHTML += '<li><a id="folderLink" href="' + myFavs.contents.contents[i].path + '">' + myFavs.contents.contents[i].name + '</a></li>';
+			linksListHTML += '<li><a id="folderLink" href="' + myFavs.contents.contents[i].path + '">' + myFavs.contents.contents[i].name + '</a>';
+			linksListHTML += '<span id="editFavBtns">&nbsp;&nbsp;<img src="images/pencil.png" />&nbsp;<img src="images/delete.png" /></span></li>';
 		}		
 		linksListHTML += '</ul>';
 		
 		YAHOO.util.Dom.get('favsLinks').innerHTML = linksListHTML;
 	});
+	
+	var handleMouseOver = function(e) {
+        if (YAHOO.util.Event.getTarget(e).nodeName.toUpperCase() == "A") {
+            options = YAHOO.util.Event.getTarget(e).nextSibling;
+            YAHOO.util.Dom.setStyle( options, 'display', 'inline' );
+        }
+        
+	};
+	
+	var handleMouseOut = function(e) {
+		if (YAHOO.util.Event.getTarget(e).nodeName.toUpperCase() == "LI") {
+            options = YAHOO.util.Event.getTarget(e).lastChild;
+            YAHOO.util.Dom.setStyle( options, 'display', 'none' );
+        }
+	};
 
 	myFavsSource.sendRequest( "list?format=json" );
-	
+    
+    YAHOO.util.Event.on("favsList", "mouseover", handleMouseOver);
+	YAHOO.util.Event.on("favsList", "mouseout", handleMouseOut);
 }
 
 YAHOO.util.Event.addListener(window, "load", function() {
 
-        api = new FD.api();
-		userFeedback = new FD.UserFeedback();
+    api = new FD.api();
+    userFeedback = new FD.UserFeedback();
 	var bookmarkDir = History.getBookmarkedState("path");
 	var bookmarkService = History.getBookmarkedState("service");
 	
