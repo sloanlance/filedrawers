@@ -45,9 +45,7 @@ class CifsStream {
 	}
 	public function dir_readdir() 
 	{
-		check();
 		$dirInfo = @smbclient_readdir( $this->_dirHandle );
-		check( $dirInfo );
 		if ( $dirInfo !== false ) {
 			return( $dirInfo['name'] );
 		}
