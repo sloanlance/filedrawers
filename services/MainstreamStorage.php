@@ -74,7 +74,7 @@ class Service_MainstreamStorage extends Filedrawers_Filesystem_Url_Cifs {
 
     public function listFavs()
     {
-        $table =  new Model_UserFavs;
+        $table =  new Model_UserFavorites;
         $ms_list =  $table->listFavs();
         return $ms_list;
     }
@@ -82,7 +82,7 @@ class Service_MainstreamStorage extends Filedrawers_Filesystem_Url_Cifs {
     public function addFavs()
     {
 
-      $table =  new Model_UserFavs;
+      $table =  new Model_UserFavorites;
       $data = array(
             'username'   => 'testnam2',
             'servicename' => 'test_servicename',

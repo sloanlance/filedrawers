@@ -62,42 +62,52 @@ class Webservices_FavoritesController extends Webservices_FiledrawersControllerA
      public function getFavs()
     {
        $favs = $this->_filesystem->listFavs();
-       $ifs_class = get_class($this->_filesystem);
-       if ($ifs_class == 'Service_Ifs'){
-            $favs = $this->Arr2d($favs);
-        }
-       echo("here");
        $this->view->contents = $favs;
     }
 
     public function setFilesystem()
     {
-       $this->_filesystem = new $allServices;
-       $this->_filesystem->init();
-       Zend_Registry::set('filesystem', $this->_filesystem);
+        $this->_filesystem = new $allServices;
+        $this->_filesystem->init();
+        Zend_Registry::set('filesystem', $this->_filesystem);
     }
 
-    public function Arr2d($ifs_favs = NULL)
+
+    public function addAction()
     {
-        $newFavs = array();
-
-	if ( is_array($ifs_favs) ) {
-            
-	    foreach ($ifs_favs as $fav) {
-	            if ( is_array($fav)){      
-	               foreach ($fav as $info){
-		                if( is_array($info)){   
-			          foreach ($info as $f){
-		                           $newFavs [ 'contents' ][] = array( 'type' => 'dir', 'filename' => $f );
-                                  }
-	                        }	
-		       } 
-                    }	
-	    }
-        
-	return $newFavs;
-
-	}
+        $favs = $this->_filesystem->addFavs();
+        $this->view->contents = $favs;
     }
+    
+    public function renameAction()
+    {
+        $this->_form = new Form_RenameForm($this->_csrfToken,
+        $this->_request->getParam('path'));
+echo $this->_form;
+
+        if ( ! $this->getRequest()->isPost()) {
+//echo "Going on";
+            return;
+        }
+        else if ( ! $this->_form->isValid($_POST)) {
+            $this->view->errorMsg = $this->_form->getMessages(null, true);
+            return;
+        }
+
+        $values = $this->_form->getValidValues($_POST);
+/*
+?><pre><?
+echo "DUmp data - " .var_dump($values);
+?></pre><?
+*/
+
+        $oldPath = $values['path'] . '/' . $values['oldName'];
+        $newPath = $values['path'] . '/' . $values['newName'];
+        $this->_filesystem->rename($oldPath, $newPath);
+
+        $this->view->status = 'success';
+        $this->view->message = 'Successfully renamed the file or directory.';
+    }
+
 
 }

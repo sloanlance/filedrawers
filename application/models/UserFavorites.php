@@ -5,7 +5,7 @@
  * All rights reserved.
  */
 
-class Model_UserFavs extends Zend_Db_Table
+class Model_UserFavorites extends Zend_Db_Table
 {
     protected $_name = 'filedrawers_favorites';
 
@@ -16,6 +16,18 @@ class Model_UserFavs extends Zend_Db_Table
 
     public function insertFavs($favs)
     {
+        //check if favorite already exists, if not insert
+
+        //check validity of filename
+        $name = trim( $name, $this->ILLEGAL_DIR_CHARS );
+  
+        //check validity of directory
+
+        //check validity of uniqname
+
+        //check validity of service
+ 
+        //insert if valid and does not already exist
         $insert = $this->insert($favs);
     }
 
@@ -29,12 +41,16 @@ class Model_UserFavs extends Zend_Db_Table
         return $entries;
      }
 
-    public function renameFavs()
-    {
-
-
-
-    }
+     public function renameFavs( $old, $new )
+     {
+        if ($this->_fileExists($new)) {
+            // do nothing
+        }
+        if ( $old == $new ) {
+            // do nothing
+        }
+        rename( $oldPath, $newPath );
+      }
 
 
     public function deleteFavs()
