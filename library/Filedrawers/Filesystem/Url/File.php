@@ -16,7 +16,7 @@ class Filedrawers_Filesystem_Url_File extends Filedrawers_Filesystem_Url {
 
     public function getHomedir()
     {
-        return Filedrawers_Filesystem::getHomedir();
+        return '/var/tmp';
     }
 
 

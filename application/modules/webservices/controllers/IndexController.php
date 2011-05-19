@@ -43,6 +43,9 @@ class Webservices_IndexController extends Webservices_FiledrawersControllerAbstr
         $serviceInfo = Zend_Registry::get('config')->filesystem->services->toArray();
         foreach( $this->_availableServices as $id => $serviceClass ) {
             $this->view->services[ 'services' ][ $id ] = $serviceInfo[ $id ];
+            $service = new $serviceClass;
+            $this->init();
+            $this->view->services[ 'services' ][ $id ][ 'home' ] = $service->getHomedir();
         }
 
         $this->view->services[ 'default' ] = Zend_Registry::get('config')->filesystem->default;

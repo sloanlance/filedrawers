@@ -28,6 +28,8 @@ abstract class Filedrawers_Filesystem {
             return '/';
         }
     }
+	
+	abstract function getFileHandle( $path );
 
 
     public static function pathConcat()

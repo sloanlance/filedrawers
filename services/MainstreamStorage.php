@@ -8,11 +8,7 @@
 class Service_MainstreamStorage extends Filedrawers_Filesystem_Url_Cifs {
     public function getUrl( $filename = null )
     {
-        $url = 'smb://'. $this->_shareName .'.m.storage.umich.edu/'. trim( $this->_path, '/' ) .'/';
-        if ( ! empty( $filename )) {
-            $url .= ltrim( $filename, '/' );
-        }
-		return( $url );
+		return( $url = 'smb://'. $this->_shareName .'.m.storage.umich.edu'.$this->pathConcat( $this->_path, $filename ) );
     }
 
 
@@ -33,7 +29,7 @@ class Service_MainstreamStorage extends Filedrawers_Filesystem_Url_Cifs {
     public function listDirectory($path, $associativeArray=false)
     {
         if ( $path == '/' ) {
-            $fake = array( 'ath-groups', 'DEV-SHARE', 'FIN-IO-Department', 'FIN-RM-Oasis_Storage', 'kines-temp', 'kines-users', 'nur-mainstreamroot', 'snre-cafi', 'snre-communications', 'snre-diana', 'snre-jpnewelllab', 'snre-esa', 'kines-sml', 'ulib-staff', 'kines-adidas', 'kines-cmbds', 'kines-vbl', 'kines-borer', 'cgh-root', 'chgd-Research', 'kines-gross', 'kines-mml', 'tri-vehsafety', 'kines-sportmgt', 'mmpei-adminsvr', 'kines-groups', 'kines-neuro', 'snre-gesi', 'kines-complex', 'bhl-archive', 'bhl-root', 'EA-PHOTOLIB', 'SMTD-BlockM', 'kines-brown', 'ssw-groups', 'ssw-users', 'nur-data', 'ENGIN-InterproShare', 'kines-hsl', 'snre-bayesian', 'snre-scavialab', 'IOE-CHEPS', 'dsp-digisign', 'its-users', 'snre-cardinalelab', 'EA-COMM-MARK', 'its-files', 'ath-users', 'tri-tdc', 'IOE-ErgoHand', 'its-amsl-abcd', 'me-abcd-its', 'SNRE-ReoLab', 'tri-tdcdata', 'kines-mtel', 'snre-css', 'kines-hnl', 'swd-deploy' );
+            $fake = array( 'ath-groups', 'DEV-SHARE', 'FIN-IO-Department', 'FIN-RM-Oasis_Storage', 'kines-temp', 'kines-users', 'nur-mainstreamroot', 'snre-cafi', 'snre-communications', 'snre-diana', 'snre-jpnewelllab', 'snre-esa', 'kines-sml', 'ulib-staff', 'kines-adidas', 'kines-cmbds', 'kines-vbl', 'kines-borer', 'cgh-root', 'chgd-Research', 'kines-gross', 'kines-mml', 'tri-vehsafety', 'kines-sportmgt', 'mmpei-adminsvr', 'kines-groups', 'kines-neuro', 'snre-gesi', 'kines-complex', 'bhl-archive', 'bhl-root', 'EA-PHOTOLIB', 'SMTD-BlockM', 'kines-brown', 'ssw-groups', 'ssw-users', 'nur-data', 'ENGIN-InterproShare', 'kines-hsl', 'snre-bayesian', 'snre-scavialab', 'IOE-CHEPS', 'dsp-digisign', 'its-users', 'snre-cardinalelab', 'EA-COMM-MARK', 'its-files', 'ath-users', 'tri-tdc', 'IOE-ErgoHand', 'its-amsl-abcd', 'me-abcd-its', 'SNRE-ReoLab', 'tri-tdcdata', 'kines-mtel', 'snre-css', 'kines-hnl', 'swd-deploy', 'its-mfile' );
             $rc[ 'path' ] = '/';
             $fake = array_map( 'strtolower', $fake );
             sort( $fake );
