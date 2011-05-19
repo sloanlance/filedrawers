@@ -9,12 +9,12 @@ class Model_UserFavs extends Zend_Db_Table
 {
     protected $_name = 'filedrawers_favorites';
 
-/*    public function __construct()
+    public function __construct()
     {
        parent::__construct();
 
     }
-*/
+
    
     public function insertFavs()
     {
@@ -23,14 +23,11 @@ class Model_UserFavs extends Zend_Db_Table
     }
 
 
-    public function fetchAll()
+    public function getAllFavs()
     {
         $table = new Model_UserFavs();
-        $select = "select * from 'filedrawers_favorites'";
-
-echo($select);
-$rows = $table->fetchAll($select);
-echo "The table name is " . $rows['username'] . "\n";
+        $select = $table->select();
+        $rows = $table->fetchAll($select);
 
      }
 
