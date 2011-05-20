@@ -150,29 +150,29 @@ FD.UserFeedback = function() {
 	}
 }
 
-// redundant - make dirTable formating use this function.
 FD.Utils = {
 
-	formatBytes: function(bytes) {
-		bytes = parseInt(bytes);
-		var size = null;
+    formatBytes: function(bytes)
+    {
+        bytes = parseInt(bytes);
+        var size = null;
 
-		if ( bytes >= 1073741824 ) {
-			size = (Math.round((bytes/1073741824)*100)/100) + ' GB';
-		} else if ( bytes >= 1048576 ) {
-			size =(Math.round((bytes/1048576)*100)/100) + ' MB';
-		} else if ( bytes >= 1024 ) {
-			size = (Math.round((bytes/1024)*100)/100) + ' KB';
-		} else if ( bytes > 0 ) {
-			size = bytes + ' Bytes';
-		} else if ( true /*readPriv*/ ) { // size unknown - file is probably not readable
-			size = 'empty';
-		} else {
-			size = '-';
-		}
+        if ( bytes >= 1073741824 ) {
+            size = (Math.round((bytes/1073741824)*100)/100) + ' GB';
+        } else if ( bytes >= 1048576 ) {
+            size =(Math.round((bytes/1048576)*100)/100) + ' MB';
+        } else if ( bytes >= 1024 ) {
+            size = (Math.round((bytes/1024)*100)/100) + ' KB';
+        } else if ( bytes > 0 ) {
+            size = bytes + ' Bytes';
+        } else if ( true /*readPriv*/ ) { // size unknown - file is probably not readable
+            size = 'empty';
+        } else {
+            size = '-';
+        }
 
-		return size;
-	},
+        return size;
+    },
 
     roundNum: function roundNum( num )
     {
