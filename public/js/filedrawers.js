@@ -9,6 +9,7 @@ clipboardState,
 baseUrl = '',
 timer1,
 timer2,
+services = {},
 History = YAHOO.util.History;
 
 if (typeof FD == "undefined" || ! FD) {
@@ -672,17 +673,15 @@ FD.InfoBar = function() {
 
         var serviceChange = function(e) {
             YAHOO.util.Event.preventDefault(e);
-            YAHOO.util.Dom.get('changeLocationNewPath').value = services[e.target.value].home;
+            YAHOO.util.Dom.get('changeLocationNewPath').value = services.contents[e.target.value].home;
         };
 
-        var services = {};
-        var defaultService = '';
         var setService = function( service ) {
-			// workaround for no value on history.register
-            if (typeof services[ service ] != 'undefined') {
-				YAHOO.util.Dom.get( 'currentLocationService' ).innerHTML = services[ service ].label;
-			}
-			//YAHOO.util.Dom.get( 'currentLocationService' ).innerHTML = service;
+            // workaround for no value on history.register
+            if (typeof services.contents != 'undefined') {
+                YAHOO.util.Dom.get( 'currentLocationService' ).innerHTML = services.contents[ service ].label;
+            }
+            //YAHOO.util.Dom.get( 'currentLocationService' ).innerHTML = service;
             api.setUrlParam( 'service', service );
         };
 	YAHOO.util.Event.on('infoBar', 'click', handleClick);
@@ -698,26 +697,11 @@ FD.InfoBar = function() {
 		},
                 setServiceOptions: function( services ) {
                     var serviceOptionsHtml;
-                    for ( var id in services ) {
-                        serviceOptionsHtml += '<option value="'+ id +'">'+ services[ id ].label +'</option>';
+                    for ( var id in services.contents ) {
+                        serviceOptionsHtml += '<option value="'+ id +'">'+ services.contents[ id ].label +'</option>';
                     }
                     YAHOO.util.Dom.get( 'changeLocationNewService' ).innerHTML = serviceOptionsHtml;
                 },
-                getServices: function() {
-					
-                    var setServiceOptions = this.setServiceOptions;
-                    var callback = { 
-                        'success': function( o ) {
-							services = YAHOO.lang.JSON.parse(o.responseText).services.services;
-                            defaultService = YAHOO.lang.JSON.parse(o.responseText).services.defaultService;
-                            setServiceOptions( services );
-                        }
-                    };
-
-                    YAHOO.util.Connect.asyncRequest('GET', api.getActionUrl( 'services' ), callback, null );
-
-                },
-				
                 setService:setService,
 		update:update
 	}
@@ -996,15 +980,28 @@ FD.Favorites = function() {
 	YAHOO.util.Event.on("favsList", "mouseout", handleMouseOut);
 }
 
+FD.init = function()
+{
+    infoBar = new FD.InfoBar();
+    api = new FD.api();
+
+    var callback = {
+        'success': function( o ) {
+            services = YAHOO.lang.JSON.parse(o.responseText).services;
+            infoBar.setServiceOptions( services );
+        }
+    };
+
+    YAHOO.util.Connect.asyncRequest('GET', api.getActionUrl( 'services' ), callback, null );
+};
+
 YAHOO.util.Event.addListener(window, "load", function() {
 
-    api = new FD.api();
+        FD.init();
     userFeedback = new FD.UserFeedback();
 	var bookmarkDir = History.getBookmarkedState("path");
 	var bookmarkService = History.getBookmarkedState("service");
 	
-	infoBar = new FD.InfoBar(); // TODO does this need to be so widely scoped?
-        infoBar.getServices();
 	var dirList = new FD.DirList();
 	dirTable = dirList.init(bookmarkDir, bookmarkService);
 	var inspector = new FD.FileInspector();
