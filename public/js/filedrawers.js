@@ -15,63 +15,6 @@ if (typeof FD == "undefined" || ! FD) {
 	var FD = {};
 }
 
-function roundNum( num )
-{
-	return Math.round( num * Math.pow( 10, 1 )) / 
-		Math.pow( 10, 1 );
-}
-
-function urlEncode( data ) {
-    var query_parts = [];
-    for ( var key in data ) {
-        value = data[ key ];
-        if ( typeof value == 'string' ) {
-            query_parts.push( escape( key ) +'='+ escape( value ));
-        } else if ( typeof value == 'object' ) {
-            if ( value instanceof Array ) {
-                for ( var i in value ) {
-                    query_parts.push( escape( key ) +'[]='+ escape( value[ i ] ));
-                }
-            } else if ( value instanceof String ) {
-                query_parts.push( escape( key ) +'='+ escape( value ));
-            } else {
-                console.warn( key +' is not a String or an Array' );
-            }
-        }
-    }
-
-    return query_parts.join( '&' );
-}
-
-function pathConcat()
-{
-    var sep = '/';
-
-    var path = '';
-    if ( arguments[ 0 ].charAt( 0 ) == sep ) {
-        path = path.concat( sep );
-    }
-
-    var pathParts = [];
-    var part;
-
-    for ( var i = 0; i < arguments.length; i++ ) {
-        part = arguments[ i ];
-        if ( part.charAt( 0 ) == sep ) {
-            part = part.slice( 1 );
-        }
-        if ( part.charAt( part.length - 1 ) == sep ) {
-            part = part.slice( 0, part.length - 1 );
-        }
-
-        if ( part != '' ) {
-            pathParts.push( part );
-        }
-    }
-
-    return path.concat( pathParts.join( '/' ));
-}
-
 FD.api = function() {
     var _apiUrl = baseUrl +'webservices/';
     var _urlParams = { 'format': 'json', 'wappver': webAppVersion.toString() };
@@ -121,7 +64,7 @@ FD.api = function() {
                 params = this.getUrlParams( params );
             }
 
-            var query = urlEncode( params );
+            var query = FD.Utils.urlEncode( params );
             if ( query != '' ) {
                 query = '?'+ query;
             }
@@ -136,7 +79,7 @@ FD.api = function() {
 
             var getTokenSuccessHandler = function(o) {
                     data[ 'formToken' ] = YAHOO.lang.JSON.parse(o.responseText).formToken;
-                    YAHOO.util.Connect.asyncRequest('POST', actionUrl, callback, urlEncode( data ));
+                    YAHOO.util.Connect.asyncRequest('POST', actionUrl, callback, FD.Utils.urlEncode( data ));
             };
 
             var getTokenFailureHandler = function(o) {
@@ -229,7 +172,66 @@ FD.Utils = {
 		}
 
 		return size;
-	}
+	},
+
+    roundNum: function roundNum( num )
+    {
+        return Math.round( num * Math.pow( 10, 1 )) /
+            Math.pow( 10, 1 );
+    },
+
+    urlEncode: function( data )
+    {
+        var query_parts = [];
+        for ( var key in data ) {
+            value = data[ key ];
+            if ( typeof value == 'string' ) {
+                query_parts.push( escape( key ) +'='+ escape( value ));
+            } else if ( typeof value == 'object' ) {
+                if ( value instanceof Array ) {
+                    for ( var i in value ) {
+                        query_parts.push( escape( key ) +'[]='+ escape( value[ i ] ));
+                    }
+                } else if ( value instanceof String ) {
+                    query_parts.push( escape( key ) +'='+ escape( value ));
+                } else {
+                    console.warn( key +' is not a String or an Array' );
+                }
+            }
+        }
+
+        return query_parts.join( '&' );
+    },
+
+    pathConcat: function()
+    {
+        var sep = '/';
+
+        var path = '';
+        if ( arguments[ 0 ].charAt( 0 ) == sep ) {
+            path = path.concat( sep );
+        }
+
+        var pathParts = [];
+        var part;
+
+        for ( var i = 0; i < arguments.length; i++ ) {
+            part = arguments[ i ];
+            if ( part.charAt( 0 ) == sep ) {
+                part = part.slice( 1 );
+            }
+            if ( part.charAt( part.length - 1 ) == sep ) {
+                part = part.slice( 0, part.length - 1 );
+            }
+
+            if ( part != '' ) {
+                pathParts.push( part );
+            }
+        }
+
+        return path.concat( pathParts.join( '/' ));
+    }
+
 };
 
 FD.cutCopyEvent = new YAHOO.util.CustomEvent('cutCopyEvent');
@@ -250,23 +252,7 @@ FD.DirList = function() {
 	
 	formatBytes = function(elCell, oRecord, oColumn, oData)	{
 		var bytes = oData;
-		var str;
-
-		if ( bytes >= 1073741824 ) {
-			str = roundNum( bytes / 1073741824 ) + ' GB';
-		} else if ( bytes >= 1048576 ) {
-			str = roundNum( bytes / 1048576 ) + ' MB';
-		} else if ( bytes > 102 ) {
-			str =  roundNum( bytes / 1024 ) + ' KB';
-		} else if ( bytes > 0 ) {
-			str = bytes + ' B';
-		} else if ( true /*readPriv*/ ) { // size unknown - file is probably not readable
-			str = '';
-		} else {
-			str = '';
-		}
-
-		elCell.innerHTML = str;
+		elCell.innerHTML = FD.Utils.formatBytes(bytes);
 	}
 	
 	formatType = function(elCell, oRecord, oColumn, sData) {					
@@ -297,7 +283,7 @@ FD.DirList = function() {
 	handleTableClick = function(oArgs) {
 					
 		if (oArgs.target.id == "folderLink") {
-			var newDir = pathConcat( currentURL, oArgs.target.innerHTML );
+			var newDir = FD.Utils.pathConcat( currentURL, oArgs.target.innerHTML );
 			userFeedback.hideFeedback();
 			History.navigate("path", newDir);
 		}		
@@ -374,7 +360,7 @@ FD.DirList = function() {
 	
 	return {
 		init: function(bookmarkDir, bookmarkService) {
-			
+
 			myDataSource = new YAHOO.util.DataSource( '' );  // first call
 			myDataSource.responseType = YAHOO.util.DataSource.TYPE_JSON; 
 			myDataSource.responseSchema = {
