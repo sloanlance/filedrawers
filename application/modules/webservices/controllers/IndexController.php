@@ -48,7 +48,7 @@ class Webservices_IndexController extends Webservices_FDController {
             $this->view->services[ 'services' ][ $id ][ 'home' ] = $service->getHomedir();
         }
 
-        $this->view->services[ 'default' ] = Zend_Registry::get('config')->filesystem->default;
+        $this->view->services[ 'defaultService' ] = Zend_Registry::get('config')->filesystem->default;
     }
 
 

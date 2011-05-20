@@ -723,7 +723,7 @@ FD.InfoBar = function() {
                     var callback = { 
                         'success': function( o ) {
 							services = YAHOO.lang.JSON.parse(o.responseText).services.services;
-                            defaultService = YAHOO.lang.JSON.parse(o.responseText).services.default;
+                            defaultService = YAHOO.lang.JSON.parse(o.responseText).services.defaultService;
                             setServiceOptions( services );
                         }
                     };
