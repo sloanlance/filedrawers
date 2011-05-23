@@ -241,6 +241,15 @@ body {
     vertical-align: middle;
 }
 
+#favsList li #editFavBtns{
+    display: none;
+}
+
+#favsList li:hover #editFavBtns{
+    display: inline;
+}
+
+
 #lone_content {
 	margin-left: 100px;
 	margin-right: 120px;

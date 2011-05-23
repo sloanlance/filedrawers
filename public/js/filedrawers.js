@@ -161,23 +161,28 @@ FD.UserFeedback = function() {
 				YAHOO.util.Dom.setStyle('spinner', 'display', 'inline');
 				timer1 = setTimeout("userFeedback.displayLoading()", 1000);
 			}
-			if (action == 'list') {
+			
+            /* 
+            if (action == 'list') {
 				timer2 = setTimeout("userFeedback.displayCancel()", 3000);
 			}
+            */
 		},
 		
 		displayLoading: function() {
 			YAHOO.util.Dom.setStyle('loadingTxt', 'display', 'inline');
 		},
 		
-		displayCancel: function() {
+		/*
+        displayCancel: function() {
 			YAHOO.util.Dom.setStyle('cancelBtn', 'display', 'inline');
 		},
+        */
 		
 		stopTimer: function() {
 			YAHOO.util.Dom.setStyle('spinner', 'display', 'none');
 			YAHOO.util.Dom.setStyle('loadingTxt', 'display', 'none');
-			YAHOO.util.Dom.setStyle('cancelBtn', 'display', 'none');
+			//YAHOO.util.Dom.setStyle('cancelBtn', 'display', 'none');
 			clearTimeout(timer1);
 			clearTimeout(timer2);
 		},
@@ -663,13 +668,17 @@ FD.InfoBar = function() {
 			var newState = {"path": YAHOO.util.Dom.get( 'changeLocationNewPath' ).value, "service": YAHOO.util.Dom.get( 'changeLocationNewService' ).value};
 			
 			//History.navigate("dirTable", YAHOO.util.Dom.get( 'changeLocationNewPath' ).value );
+            console.warn( "path: " + YAHOO.util.Dom.get( 'changeLocationNewPath' ).value + "  |  service: " + YAHOO.util.Dom.get( 'changeLocationNewService' ).value );
 			History.multiNavigate( newState );
 			
-		} else if (target.id == 'changeLocationCancel') {
+		} 
+            /*
+            else if (target.id == 'changeLocationCancel') {
             YAHOO.util.Dom.setStyle( currentLocation, 'display', 'inline' );
             YAHOO.util.Dom.setStyle( changeLocation, 'display', 'none' );
                         // TODO abort the request
 		}
+            */
 	};
 
 	var handleSubmit = function(e) {
@@ -988,26 +997,8 @@ FD.Favorites = function() {
 		
 		YAHOO.util.Dom.get('favsLinks').innerHTML = linksListHTML;
 	});
-	
-	var handleMouseOver = function(e) {
-        if (YAHOO.util.Event.getTarget(e).nodeName.toUpperCase() == "A") {
-            options = YAHOO.util.Event.getTarget(e).nextSibling;
-            YAHOO.util.Dom.setStyle( options, 'display', 'inline' );
-        }
-        
-	};
-	
-	var handleMouseOut = function(e) {
-		if (YAHOO.util.Event.getTarget(e).nodeName.toUpperCase() == "LI") {
-            options = YAHOO.util.Event.getTarget(e).lastChild;
-            YAHOO.util.Dom.setStyle( options, 'display', 'none' );
-        }
-	};
 
 	myFavsSource.sendRequest( "list?format=json" );
-    
-    YAHOO.util.Event.on("favsList", "mouseover", handleMouseOver);
-	YAHOO.util.Event.on("favsList", "mouseout", handleMouseOut);
 }
 
 YAHOO.util.Event.addListener(window, "load", function() {
