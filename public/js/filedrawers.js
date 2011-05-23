@@ -683,7 +683,6 @@ FD.InfoBar = function() {
                 YAHOO.util.Dom.get( 'currentLocationService' ).innerHTML = services.contents[ service ].label;
             }
             //YAHOO.util.Dom.get( 'currentLocationService' ).innerHTML = service;
-            console.log('setting service to: ' +  service);
             api.setUrlParam( 'service', service );
         };
 	YAHOO.util.Event.on('infoBar', 'click', handleClick);
@@ -1000,8 +999,8 @@ FD.History = function()
             var pathInitialState = YAHOO.util.History.getBookmarkedState("path") || services.contents[services.defaultService].home;
             var serviceInitialState = YAHOO.util.History.getBookmarkedState("service") || services.defaultService;
 
-            YAHOO.util.History.register('path', pathInitialState, pathStateChangeHandler);
             YAHOO.util.History.register('service', serviceInitialState, serviceStateChangeHandler);
+            YAHOO.util.History.register('path', pathInitialState, pathStateChangeHandler);
             YAHOO.util.History.initialize("yui-history-field", "yui-history-iframe");
 
             dirTable = dirList.init(pathInitialState, serviceInitialState);
@@ -1026,9 +1025,8 @@ FD.History = function()
             if (typeof service == 'undefined' ) {
                 service = YAHOO.util.History.getCurrentState('service');
             }
-            console.log('path: ' + path + ' service: ' + service );
-            infoBar.setService(service);
-            YAHOO.util.History.multiNavigate({"path": path, "service": service});
+
+            YAHOO.util.History.multiNavigate({"service": service, "path": path});
         } 
     };
 };
