@@ -19,9 +19,9 @@ class Filedrawers_Filetransfer {
         $this->_stats = @fstat($this->_handle);
 
         if ( ! is_array($this->_stats)) {
-            throw new Filedrawers_Filetransfer_Exception(
-                'The specified file to transfer does not exist or is inaccessible.', 404
-            );
+           	throw new Filedrawers_Filetransfer_Exception(
+              	 'The specified file to transfer does not exist or is inaccessible.', 404
+           	);
         }
     }
 

@@ -42,13 +42,13 @@ class Webservices_IndexController extends Webservices_FDController {
         $this->view->services = array();
         $serviceInfo = Zend_Registry::get('config')->filesystem->services->toArray();
         foreach( $this->_availableServices as $id => $serviceClass ) {
-            $this->view->services[ 'services' ][ $id ] = $serviceInfo[ $id ];
+            $this->view->services[ 'contents' ][ $id ] = $serviceInfo[ $id ];
             $service = new $serviceClass;
             $this->init();
-            $this->view->services[ 'services' ][ $id ][ 'home' ] = $service->getHomedir();
+            $this->view->services[ 'contents' ][ $id ][ 'home' ] = $service->getHomedir();
         }
 
-        $this->view->services[ 'default' ] = Zend_Registry::get('config')->filesystem->default;
+        $this->view->services[ 'defaultService' ] = Zend_Registry::get('config')->filesystem->default;
     }
 
 
