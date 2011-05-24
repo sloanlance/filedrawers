@@ -233,8 +233,13 @@ body {
     height: 16px;
 }
 
-#favsList li span{
+#favsList li form {
     display: none;
+}
+
+#addBtn {
+    float: right;
+    padding: 2px;
 }
 
 #editFavBtns img {

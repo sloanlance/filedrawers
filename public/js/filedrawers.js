@@ -620,8 +620,8 @@ FD.InfoBar = function() {
 
 	var currentDir,
 	locationDiv = YAHOO.util.Dom.get('location'),
-        currentLocation = YAHOO.util.Dom.get( 'currentLocation' ),
-        changeLocation  = YAHOO.util.Dom.get( 'changeLocation' ),
+    currentLocation = YAHOO.util.Dom.get( 'currentLocation' ),
+    changeLocation  = YAHOO.util.Dom.get( 'changeLocation' ),
 	viewHTML;
 
 	var update = function(oArgs) {};
@@ -656,7 +656,7 @@ FD.InfoBar = function() {
             setService( YAHOO.util.Dom.get( 'changeLocationNewService' ).value );
 			userFeedback.hideFeedback();
 			
-                    History.navigate(YAHOO.util.Dom.get('changeLocationNewPath').value, YAHOO.util.Dom.get('changeLocationNewService').value);
+            History.navigate(YAHOO.util.Dom.get('changeLocationNewPath').value, YAHOO.util.Dom.get('changeLocationNewService').value);
 			
 		} 
             /*
@@ -960,15 +960,33 @@ FD.Favorites = function() {
 				
 		var linksListHTML = '<ul>';	
 		for ( i=0; i < myFavs.contents.count; i++ ) {
-			linksListHTML += '<li><a id="folderLink" href="' + myFavs.contents.contents[i].path + '">' + myFavs.contents.contents[i].name + '</a>';
-			linksListHTML += '<span id="editFavBtns">&nbsp;&nbsp;<img src="images/pencil.png" />&nbsp;<img src="images/delete.png" /></span></li>';
+			linksListHTML += '<li><form id="changeFav"><input type="text" name="editFav" id="editFav" size="10" value="' + myFavs.contents.contents[i].name + '"/></form>';
+            linksListHTML += '<span id="currentFav"><a id="folderLink" href="' + myFavs.contents.contents[i].path + '">' + myFavs.contents.contents[i].name + '</a>';
+			linksListHTML += '<span id="editFavBtns">&nbsp;&nbsp;<a href="#edit"><img src="images/pencil.png" id="editBtn" /></a>&nbsp;<a href="#delete"><img src="images/delete.png" id="deleBtn"/></a></span></span></li>';
 		}		
 		linksListHTML += '</ul>';
 		
 		YAHOO.util.Dom.get('favsLinks').innerHTML = linksListHTML;
 	});
+    
+    var editFav = function(target) {
+        if (target.id == "editBtn") {
+        
+            var thisCurrentFav = target.parentNode.parentNode.parentNode;
+            var thisChangeFav = target.parentNode.parentNode.parentNode.previousSibling;
+                        
+            YAHOO.util.Dom.setStyle( thisCurrentFav, 'display', 'none' );
+            YAHOO.util.Dom.setStyle( thisChangeFav, 'display', 'inline' );
+        } else if (target.id == "deleBtn") {
+            console.warn("delete this favorite");
+        }
+    }
 
 	myFavsSource.sendRequest( "list?format=json" );
+    
+    return {
+        editFav:editFav
+    }
 }
 
 FD.History = function()
@@ -1070,10 +1088,14 @@ YAHOO.util.Event.addListener(window, "load", function() {
 	});	
 	
 	YAHOO.util.Event.on('favsList', 'click', function(e) {
-		if (e.target.href) {	
-			YAHOO.util.Event.preventDefault(e);
-			userFeedback.hideFeedback();
-			History.navigate(e.target.getAttribute("href"));
-		}
+        YAHOO.util.Event.preventDefault(e);
+        if (e.target.id == "folderLink") {
+                userFeedback.hideFeedback();
+                History.navigate(e.target.getAttribute("href"));
+        } else if (e.target.parentNode.href) {
+            //console.warn(e.target.parentNode.href)
+            favorites.editFav(e.target);
+        }
+		
 	});	
 });
