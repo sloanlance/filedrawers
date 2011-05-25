@@ -955,6 +955,9 @@ FD.Favorites = function() {
 	*/
 	
 	myFavsSource.subscribe('responseEvent', function(oDS){
+    
+        var thisCurrentFav,
+        thisChangeFav;
 		
 		myFavs = YAHOO.lang.JSON.parse(oDS.response.responseText);
 				
@@ -972,8 +975,10 @@ FD.Favorites = function() {
     var editFav = function(target) {
         if (target.id == "editBtn") {
         
-            var thisCurrentFav = target.parentNode.parentNode.parentNode;
-            var thisChangeFav = target.parentNode.parentNode.parentNode.previousSibling;
+            klEsc.enable();
+        
+            thisCurrentFav = target.parentNode.parentNode.parentNode;
+            thisChangeFav = target.parentNode.parentNode.parentNode.previousSibling;
                         
             YAHOO.util.Dom.setStyle( thisCurrentFav, 'display', 'none' );
             YAHOO.util.Dom.setStyle( thisChangeFav, 'display', 'inline' );
@@ -981,8 +986,32 @@ FD.Favorites = function() {
             console.warn("delete this favorite");
         }
     }
+    
+    var handleFavChange = function(e) {
+        YAHOO.util.Event.preventDefault(e);
+        console.warn("fav change submitted");
+        klEsc.disable();
+        
+        YAHOO.util.Dom.setStyle( thisCurrentFav, 'display', 'inline' );
+        YAHOO.util.Dom.setStyle( thisChangeFav, 'display', 'none' );
+        
+    }
+    
+    var handleFavCancel = function(e) {
+        YAHOO.util.Event.preventDefault(e);
+        console.warn("fav change cancelled");
+        klEsc.disable();
+        
+        YAHOO.util.Dom.setStyle( thisCurrentFav, 'display', 'inline' );
+        YAHOO.util.Dom.setStyle( thisChangeFav, 'display', 'none' );
+    }
 
 	myFavsSource.sendRequest( "list?format=json" );
+    
+    var klEsc = new YAHOO.util.KeyListener(document, { keys:27 }, { fn:handleFavCancel } );
+    
+    YAHOO.util.Event.on('changeFav', 'submit', handleFavChange);
+    YAHOO.util.Event.on('changeFav', 'cancel', handleFavCancel);
     
     return {
         editFav:editFav
