@@ -15,13 +15,7 @@ class Webservices_FavoritesController extends Webservices_FiledrawersControllerA
       $this->contexts['add'] = array('xml', 'json', 'html');
       $this->contexts['rename'] = array('xml', 'json', 'html');
       $this->contexts['delete'] = array('xml', 'json', 'html');
-      parent::init(); 
-      
-    }
-
-    public function preDispatch()
-    {
-       parent::preDispatch();
+      parent::init();
     }
 
     public function listAction()
@@ -72,34 +66,40 @@ class Webservices_FavoritesController extends Webservices_FiledrawersControllerA
         Zend_Registry::set('filesystem', $this->_filesystem);
     }
 
-
     public function addAction()
     {
-        $favs = $this->_filesystem->addFavs();
-        $this->view->contents = $favs;
-    }
-    
-    public function renameAction()
-    {
-        $this->_form = new Form_RenameForm($this->_csrfToken,
-        $this->_request->getParam('path'));
-echo $this->_form;
-
+        $this->_form = new Form_AddForm($this->_csrfToken, $this->_request->getParam('path'));
+              
         if ( ! $this->getRequest()->isPost()) {
-//echo "Going on";
             return;
         }
         else if ( ! $this->_form->isValid($_POST)) {
             $this->view->errorMsg = $this->_form->getMessages(null, true);
             return;
         }
-
+       
         $values = $this->_form->getValidValues($_POST);
-/*
-?><pre><?
-echo "DUmp data - " .var_dump($values);
-?></pre><?
-*/
+        $this->_filesystem->addFavs($values['path'], $values['folderName']);
+        
+        $this->view->status = 'success';
+        $this->view->message = 'Successfully created favorites link.';
+
+    }
+    
+    public function renameAction()
+    {
+        $this->_form = new Form_RenameForm($this->_csrfToken,
+        $this->_request->getParam('path'));
+    
+        if ( ! $this->getRequest()->isPost()) {
+            return;
+        }
+        else if ( ! $this->_form->isValid($_POST)) {
+            $this->view->errorMsg = $this->_form->getMessages(null, true);
+            return;
+        }
+   
+        $values = $this->_form->getValidValues($_POST);
 
         $oldPath = $values['path'] . '/' . $values['oldName'];
         $newPath = $values['path'] . '/' . $values['newName'];

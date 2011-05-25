@@ -5,7 +5,7 @@
  * All rights reserved.
  */
 
-class Webservices_IndexController extends Webservices_FiledrawersControllerAbstract {
+class Webservices_IndexController extends Webservices_FDController {
 
     public function init()
     {
@@ -20,14 +20,9 @@ class Webservices_IndexController extends Webservices_FiledrawersControllerAbstr
         $this->contexts['gettoken'] = array('xml', 'json', 'html');
         $this->contexts['uploadstatus'] = array('xml', 'json', 'html');  
         $this->contexts['uploadfinish'] = array('xml', 'json', 'html');
-	 parent::init(); 
+        parent::init(); 
     }
     
-    public function preDispatch()
-    {
-        parent::preDispatch(); 
-    }
-
 
     public function postDispatch()
     {
@@ -42,13 +37,13 @@ class Webservices_IndexController extends Webservices_FiledrawersControllerAbstr
         $this->view->services = array();
         $serviceInfo = Zend_Registry::get('config')->filesystem->services->toArray();
         foreach( $this->_availableServices as $id => $serviceClass ) {
-            $this->view->services[ 'services' ][ $id ] = $serviceInfo[ $id ];
+            $this->view->services[ 'contents' ][ $id ] = $serviceInfo[ $id ];
             $service = new $serviceClass;
             $this->init();
-            $this->view->services[ 'services' ][ $id ][ 'home' ] = $service->getHomedir();
+            $this->view->services[ 'contents' ][ $id ][ 'home' ] = $service->getHomedir();
         }
 
-        $this->view->services[ 'default' ] = Zend_Registry::get('config')->filesystem->default;
+        $this->view->services[ 'defaultService' ] = Zend_Registry::get('config')->filesystem->default;
     }
 
 
@@ -407,3 +402,4 @@ class Webservices_IndexController extends Webservices_FiledrawersControllerAbstr
         return true;
     }
  }
+

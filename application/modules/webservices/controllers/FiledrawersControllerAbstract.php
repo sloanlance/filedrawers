@@ -8,6 +8,7 @@ abstract class Webservices_FiledrawersControllerAbstract extends Zend_Controller
 	protected $_baseFilter = array('*' => 'StringTrim');
 	protected $_context = null;
  	protected $_availableServices = array();
+        protected $_request = null;
         public $contexts = array();      	
 
     // Common methods
@@ -55,7 +56,7 @@ abstract class Webservices_FiledrawersControllerAbstract extends Zend_Controller
         );
         $options = array('inputNamespace' => 'Filedrawers_Validate');
         $input = new Zend_Filter_Input($this->_baseFilter, $validators, $_GET, $options);
-
+       
         if ( ! $input->isValid( 'service' )) {
             $this->view->errorMsg = array( 'service' => array( 'invalid' => 'invalid service specified' ));
             throw( new Zend_Exception( 'service parameter must be one of: '. implode( ', ', array_keys( $this->_availableServices ))));
@@ -81,5 +82,14 @@ abstract class Webservices_FiledrawersControllerAbstract extends Zend_Controller
             Zend_Registry::set('filesystem', $this->_filesystem); 
         }
     }
+
+
+     public function postDispatch()
+    {
+        if (is_null($this->_context->getCurrentContext()) && $this->_form) {
+            $this->view->form = $this->_form;
+        }
+    }
+
     
 }
