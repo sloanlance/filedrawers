@@ -10,7 +10,7 @@ class Service_MainstreamStorage extends Filedrawers_Filesystem_Url_Cifs {
 
     public function getUrl( $filename = null )
     {
-		return( $url = 'smb://'. $this->_shareName .'.m.storage.umich.edu'.$this->pathConcat( $this->_path, $filename ) );
+        return( $url = 'smb://'. $this->_shareName .'.m.storage.umich.edu'.$this->pathConcat( $this->_path, $filename ) );
     }
 
 
@@ -56,17 +56,21 @@ class Service_MainstreamStorage extends Filedrawers_Filesystem_Url_Cifs {
             return parent::getInfo( $path );
         }
     }
-	private function mkdir_tree( $path )
+    
+
+    private function mkdir_tree( $path )
+    {
+        if ( !is_dir( dirname( $this->getUrl( $path ) ) ) )
 	{
-		if ( !is_dir( dirname( $this->getUrl( $path ) ) ) )
-		{
-			$this->mkdir_tree( dirname( $path ) );
-		}
+            $this->mkdir_tree( dirname( $path ) );
+        }
         if ( ! mkdir($this->getUrl( $path), 0744 )) {
             throw new Filedrawers_Filesystem_Exception(sprintf(
                 'Unable to create the directory "%s".', $name), 5);
         }
-	}
+    }
+   
+ 
     public function createDirectory($path, $name)
     {
         $this->setPath( $path );
@@ -74,14 +78,15 @@ class Service_MainstreamStorage extends Filedrawers_Filesystem_Url_Cifs {
 	$this->mkdir_tree( $name ); 
     }
 
+
     public function listFavs()
     {
-        $table =  new Model_UserFavorites;
-        $ms_list =  $table->listFavs();
+        $favsTbl =  new Model_UserFavorites;
+        $listFavs =  $favsTbl->listFavs();
         $myFavs = array( 'count' => 0 );
         $c = 0;
 
-        foreach( $ms_list as $row ){ 
+        foreach( $listFavs as $row ){ 
            foreach( $row as $column => $value ) {
 
                if ($column == 'servicename'){ 
@@ -98,8 +103,8 @@ class Service_MainstreamStorage extends Filedrawers_Filesystem_Url_Cifs {
            }
            $c++; 
         }
-        $myFavs['count'] = $c;
 
+        $myFavs['count'] = $c;
         return $myFavs;
     }
 
@@ -107,7 +112,7 @@ class Service_MainstreamStorage extends Filedrawers_Filesystem_Url_Cifs {
     public function addFavs($path,$foldername)
     {
          $uniqname = $this->getUser();
-         $table = new Model_UserFavorites;
+         $favsTbl = new Model_UserFavorites;
          $action = 'add';
 
          $favs = array(
@@ -117,7 +122,7 @@ class Service_MainstreamStorage extends Filedrawers_Filesystem_Url_Cifs {
             'foldername' => $foldername
          );
       
-         $isValidInsert = $table->insertFavs($favs,$action);
+         $isValidInsert = $favsTbl->insertFavs($favs,$action);
          if (! $isValidInsert ) {
             throw new Filedrawers_Filesystem_Exception(sprintf(
                 'Unable to add foldername'), 2);
@@ -125,6 +130,4 @@ class Service_MainstreamStorage extends Filedrawers_Filesystem_Url_Cifs {
 
     }
 
-
 }
-
