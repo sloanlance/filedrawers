@@ -41,16 +41,11 @@ class Service_Ifs extends Filedrawers_Filesystem_Mounted_Afs {
         for ( $i = 0, $c = 0; $i < count($files['contents']); $i++) {
             foreach( $files['contents'][$i] as $key => $value ) {
                 if ( $key == 'filename' ) {
-                    if ( ( is_link( $favoritesPath .$value )) ) {
+					if ( is_dir($favoritesPath .$value) && ( is_link( $favoritesPath .$value )) ) {
                         $myFavs['contents'][$c]['service'] = 'IFS';
                         $myFavs['contents'][$c]['name'] = $value;
-                        $myFavs['contents'][$c]['path'] = readlink( $favoritesPath .$value );
+                        $myFavs['contents'][$c]['path'] = realpath( $favoritesPath .$value );
                         $c++;
-                    } elseif ( !(is_dir($favoritesPath .$value))) {
-						$myFavs['contents'][$c]['service'] = 'IFS';
-						$myFavs['contents'][$c]['name'] = $value;
-						$myFavs['contents'][$c]['path'] = $homedir;
-						$c++;
 					} 
                 }
             }
@@ -58,5 +53,52 @@ class Service_Ifs extends Filedrawers_Filesystem_Mounted_Afs {
         $myFavs['count'] = $c;
         return $myFavs;
     }
+
+	public function addFavs( $path, $name )
+	{
+		//adding directory
+		$name = trim( $name, $this->ILLEGAL_DIR_CHARS );
+		$homedir = $this->getHomedir();
+		$favoritesPath = $homedir . '/Favorites';
+        $newFav = $favoritesPath .'/'.$name;
+
+
+		if ($this->_fileExists($newFav)) {
+			// ??
+			throw new Filedrawers_Filesystem_Exception(sprintf(
+            	'A Fav with this name already exists "%s".', $newFav), 5);
+		}
+
+
+        if ( is_dir( $path )) {
+            // add symlink
+            symlink( $path, $newFav );
+		} else {
+			// not a dir, fail?
+		}
+	}
+
+	public function deleteFavs( $name ) {
+		$homedir = $this->getHomedir();
+        $favoritesPath = $homedir . '/Favorites';
+		$filename = $favoritesPath .'/'.$name;
+		if ( is_link( $filename ) ) {
+			if ( ! @unlink($filename) ) {
+				throw new Filedrawers_Filesystem_Exception(sprintf(
+                        'Unable to remove the file "%s".', $filename), 5);
+			}
+		}
+	}
+
+	public function renameFavs( $oldPath, $newPath )
+	{
+		if ( !is_link( $oldPath ) ) {
+			// do nothing
+			throw new Filedrawers_Filesystem_Exception(sprintf(
+                'Unable to rename the file "%s".', basename($oldPath)), 2);
+		}
+
+		rename( $oldPath, $newPath );
+	}
 
 }

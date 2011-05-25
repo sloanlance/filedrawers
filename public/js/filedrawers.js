@@ -7,69 +7,15 @@ cutCopyURL,
 cutCopyFiles = [],
 clipboardState,
 baseUrl = '',
+dirList,
+inspector,
 timer1,
 timer2,
+services = {},
 History = YAHOO.util.History;
 
 if (typeof FD == "undefined" || ! FD) {
 	var FD = {};
-}
-
-function roundNum( num )
-{
-	return Math.round( num * Math.pow( 10, 1 )) / 
-		Math.pow( 10, 1 );
-}
-
-function urlEncode( data ) {
-    var query_parts = [];
-    for ( var key in data ) {
-        value = data[ key ];
-        if ( typeof value == 'string' ) {
-            query_parts.push( escape( key ) +'='+ escape( value ));
-        } else if ( typeof value == 'object' ) {
-            if ( value instanceof Array ) {
-                for ( var i in value ) {
-                    query_parts.push( escape( key ) +'[]='+ escape( value[ i ] ));
-                }
-            } else if ( value instanceof String ) {
-                query_parts.push( escape( key ) +'='+ escape( value ));
-            } else {
-                console.warn( key +' is not a String or an Array' );
-            }
-        }
-    }
-
-    return query_parts.join( '&' );
-}
-
-function pathConcat()
-{
-    var sep = '/';
-
-    var path = '';
-    if ( arguments[ 0 ].charAt( 0 ) == sep ) {
-        path = path.concat( sep );
-    }
-
-    var pathParts = [];
-    var part;
-
-    for ( var i = 0; i < arguments.length; i++ ) {
-        part = arguments[ i ];
-        if ( part.charAt( 0 ) == sep ) {
-            part = part.slice( 1 );
-        }
-        if ( part.charAt( part.length - 1 ) == sep ) {
-            part = part.slice( 0, part.length - 1 );
-        }
-
-        if ( part != '' ) {
-            pathParts.push( part );
-        }
-    }
-
-    return path.concat( pathParts.join( '/' ));
 }
 
 FD.api = function() {
@@ -92,7 +38,7 @@ FD.api = function() {
             return type
         }
 
-        return merged_params;
+    return merged_params;
     };
     var _setParam = function( type, key, value ) {
         type[ key ] = value;
@@ -121,7 +67,7 @@ FD.api = function() {
                 params = this.getUrlParams( params );
             }
 
-            var query = urlEncode( params );
+            var query = FD.Utils.urlEncode( params );
             if ( query != '' ) {
                 query = '?'+ query;
             }
@@ -136,7 +82,7 @@ FD.api = function() {
 
             var getTokenSuccessHandler = function(o) {
                     data[ 'formToken' ] = YAHOO.lang.JSON.parse(o.responseText).formToken;
-                    YAHOO.util.Connect.asyncRequest('POST', actionUrl, callback, urlEncode( data ));
+                    YAHOO.util.Connect.asyncRequest('POST', actionUrl, callback, FD.Utils.urlEncode( data ));
             };
 
             var getTokenFailureHandler = function(o) {
@@ -161,23 +107,28 @@ FD.UserFeedback = function() {
 				YAHOO.util.Dom.setStyle('spinner', 'display', 'inline');
 				timer1 = setTimeout("userFeedback.displayLoading()", 1000);
 			}
-			if (action == 'list') {
+			
+            /* 
+            if (action == 'list') {
 				timer2 = setTimeout("userFeedback.displayCancel()", 3000);
 			}
+            */
 		},
 		
 		displayLoading: function() {
 			YAHOO.util.Dom.setStyle('loadingTxt', 'display', 'inline');
 		},
 		
-		displayCancel: function() {
+		/*
+        displayCancel: function() {
 			YAHOO.util.Dom.setStyle('cancelBtn', 'display', 'inline');
 		},
+        */
 		
 		stopTimer: function() {
 			YAHOO.util.Dom.setStyle('spinner', 'display', 'none');
 			YAHOO.util.Dom.setStyle('loadingTxt', 'display', 'none');
-			YAHOO.util.Dom.setStyle('cancelBtn', 'display', 'none');
+			//YAHOO.util.Dom.setStyle('cancelBtn', 'display', 'none');
 			clearTimeout(timer1);
 			clearTimeout(timer2);
 		},
@@ -207,29 +158,88 @@ FD.UserFeedback = function() {
 	}
 }
 
-// redundant - make dirTable formating use this function.
 FD.Utils = {
 
-	formatBytes: function(bytes) {
-		bytes = parseInt(bytes);
-		var size = null;
+    formatBytes: function(bytes)
+    {
+        bytes = parseInt(bytes);
+        var size = null;
 
-		if ( bytes >= 1073741824 ) {
-			size = (Math.round((bytes/1073741824)*100)/100) + ' GB';
-		} else if ( bytes >= 1048576 ) {
-			size =(Math.round((bytes/1048576)*100)/100) + ' MB';
-		} else if ( bytes >= 1024 ) {
-			size = (Math.round((bytes/1024)*100)/100) + ' KB';
-		} else if ( bytes > 0 ) {
-			size = bytes + ' Bytes';
-		} else if ( true /*readPriv*/ ) { // size unknown - file is probably not readable
-			size = 'empty';
-		} else {
-			size = '-';
-		}
+        if ( bytes >= 1073741824 ) {
+            size = (Math.round((bytes/1073741824)*100)/100) + ' GB';
+        } else if ( bytes >= 1048576 ) {
+            size =(Math.round((bytes/1048576)*100)/100) + ' MB';
+        } else if ( bytes >= 1024 ) {
+            size = (Math.round((bytes/1024)*100)/100) + ' KB';
+        } else if ( bytes > 0 ) {
+            size = bytes + ' Bytes';
+        } else if ( true /*readPriv*/ ) { // size unknown - file is probably not readable
+            size = 'empty';
+        } else {
+            size = '-';
+        }
 
-		return size;
-	}
+        return size;
+    },
+
+    roundNum: function roundNum( num )
+    {
+        return Math.round( num * Math.pow( 10, 1 )) /
+            Math.pow( 10, 1 );
+    },
+
+    urlEncode: function( data )
+    {
+        var query_parts = [];
+        for ( var key in data ) {
+            value = data[ key ];
+            if ( typeof value == 'string' ) {
+                query_parts.push( escape( key ) +'='+ escape( value ));
+            } else if ( typeof value == 'object' ) {
+                if ( value instanceof Array ) {
+                    for ( var i in value ) {
+                        query_parts.push( escape( key ) +'[]='+ escape( value[ i ] ));
+                    }
+                } else if ( value instanceof String ) {
+                    query_parts.push( escape( key ) +'='+ escape( value ));
+                } else {
+                    console.warn( key +' is not a String or an Array' );
+                }
+            }
+        }
+
+        return query_parts.join( '&' );
+    },
+
+    pathConcat: function()
+    {
+        var sep = '/';
+
+        var path = '';
+        if ( arguments[ 0 ].charAt( 0 ) == sep ) {
+            path = path.concat( sep );
+        }
+
+        var pathParts = [];
+        var part;
+
+        for ( var i = 0; i < arguments.length; i++ ) {
+            part = arguments[ i ];
+            if ( part.charAt( 0 ) == sep ) {
+                part = part.slice( 1 );
+            }
+            if ( part.charAt( part.length - 1 ) == sep ) {
+                part = part.slice( 0, part.length - 1 );
+            }
+
+            if ( part != '' ) {
+                pathParts.push( part );
+            }
+        }
+
+        return path.concat( pathParts.join( '/' ));
+    }
+
 };
 
 FD.cutCopyEvent = new YAHOO.util.CustomEvent('cutCopyEvent');
@@ -250,23 +260,7 @@ FD.DirList = function() {
 	
 	formatBytes = function(elCell, oRecord, oColumn, oData)	{
 		var bytes = oData;
-		var str;
-
-		if ( bytes >= 1073741824 ) {
-			str = roundNum( bytes / 1073741824 ) + ' GB';
-		} else if ( bytes >= 1048576 ) {
-			str = roundNum( bytes / 1048576 ) + ' MB';
-		} else if ( bytes > 102 ) {
-			str =  roundNum( bytes / 1024 ) + ' KB';
-		} else if ( bytes > 0 ) {
-			str = bytes + ' B';
-		} else if ( true /*readPriv*/ ) { // size unknown - file is probably not readable
-			str = '';
-		} else {
-			str = '';
-		}
-
-		elCell.innerHTML = str;
+		elCell.innerHTML = FD.Utils.formatBytes(bytes);
 	}
 	
 	formatType = function(elCell, oRecord, oColumn, sData) {					
@@ -297,9 +291,9 @@ FD.DirList = function() {
 	handleTableClick = function(oArgs) {
 					
 		if (oArgs.target.id == "folderLink") {
-			var newDir = pathConcat( currentURL, oArgs.target.innerHTML );
+			var newDir = FD.Utils.pathConcat( currentURL, oArgs.target.innerHTML );
 			userFeedback.hideFeedback();
-			History.navigate("path", newDir);
+			History.navigate(newDir);
 		}		
 		
 	};
@@ -374,7 +368,7 @@ FD.DirList = function() {
 	
 	return {
 		init: function(bookmarkDir, bookmarkService) {
-			
+
 			myDataSource = new YAHOO.util.DataSource( '' );  // first call
 			myDataSource.responseType = YAHOO.util.DataSource.TYPE_JSON; 
 			myDataSource.responseSchema = {
@@ -395,6 +389,8 @@ FD.DirList = function() {
 				
 				currentURL = YAHOO.lang.dump(myJSONdata.path);
                                 api.setUrlParam( 'path', currentURL );
+				currentService = YAHOO.lang.dump(myJSONdata.service);
+                                api.setUrlParam( 'service', currentService );
 								
 				if (!homeURL) {
 					homeURL = currentURL;
@@ -624,8 +620,8 @@ FD.InfoBar = function() {
 
 	var currentDir,
 	locationDiv = YAHOO.util.Dom.get('location'),
-        currentLocation = YAHOO.util.Dom.get( 'currentLocation' ),
-        changeLocation  = YAHOO.util.Dom.get( 'changeLocation' ),
+    currentLocation = YAHOO.util.Dom.get( 'currentLocation' ),
+    changeLocation  = YAHOO.util.Dom.get( 'changeLocation' ),
 	viewHTML;
 
 	var update = function(oArgs) {};
@@ -639,7 +635,7 @@ FD.InfoBar = function() {
 		if (target.id == "goUp") {
 			var upDir = currentURL.slice( 0, currentURL.lastIndexOf("/") );
 			userFeedback.hideFeedback();
-			History.navigate("path", upDir);
+			History.navigate(upDir);
 		} else if (target.id == "refresh") {
 			userFeedback.hideFeedback();
 			myDataSource.sendRequest( api.getActionUrl( 'list' ), dirTable.onDataReturnInitializeTable, dirTable);
@@ -660,16 +656,16 @@ FD.InfoBar = function() {
             setService( YAHOO.util.Dom.get( 'changeLocationNewService' ).value );
 			userFeedback.hideFeedback();
 			
-			var newState = {"path": YAHOO.util.Dom.get( 'changeLocationNewPath' ).value, "service": YAHOO.util.Dom.get( 'changeLocationNewService' ).value};
+            History.navigate(YAHOO.util.Dom.get('changeLocationNewPath').value, YAHOO.util.Dom.get('changeLocationNewService').value);
 			
-			//History.navigate("dirTable", YAHOO.util.Dom.get( 'changeLocationNewPath' ).value );
-			History.multiNavigate( newState );
-			
-		} else if (target.id == 'changeLocationCancel') {
+		} 
+            /*
+            else if (target.id == 'changeLocationCancel') {
             YAHOO.util.Dom.setStyle( currentLocation, 'display', 'inline' );
             YAHOO.util.Dom.setStyle( changeLocation, 'display', 'none' );
                         // TODO abort the request
 		}
+            */
 	};
 
 	var handleSubmit = function(e) {
@@ -680,23 +676,21 @@ FD.InfoBar = function() {
 		YAHOO.util.Event.preventDefault(e);
 		if (e.target.href) {
 			userFeedback.hideFeedback();
-			History.navigate("path", e.target.id);
+			History.navigate(e.target.id);
 		}
 	};
 
         var serviceChange = function(e) {
             YAHOO.util.Event.preventDefault(e);
-            YAHOO.util.Dom.get('changeLocationNewPath').value = services[e.target.value].home;
+            YAHOO.util.Dom.get('changeLocationNewPath').value = services.contents[e.target.value].home;
         };
 
-        var services = {};
-        var defaultService = '';
         var setService = function( service ) {
-			// workaround for no value on history.register
-            if (typeof services[ service ] != 'undefined') {
-				YAHOO.util.Dom.get( 'currentLocationService' ).innerHTML = services[ service ].label;
-			}
-			//YAHOO.util.Dom.get( 'currentLocationService' ).innerHTML = service;
+            // workaround for no value on history.register
+            if (typeof services.contents != 'undefined') {
+                YAHOO.util.Dom.get( 'currentLocationService' ).innerHTML = services.contents[ service ].label;
+            }
+            //YAHOO.util.Dom.get( 'currentLocationService' ).innerHTML = service;
             api.setUrlParam( 'service', service );
         };
 	YAHOO.util.Event.on('infoBar', 'click', handleClick);
@@ -712,26 +706,11 @@ FD.InfoBar = function() {
 		},
                 setServiceOptions: function( services ) {
                     var serviceOptionsHtml;
-                    for ( var id in services ) {
-                        serviceOptionsHtml += '<option value="'+ id +'">'+ services[ id ].label +'</option>';
+                    for ( var id in services.contents ) {
+                        serviceOptionsHtml += '<option value="'+ id +'">'+ services.contents[ id ].label +'</option>';
                     }
                     YAHOO.util.Dom.get( 'changeLocationNewService' ).innerHTML = serviceOptionsHtml;
                 },
-                getServices: function() {
-					
-                    var setServiceOptions = this.setServiceOptions;
-                    var callback = { 
-                        'success': function( o ) {
-							services = YAHOO.lang.JSON.parse(o.responseText).services.services;
-                            defaultService = YAHOO.lang.JSON.parse(o.responseText).services.default;
-                            setServiceOptions( services );
-                        }
-                    };
-
-                    YAHOO.util.Connect.asyncRequest('GET', api.getActionUrl( 'services' ), callback, null );
-
-                },
-				
                 setService:setService,
 		update:update
 	}
@@ -967,7 +946,7 @@ FD.Favorites = function() {
 	
 	myFavsSource = new YAHOO.util.DataSource("webservices/favorites/");
 	
-	// doesn't seem like this stuff is need for 'list', but perhaps once Favs gets more complex...
+	// doesn't seem like this stuff is needed for 'list', but perhaps once Favs gets more complex...
 	/*	
 		myFavsSource.responseType = YAHOO.util.DataSource.TYPE_JSON; 
 		myFavsSource.responseSchema = {
@@ -976,70 +955,153 @@ FD.Favorites = function() {
 	*/
 	
 	myFavsSource.subscribe('responseEvent', function(oDS){
+    
+        var thisCurrentFav,
+        thisChangeFav;
 		
 		myFavs = YAHOO.lang.JSON.parse(oDS.response.responseText);
 				
 		var linksListHTML = '<ul>';	
 		for ( i=0; i < myFavs.contents.count; i++ ) {
-			linksListHTML += '<li><a id="folderLink" href="' + myFavs.contents.contents[i].path + '">' + myFavs.contents.contents[i].name + '</a></li>';
+			linksListHTML += '<li><form id="changeFav"><input type="text" name="editFav" id="editFav" size="10" value="' + myFavs.contents.contents[i].name + '"/></form>';
+            linksListHTML += '<span id="currentFav"><a id="folderLink" href="' + myFavs.contents.contents[i].path + '">' + myFavs.contents.contents[i].name + '</a>';
+			linksListHTML += '<span id="editFavBtns">&nbsp;&nbsp;<a href="#edit"><img src="images/pencil.png" id="editBtn" /></a>&nbsp;<a href="#delete"><img src="images/delete.png" id="deleBtn"/></a></span></span></li>';
 		}		
 		linksListHTML += '</ul>';
 		
 		YAHOO.util.Dom.get('favsLinks').innerHTML = linksListHTML;
 	});
+    
+    var editFav = function(target) {
+        if (target.id == "editBtn") {
+        
+            klEsc.enable();
+        
+            thisCurrentFav = target.parentNode.parentNode.parentNode;
+            thisChangeFav = target.parentNode.parentNode.parentNode.previousSibling;
+                        
+            YAHOO.util.Dom.setStyle( thisCurrentFav, 'display', 'none' );
+            YAHOO.util.Dom.setStyle( thisChangeFav, 'display', 'inline' );
+        } else if (target.id == "deleBtn") {
+            console.warn("delete this favorite");
+        }
+    }
+    
+    var handleFavChange = function(e) {
+        YAHOO.util.Event.preventDefault(e);
+        console.warn("fav change submitted");
+        klEsc.disable();
+        
+        YAHOO.util.Dom.setStyle( thisCurrentFav, 'display', 'inline' );
+        YAHOO.util.Dom.setStyle( thisChangeFav, 'display', 'none' );
+        
+    }
+    
+    var handleFavCancel = function(e) {
+        YAHOO.util.Event.preventDefault(e);
+        console.warn("fav change cancelled");
+        klEsc.disable();
+        
+        YAHOO.util.Dom.setStyle( thisCurrentFav, 'display', 'inline' );
+        YAHOO.util.Dom.setStyle( thisChangeFav, 'display', 'none' );
+    }
 
 	myFavsSource.sendRequest( "list?format=json" );
-	
+    
+    var klEsc = new YAHOO.util.KeyListener(document, { keys:27 }, { fn:handleFavCancel } );
+    
+    YAHOO.util.Event.on('changeFav', 'submit', handleFavChange);
+    YAHOO.util.Event.on('changeFav', 'cancel', handleFavCancel);
+    
+    return {
+        editFav:editFav
+    }
 }
+
+FD.History = function()
+{
+    var pathStateChangeHandler = function(state)
+    {
+        dirList.reqSender(state);
+    };
+
+    var serviceStateChangeHandler = function(state)
+    {
+        infoBar.setService(state);
+    };
+
+    return {
+        init: function()
+        {
+            var pathInitialState = YAHOO.util.History.getBookmarkedState("path") || services.contents[services.defaultService].home;
+            var serviceInitialState = YAHOO.util.History.getBookmarkedState("service") || services.defaultService;
+
+            YAHOO.util.History.register('service', serviceInitialState, serviceStateChangeHandler);
+            YAHOO.util.History.register('path', pathInitialState, pathStateChangeHandler);
+            YAHOO.util.History.initialize("yui-history-field", "yui-history-iframe");
+
+            dirTable = dirList.init(pathInitialState, serviceInitialState);
+            dirTable.subscribe('rowSelectEvent', inspector.update);
+            dirTable.subscribe('rowUnselectEvent', inspector.update);
+            dirTable.subscribe('initEvent', inspector.update);
+            dirTable.subscribe('editorSaveEvent', dirList.handleNameEditorSave);
+            //stops dirTable "Data error." behavior when path does not exist
+            dirTable.doBeforeLoadData = function(oRequest, oResponse, oPayload) {
+                //console.warn(oResponse);
+                if (!oResponse.error) {
+                    return true;
+                }
+            };
+        },
+        navigate: function(path, service)
+        {
+            if (typeof path == 'undefined' ) {
+                path = YAHOO.util.History.getCurrentState('path');
+            }
+
+            if (typeof service == 'undefined' ) {
+                service = YAHOO.util.History.getCurrentState('service');
+            }
+
+            YAHOO.util.History.multiNavigate({"service": service, "path": path});
+        } 
+    };
+};
+
+FD.init = function()
+{
+    infoBar = new FD.InfoBar();
+    api = new FD.api();
+    dirList = new FD.DirList();
+    userFeedback = new FD.UserFeedback();
+    favorites = new FD.Favorites();	
+    History = new FD.History();
+
+    inspector = new FD.FileInspector();
+
+    inspector.evnt.subscribe(dirList.toggleHiddenFilter);
+    inspector.evnt.subscribe(dirList.deleteItems);
+    inspector.evnt.subscribe(dirList.cutCopyItems);
+    inspector.evnt.subscribe(dirList.pasteItems);
+    inspector.evnt.subscribe(dirList.renameItem);
+    inspector.evnt.subscribe(FD.NewFolderDialog.show);
+
+    var callback = {
+        'success': function( o ) {
+            services = YAHOO.lang.JSON.parse(o.responseText).services;
+            infoBar.setServiceOptions( services );
+            History.init();
+        }
+    };
+
+    YAHOO.util.Connect.asyncRequest('GET', api.getActionUrl( 'services' ), callback, null );
+};
 
 YAHOO.util.Event.addListener(window, "load", function() {
 
-        api = new FD.api();
-		userFeedback = new FD.UserFeedback();
-	var bookmarkDir = History.getBookmarkedState("path");
-	var bookmarkService = History.getBookmarkedState("service");
-	
-	infoBar = new FD.InfoBar(); // TODO does this need to be so widely scoped?
-        infoBar.getServices();
-	var dirList = new FD.DirList();
-	dirTable = dirList.init(bookmarkDir, bookmarkService);
-	var inspector = new FD.FileInspector();
-	
-	favorites = new FD.Favorites();	
-	History.register("path", "", dirList.reqSender);
-	
-	var initService;
-	if (bookmarkService) {
-		initService = bookmarkService;
-	} else {
-		initService = "ifs";
-	}
-	
-	History.register("service", initService, infoBar.setService);
-	
-	History.initialize("yui-history-field", "yui-history-iframe");
-	
-	inspector.evnt.subscribe(dirList.toggleHiddenFilter);
-	inspector.evnt.subscribe(dirList.deleteItems);
-	inspector.evnt.subscribe(dirList.cutCopyItems);
-	inspector.evnt.subscribe(dirList.pasteItems);
-	inspector.evnt.subscribe(dirList.renameItem);
-	inspector.evnt.subscribe(FD.NewFolderDialog.show);
+        FD.init();
 	
 	FD.cutCopyEvent.subscribe(inspector.update);
-	
-	dirTable.subscribe('rowSelectEvent', inspector.update);
-	dirTable.subscribe('rowUnselectEvent', inspector.update);
-	dirTable.subscribe('initEvent', inspector.update);
-	dirTable.subscribe('editorSaveEvent', dirList.handleNameEditorSave);
-	
-	//stops dirTable "Data error." behavior when path does not exist
-	dirTable.doBeforeLoadData = function(oRequest, oResponse, oPayload) {
-		//console.warn(oResponse);
-		if (!oResponse.error) {
-			return true;
-		}
-	};
 	
 	// TODO add errorChecking to myDataSource.doBeforeCallback = hiddenFileFilter
 	// to catch error on initial load, where path in URL doesn't exist.
@@ -1051,14 +1113,18 @@ YAHOO.util.Event.addListener(window, "load", function() {
 	YAHOO.util.Event.on('homeBtn', 'click', function(e) {
 		YAHOO.util.Event.preventDefault(e);
 		userFeedback.hideFeedback();
-		History.navigate("path", homeURL);
+		History.navigate(homeURL);
 	});	
 	
 	YAHOO.util.Event.on('favsList', 'click', function(e) {
-		if (e.target.href) {	
-			YAHOO.util.Event.preventDefault(e);
-			userFeedback.hideFeedback();
-			History.navigate("path", e.target.getAttribute("href"));
-		}
+        YAHOO.util.Event.preventDefault(e);
+        if (e.target.id == "folderLink") {
+                userFeedback.hideFeedback();
+                History.navigate(e.target.getAttribute("href"));
+        } else if (e.target.parentNode.href) {
+            //console.warn(e.target.parentNode.href)
+            favorites.editFav(e.target);
+        }
+		
 	});	
 });
