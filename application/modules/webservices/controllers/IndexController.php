@@ -5,7 +5,7 @@
  * All rights reserved.
  */
 
-class Webservices_IndexController extends Webservices_FDController {
+class Webservices_IndexController extends Webservices_FiledrawersControllerAbstract {
 
     public function init()
     {

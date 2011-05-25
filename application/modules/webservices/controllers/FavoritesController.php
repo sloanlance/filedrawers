@@ -80,7 +80,6 @@ class Webservices_FavoritesController extends Webservices_FiledrawersControllerA
        
         $values = $this->_form->getValidValues($_POST);
         $this->_filesystem->addFavs($values['path'], $values['folderName']);
-        
         $this->view->status = 'success';
         $this->view->message = 'Successfully created favorites link.';
 
