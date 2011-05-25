@@ -6,6 +6,8 @@
  */
 
 class Service_MainstreamStorage extends Filedrawers_Filesystem_Url_Cifs {
+    protected $_favs = array();
+
     public function getUrl( $filename = null )
     {
 		return( $url = 'smb://'. $this->_shareName .'.m.storage.umich.edu'.$this->pathConcat( $this->_path, $filename ) );
@@ -76,22 +78,53 @@ class Service_MainstreamStorage extends Filedrawers_Filesystem_Url_Cifs {
     {
         $table =  new Model_UserFavorites;
         $ms_list =  $table->listFavs();
-        return $ms_list;
-    }
-    
-    public function addFavs()
-    {
+        $myFavs = array( 'count' => 0 );
+        $c = 0;
 
-      $table =  new Model_UserFavorites;
-      $data = array(
-            'username'   => 'testnam2',
-            'servicename' => 'test_servicename',
-            'location' => 'testloc',
-            'filename' => 'testfile.txt'
-         );
-         
-       $table->insertFavs($data);
+        foreach( $ms_list as $row ){ 
+           foreach( $row as $column => $value ) {
+
+               if ($column == 'servicename'){ 
+                   $myFavs['contents'][$c]['service'] = $value;
+               }    
  
+               if ($column == 'foldername'){
+	           $myFavs['contents'][$c]['name'] = $value;
+               }
+
+               if ($column == 'location'){ 
+                   $myFavs['contents'][$c]['path'] = $value;
+               }          
+           }
+           $c++; 
+        }
+        $myFavs['count'] = $c;
+
+        return $myFavs;
     }
+
+
+    public function addFavs($path,$foldername)
+    {
+         $uniqname = $this->getUser();
+         $table = new Model_UserFavorites;
+         $action = 'add';
+
+         $favs = array(
+            'username'   => $uniqname,
+            'servicename' => 'mainstreamStorage',
+            'location' => $path,
+            'foldername' => $foldername
+         );
+      
+         $isValidInsert = $table->insertFavs($favs,$action);
+         if (! $isValidInsert ) {
+            throw new Filedrawers_Filesystem_Exception(sprintf(
+                'Unable to add foldername'), 2);
+         }
+
+    }
+
+
 }
 
