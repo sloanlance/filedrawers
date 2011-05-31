@@ -102,10 +102,10 @@ class Webservices_FavoritesController extends Webservices_FiledrawersControllerA
 
         $oldPath = $values['path'] . '/' . $values['oldName'];
         $newPath = $values['path'] . '/' . $values['newName'];
-        $this->_filesystem->rename($oldPath, $newPath);
+        $this->_filesystem->renameFavs($oldPath, $newPath);
 
         $this->view->status = 'success';
-        $this->view->message = 'Successfully renamed the file or directory.';
+        $this->view->message = 'Successfully renamed the Favs.';
     }
 
 
