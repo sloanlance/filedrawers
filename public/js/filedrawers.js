@@ -924,8 +924,15 @@ FD.FileInspector = function() {
 				YAHOO.util.Dom.addClass(target, 'inspSelected');
 			}
 
-		evnt.fire(action[1]);
-		
+                        switch (action[1]) {
+                            case 'upload':
+                            case 'permissions':
+                                alert('"' + action[1] + '" not implemented');
+                                break;
+                            default:
+                                evnt.fire(action[1]);
+                                break;
+                        }
 		}
 	};
 	
