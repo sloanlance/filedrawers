@@ -274,7 +274,7 @@ FD.DirList = function() {
 		if (oRecord.getData("type") == "dir") {
 			elCell.innerHTML = '<a id="folderLink">' + sData + '</a>';
 		} else {
-			elCell.innerHTML = '<a href="webservices/download/?path=' + currentURL + '/' + sData + '">' + sData + '</a>';
+                        elCell.innerHTML = '<a href="' + api.getActionUrl('download', {'path':FD.Utils.pathConcat(currentURL, sData)}, true) + '">' + sData + '</a>';
 		}
 	};
 	
