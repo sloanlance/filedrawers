@@ -994,6 +994,14 @@ FD.Favorites = function() {
         console.warn("fav change submitted");
         klEsc.disable();
         
+        oldName = thisCurrentFav.firstChild.innerHTML;
+        newName = thisChangeFav.firstChild.value;
+        path = thisCurrentFav.firstChild.getAttribute("href");
+        
+        myFavsSource.sendRequest( "rename?format=json&path=" + path + "&oldName=" + oldName + "&newName=" + newName );
+        
+        //console.warn( thisChangeFav.firstChild.value );
+        
         YAHOO.util.Dom.setStyle( thisCurrentFav, 'display', 'inline' );
         YAHOO.util.Dom.setStyle( thisChangeFav, 'display', 'none' );
         
