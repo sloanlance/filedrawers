@@ -770,7 +770,7 @@ FD.NewFolderDialog = function() {
 			}
 
 			YAHOO.util.Dom.setStyle('newFolder', 'display', 'block');
-			document.getElementById('newFold').focus() 
+			document.getElementById('newFold').focus(); 
 		},
 
 		evnt:evnt
@@ -952,6 +952,9 @@ FD.FileInspector = function() {
 }
 
 FD.Favorites = function() {
+
+    var thisCurrentFav,
+    thisChangeFav;
 	
 	myFavsSource = new YAHOO.util.DataSource("webservices/favorites/");
 	
@@ -968,7 +971,7 @@ FD.Favorites = function() {
         var thisCurrentFav,
         thisChangeFav;
 		
-		myFavs = YAHOO.lang.JSON.parse(oDS.response.responseText);
+		myFavs = YAHOO.lang.JSON.parse(oDS.response.responseText);        
 				
 		var linksListHTML = '<ul>';	
 		for ( i=0; i < myFavs.contents.count; i++ ) {
@@ -981,7 +984,41 @@ FD.Favorites = function() {
 		YAHOO.util.Dom.get('favsLinks').innerHTML = linksListHTML;
 	});
     
+    var getFavsListCallback = function() {
+	
+		return callback = {
+			success: function (o) {
+                console.warn("getFavsCallback success");
+                
+                userFeedback.displayFeedback(o);
+                
+                userFeedback.stopTimer();
+                
+                myFavsSource.sendRequest( "list?format=json" );
+                
+                /*
+				myFavsSource.sendRequest( api.getActionUrl( 'list' ), {
+					success  : oTable.onDataReturnInitializeTable,
+					failure  : oTable.onDataReturnInitializeTable,  // add errorHandling
+					scope    : oTable,
+					argument : tableState
+				});
+                */
+			},
+
+			timeout: 3000
+		};
+	};
+    
     var editFav = function(target) {
+    
+        if (thisCurrentFav!='undefined') {
+            YAHOO.util.Dom.setStyle( thisCurrentFav, 'display', 'inline' );
+            YAHOO.util.Dom.setStyle( thisChangeFav, 'display', 'none' );
+        }
+    
+        userFeedback.hideFeedback();
+    
         if (target.id == "editBtn") {
         
             klEsc.enable();
@@ -991,8 +1028,22 @@ FD.Favorites = function() {
                         
             YAHOO.util.Dom.setStyle( thisCurrentFav, 'display', 'none' );
             YAHOO.util.Dom.setStyle( thisChangeFav, 'display', 'inline' );
+            
+            YAHOO.util.Event.on(thisChangeFav, 'submit', handleFavChange);
+            YAHOO.util.Event.on(thisChangeFav, 'cancel', handleFavCancel);
+            
         } else if (target.id == "deleBtn") {
             console.warn("delete this favorite");
+        } else if (target.id == "addBtn") {
+
+            var linksListHTML = YAHOO.util.Dom.get('favsLinks').innerHTML;
+            // trims off the last </ul> of the favs list
+            linksListHTML = linksListHTML.substr(0, linksListHTML.length - 5);
+            // grabs the highest folder from the current path
+            lastFolder = currentURL.substr(currentURL.lastIndexOf("/")+1);
+            linksListHTML += '<li><form><input type="text" name="newFav" id="newFav" size="10" value="' + lastFolder + '"/></form></li></ul>';
+            YAHOO.util.Dom.get('favsLinks').innerHTML = linksListHTML;
+            document.getElementById("newFav").focus();
         }
     }
     
@@ -1003,9 +1054,13 @@ FD.Favorites = function() {
         
         oldName = thisCurrentFav.firstChild.innerHTML;
         newName = thisChangeFav.firstChild.value;
-        path = thisCurrentFav.firstChild.getAttribute("href");
+        //path = thisCurrentFav.firstChild.getAttribute("href"); <--- this returns the path the Fav links to.
+        path = homeURL + "/Favorites";
         
-        myFavsSource.sendRequest( "rename?format=json&path=" + path + "&oldName=" + oldName + "&newName=" + newName );
+        //myFavsSource.sendRequest( "rename?format=json&path=" + path + "&oldName=" + oldName + "&newName=" + newName );
+        
+        var callback = getFavsListCallback();			
+		api.post( api.getActionUrl( 'favorites/rename' ), callback, { 'oldName': oldName, 'newName': newName, 'path': path } );
         
         //console.warn( thisChangeFav.firstChild.value );
         
@@ -1026,9 +1081,6 @@ FD.Favorites = function() {
 	myFavsSource.sendRequest( "list?format=json" );
     
     var klEsc = new YAHOO.util.KeyListener(document, { keys:27 }, { fn:handleFavCancel } );
-    
-    YAHOO.util.Event.on('changeFav', 'submit', handleFavChange);
-    YAHOO.util.Event.on('changeFav', 'cancel', handleFavCancel);
     
     return {
         editFav:editFav

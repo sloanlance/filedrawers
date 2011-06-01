@@ -233,7 +233,7 @@ body {
     height: 16px;
 }
 
-#favsList li form {
+#changeFav {
     display: none;
 }
 
