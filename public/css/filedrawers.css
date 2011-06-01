@@ -250,11 +250,9 @@ body {
     display: none;
 }
 
-/* removed temporarily for demo:
 #favsList li:hover #editFavBtns{
-     display: inline;
+    display: inline;
 }
-*/
 
 
 #lone_content {
