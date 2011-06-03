@@ -6,7 +6,6 @@
  */
 
 class Service_MainstreamStorage extends Filedrawers_Filesystem_Url_Cifs {
-    protected $_favs = array();
 
     public function getUrl( $filename = null )
     {
@@ -33,9 +32,9 @@ class Service_MainstreamStorage extends Filedrawers_Filesystem_Url_Cifs {
         $this->_path = $path;
     }
 
-    public function favsExists($favs){
+    public function favoriteExists($favorite){
 
-        $testArr = explode('/',$favs);
+        $testArr = explode('/',$favorite);
         $foldername = array_pop($testArr);
         $path = implode('/', $testArr); 
         $uniqname = $this->getUniqname();
@@ -112,7 +111,7 @@ class Service_MainstreamStorage extends Filedrawers_Filesystem_Url_Cifs {
     }
 
 
-    public function listFavs()
+    public function listFavorite()
     {
         $favsTbl =  new Model_UserFavorites;
         $listFavs =  $favsTbl->listFavs();
@@ -126,7 +125,7 @@ class Service_MainstreamStorage extends Filedrawers_Filesystem_Url_Cifs {
                    $myFavs['contents'][$c]['service'] = $value;
                }    
  
-               if ($column == 'foldername'){
+               if ($column == 'favorite'){
 	           $myFavs['contents'][$c]['name'] = $value;
                }
 
@@ -142,7 +141,7 @@ class Service_MainstreamStorage extends Filedrawers_Filesystem_Url_Cifs {
     }
 
 
-    public function addFavs($path,$foldername)
+    public function addFavorite($path,$favorite)
     {
         $uniqname = $this->getUniqname(); 
         $favsTbl = new Model_UserFavorites;
@@ -151,24 +150,19 @@ class Service_MainstreamStorage extends Filedrawers_Filesystem_Url_Cifs {
            'username'   => $uniqname,
            'servicename' => 'mainstreamStorage',
            'location' => $path,
-           'foldername' => $foldername
+           'favoritename' => $favoriteName
         );
          
-        $isValidInsert = $favsTbl->insertFavs($favs);
+        $isValidInsert = $favsTbl->insertFavorite($path, $favoriteName);
     }
 
 
-     public function rename($oldFoldername,$newFoldername,$path)
+     public function renameFavorite($oldFavorite,$newFavorite,$path)
     {
         $uniqname = $this->getUniqname();
         $favsTbl = new Model_UserFavorites;
  
-        $favsOld = array(
-           'username'   => $uniqname,
-           'servicename' => 'mainstreamStorage',
-           'location' => $path,
            'foldername' => $oldPath
-        );
 
         $favsNew = array(
            'username'   => $uniqname,
@@ -181,7 +175,7 @@ class Service_MainstreamStorage extends Filedrawers_Filesystem_Url_Cifs {
     }
 
 
-     public function deleteFavs($path,$foldername)
+     public function deleteFavorite($path,$foldername)
     {
         $uniqname = $this->getUniqname();
         $favsTbl = new Model_UserFavorites;

@@ -26,17 +26,10 @@ class Form_Favorites_FavRenameForm extends Zend_Form
             )
         );
 
-<<<<<<< HEAD
-        $oldName->addValidator('FavoritesPath', false, array(
-            'modifyable' => true,
-    //        'pathContext' => 'path'
-=======
         $oldName->addValidator('FavoritesPath', true, array(
-            //'modifyable' => true,
-    //        'pathContext' => 'path'
-			'oldexists' => false 
->>>>>>> 93c88b76b1177d8ba175d3034e6916664cbe9586
-        ));
+	    'oldexists' => 'false' 
+        )
+       );
 
         $oldName->addFilter('StringTrim');
         $this->addElement($oldName);
@@ -51,12 +44,7 @@ class Form_Favorites_FavRenameForm extends Zend_Form
         );
 
         $newName->addValidator('FavoritesPath', true, array(
-            //'pathContext' => 'path',
-<<<<<<< HEAD
-            'exists' => 'checkExisting'
-=======
             'exists' => true 
->>>>>>> 93c88b76b1177d8ba175d3034e6916664cbe9586
         ));
 
 

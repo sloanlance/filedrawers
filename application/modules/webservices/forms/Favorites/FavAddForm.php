@@ -26,7 +26,7 @@ class Form_Favorites_FavAddForm extends Zend_Form
             )
         );
         $path->addValidator('FavoritesPath', true, array(
-            //'modifyable' => true,
+            'modifyable' => true,
             'type' => 'dir'
         ));
         $path->addFilter('StringTrim');
@@ -43,8 +43,8 @@ class Form_Favorites_FavAddForm extends Zend_Form
             )
         );
         $folderName->addValidator('FavoritesPath', true, array(
-            //'pathContext' => 'path',
-            'exists' => true 
+            'pathContext' => 'path',
+            'exists' => 'true' 
         ));
         $this->addElement($folderName);
 

@@ -13,22 +13,23 @@ class Model_UserFavorites extends Zend_Db_Table
  
     public function __construct()
     {
+    
         parent::__construct();
+        $username = 
+        $servicename =  
+
     }
 
  
-    public function insertFavs($favs)
+    public function insertFavorite($favorite)
     {
-        try {     
-            $this->insert($favs);
-            } catch (Exception $ex) {
-                    echo $ex->getMessage();
-        }   
+   
+        $this->insert($favorite);
 
     }
 
 
-    public function listFavs()
+    public function listFavorites()
     {
         $select = $this->select();
         $rows = $this->fetchAll($select);
@@ -37,7 +38,7 @@ class Model_UserFavorites extends Zend_Db_Table
     }
 
 
-     public function renameFavs( $old, $new )
+     public function renameFavorite( $old, $new )
      {
 
         $row = NULL;
@@ -61,7 +62,7 @@ class Model_UserFavorites extends Zend_Db_Table
     }
 
 
-    public function deleteFavs($del)
+    public function deleteFavorite($del)
     {
 
         $row = NULL;
