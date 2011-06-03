@@ -1,6 +1,6 @@
 <?php
 
-class Form_Favorites_FavDeleteForm extends Zend_Form
+class Form_Favorites_DeleteForm extends Zend_Form
 {
     protected $_csrfToken = null;
     protected $_options = array();

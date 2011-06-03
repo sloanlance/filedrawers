@@ -1,6 +1,6 @@
 <?php
 
-class Form_Favorites_FavAddForm extends Zend_Form
+class Form_Favorites_AddForm extends Zend_Form
 {
     protected $_csrfToken = null;
     protected $_path = null;

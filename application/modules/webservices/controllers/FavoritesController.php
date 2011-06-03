@@ -68,7 +68,7 @@ class Webservices_FavoritesController extends Webservices_FiledrawersControllerA
 
     public function addAction()
     {
-        $this->_form = new Form_Favorites_FavAddForm($this->_csrfToken, $this->_request->getParam('path'));
+        $this->_form = new Form_Favorites_AddForm($this->_csrfToken, $this->_request->getParam('path'));
               
         if ( ! $this->getRequest()->isPost()) {
             return;
@@ -81,13 +81,13 @@ class Webservices_FavoritesController extends Webservices_FiledrawersControllerA
         $values = $this->_form->getValidValues($_POST);
         $this->_filesystem->addFavs($values['path'], $values['folderName']);
         $this->view->status = 'success';
-        $this->view->message = 'Successfully created favorites link.';
+        $this->view->message = 'Successfully added favorite.';
 
     }
     
     public function renameAction()
     {
-        $this->_form = new Form_Favorites_FavRenameForm($this->_csrfToken, $this->_request->getParam('path'));
+        $this->_form = new Form_Favorites_RenameForm($this->_csrfToken, $this->_request->getParam('path'));
     
         if ( ! $this->getRequest()->isPost()) {
             return;
@@ -104,12 +104,12 @@ class Webservices_FavoritesController extends Webservices_FiledrawersControllerA
         $this->_filesystem->renameFavs($oldName, $newName);
 
         $this->view->status = 'success';
-        $this->view->message = 'Successfully renamed the Favs.';
+        $this->view->message = 'Successfully renamed favorite.';
     }
 
 	public function deleteAction()
 	{
-		$this->_form = new Form_Favorites_FavDeleteForm($this->_csrfToken, $this->_request->getParam('path'));
+		$this->_form = new Form_Favorites_DeleteForm($this->_csrfToken, $this->_request->getParam('path'));
 
 		if ( ! $this->getRequest()->isPost()) {
             return;
@@ -125,7 +125,7 @@ class Webservices_FavoritesController extends Webservices_FiledrawersControllerA
 		$this->_filesystem->deleteFavs( $name );
             
         $this->view->status = 'success';
-        $this->view->message = 'Successfully deleted the Favs.';
+        $this->view->message = 'Successfully deleted favorite.';
 
 	}
 
