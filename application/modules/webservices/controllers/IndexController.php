@@ -87,6 +87,7 @@ class Webservices_IndexController extends Webservices_FiledrawersControllerAbstr
         $this->view->offset = $input->offset;
         $this->view->limit = $input->limit;
         $this->view->count = count($files['contents']);
+        $this->view->quota = $this->_filesystem->getQuota($path);
         $contentsSlice =  array_slice($files['contents'], $input->offset, $input->limit);
         unset($files['contents']);
         $this->view->contents = $contentsSlice;

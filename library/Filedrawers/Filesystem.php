@@ -51,10 +51,16 @@ abstract class Filedrawers_Filesystem {
         return $path .= implode(self::$pathSeparator, $pathParts);
     }
 
+
+    public function getQuota($path)
+    {
+        return array('total' => NULL, 'user' => NULL);
+    }
+
+
     public function listFavs()
     {
     }
-
 
     public function addFavs()
     {
