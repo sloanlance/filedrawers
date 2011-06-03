@@ -23,7 +23,7 @@ class Webservices_FavoritesController extends Webservices_FiledrawersControllerA
 	$validators = array(
         'path'     => array(
              array(
-                'FavoritesPath', array(
+                'FilePath', array(
                 'type' => 'dir',
                 'readable' => true
             )
@@ -68,7 +68,7 @@ class Webservices_FavoritesController extends Webservices_FiledrawersControllerA
 
     public function addAction()
     {
-        $this->_form = new Form_FavoritesAddForm($this->_csrfToken, $this->_request->getParam('path'));
+        $this->_form = new Form_Favorites_FavAddForm($this->_csrfToken, $this->_request->getParam('path'));
               
         if ( ! $this->getRequest()->isPost()) {
             return;
@@ -87,8 +87,7 @@ class Webservices_FavoritesController extends Webservices_FiledrawersControllerA
     
     public function renameAction()
     {
-        $this->_form = new Form_FavoritesRenameForm($this->_csrfToken,
-        $this->_request->getParam('path'));
+        $this->_form = new Form_Favorites_FavRenameForm($this->_csrfToken, $this->_request->getParam('path'));
     
         if ( ! $this->getRequest()->isPost()) {
             return;
@@ -99,57 +98,35 @@ class Webservices_FavoritesController extends Webservices_FiledrawersControllerA
         }
    
         $values = $this->_form->getValidValues($_POST);
-        check($values);
-        $oldPath = $values['oldName'];
-        $newPath = $values['newName'];
-        $this->_filesystem->rename($oldPath, $newPath);
+
+        $oldName = $values['oldName'];
+        $newName = $values['newName'];
+        $this->_filesystem->renameFavs($oldName, $newName);
 
         $this->view->status = 'success';
-        $this->view->message = 'Successfully renamed the file or directory.';
+        $this->view->message = 'Successfully renamed the Favs.';
     }
 
-    
-    public function deleteAction()
-    {
-        $validators = array(
-            'path'     => array(
-                array(
-                    'FilePath', array(
-                        'type' => 'dir',
-                        'readable' => 'true'
-                     )
-                ), 'presence' => 'required')
-        );
+	public function deleteAction()
+	{
+		$this->_form = new Form_Favorites_FavDeleteForm($this->_csrfToken, $this->_request->getParam('path'));
 
-        $options = array(
-            'inputNamespace' => 'Filedrawers_Validate',
-            'missingMessage' => 'You must specify the path that contains the file(s) or folder(s) you want to delete in the URL.'
-        );
-
-        $input = new Zend_Filter_Input($this->_baseFilter, $validators, $_GET, $options);
-
-        if ( ! $input->isValid('path')) {
-            $this->view->errorMsg = $input->getMessages();
-            return;
-        }
-
-        $this->_filesystem->addListHelper(array($this, 'filterByFileName'));
-        $files = $this->_filesystem->listDirectory($input->path, true);
-        $this->_form = new Form_FavoritesDeleteForm($this->_csrfToken, $files['contents']);
-
-        if ( ! $this->getRequest()->isPost()) {
+		if ( ! $this->getRequest()->isPost()) {
             return;
         }
         else if ( ! $this->_form->isValid($_POST)) {
             $this->view->errorMsg = $this->_form->getMessages(null, true);
             return;
         }
-
+                
         $values = $this->_form->getValidValues($_POST);
 
-        $this->_filesystem->remove($input->path, $values['files']);
+		$name = $values['folderName'];
+		$this->_filesystem->deleteFavs( $name );
+            
         $this->view->status = 'success';
-        $this->view->message = 'Delete successful.';
-    }
+        $this->view->message = 'Successfully deleted the Favs.';
+
+	}
 
 }

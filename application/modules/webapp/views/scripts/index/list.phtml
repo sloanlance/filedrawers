@@ -10,7 +10,6 @@ $this->headScript()->appendFile('yui/build/datatable/datatable-min.js');
 $this->headScript()->appendFile('yui/build/connection/connection-min.js');
 $this->headScript()->appendFile('yui/build/history/history-min.js');
 $this->headScript()->appendFile('yui/build/json/json-min.js');
-$this->headScript()->appendFile('yui/build/event-delegate/event-delegate-min.js');
 $this->headScript()->appendFile('js/filedrawers.js');
 ?>
 
@@ -66,7 +65,7 @@ $this->headScript()->appendFile('js/filedrawers.js');
 				<li><a href="#createFolder" class="expandable">Create a New Folder</a></li>
 				<li><a href="#rename">Rename Selected Item</a></li>
 				<li><a href="#permissions">Set Permissions for Folder</a></li>
-				<li><a href="#favorites" class="global expandable">Favorite Locations</a></li>
+				<? //<li><a href="#favorites" class="global expandable">Favorite Locations</a></li> ?>
 			</ul>
 			<div id="itemInfo"></div>
 			<h4>View Options</h4>
@@ -83,7 +82,7 @@ $this->headScript()->appendFile('js/filedrawers.js');
 			<div id="fileList"></div>
 		</div>
 		<div id="favsList">
-            <img id="addBtn" src="images/add.png" />
+            <a href="#add"><img id="addBtn" src="images/add.png" /></a>
 			<h3>Favorites</h3>
 			<div id="favsLinks">
 			</div>
