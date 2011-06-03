@@ -8,6 +8,7 @@ class Filedrawers_Validate_FavoritesPath extends Zend_Validate_Abstract
     const NO_READ = 'noRead';
     const NO_MODIFY = 'noModify';
     const NO_CONTEXT = 'noContext';
+    const OLD_EXISTS = 'oldexists';
 
     protected $_options = array();
 
@@ -31,7 +32,8 @@ class Filedrawers_Validate_FavoritesPath extends Zend_Validate_Abstract
     {
         $this->_setValue($value);
         $filesystem = Zend_Registry::get('filesystem');
-
+        $input = $value;
+         
         if (isset($this->_options['pathContext'])) {
             if ( ! isset($context[$this->_options['pathContext']])) {
                 $this->_error(self::NO_CONTEXT);
@@ -39,16 +41,28 @@ class Filedrawers_Validate_FavoritesPath extends Zend_Validate_Abstract
             }
             $value = $filesystem->pathConcat($context[$this->_options['pathContext']], $value);
         }
-
+                
         $info = $filesystem->getInfo($value);
+         
+        if (isset($this->_options['oldexists']) ) {
+			$foldername = $filesystem->favExists($value);
+            if ($foldername === false){
+                $this->_error(self::EXISTS);
+                return false;
+            } else {
+				return true;
+			}
+		}
 
-        if (isset($this->_options['exists']) && $this->_options['exists'] === 'checkExisting') {
-            if (is_array($info)) {
+        if (isset($this->_options['exists']) ) {
+            $foldername = $filesystem->favExists($value);
+            if ($foldername === true){
                 $this->_error(self::ALREADY_EXISTS);
                 return false;
-            }
+            } 
         }
-        else if ( ! is_array($info)) {
+ 
+        else if ( !is_array($info)) {
             $this->_error(self::EXISTS);
             return false;
         }
