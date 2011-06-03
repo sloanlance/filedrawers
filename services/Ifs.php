@@ -31,11 +31,31 @@ class Service_Ifs extends Filedrawers_Filesystem_Mounted_Afs {
         return $homedir;
     }
 
+	public function getFavPath( )
+	{
+		$homedir = $this->getHomedir();
+        $favoritesPath = $homedir . '/Favorites/';
+		return $favoritesPath;
+	}
+
+	public function favExists($fav)
+	{
+		$favoritesPath = $this->getFavPath();
+		$fav = $favoritesPath . $fav;
+
+        if ( $this->_fileExists($fav)) 
+		{
+			return true;
+        } else {
+			return false;
+		}
+
+	}
+
     public function listFavs( )
     {
         $myFavs = array( 'count' => 0 );
-		$homedir = $this->getHomedir(); 
-        $favoritesPath = $homedir . '/Favorites/';
+		$favoritesPath = $this->getFavPath();
         $files = $this->listDirectory( $favoritesPath );
     
         for ( $i = 0, $c = 0; $i < count($files['contents']); $i++) {
@@ -58,17 +78,8 @@ class Service_Ifs extends Filedrawers_Filesystem_Mounted_Afs {
 	{
 		//adding directory
 		$name = trim( $name, $this->ILLEGAL_DIR_CHARS );
-		$homedir = $this->getHomedir();
-		$favoritesPath = $homedir . '/Favorites';
-        $newFav = $favoritesPath .'/'.$name;
-
-
-		if ($this->_fileExists($newFav)) {
-			// ??
-			throw new Filedrawers_Filesystem_Exception(sprintf(
-            	'A Fav with this name already exists "%s".', $newFav), 5);
-		}
-
+		$favoritesPath = $this->getFavPath();
+        $newFav = $favoritesPath .$name;
 
         if ( is_dir( $path )) {
             // add symlink
@@ -78,10 +89,11 @@ class Service_Ifs extends Filedrawers_Filesystem_Mounted_Afs {
 		}
 	}
 
-	public function deleteFavs( $name ) {
-		$homedir = $this->getHomedir();
-        $favoritesPath = $homedir . '/Favorites';
-		$filename = $favoritesPath .'/'.$name;
+	public function deleteFavs( $name )
+	{
+		$favoritesPath = $this->getFavPath();
+		$filename = $favoritesPath .$name;
+
 		if ( is_link( $filename ) ) {
 			if ( ! @unlink($filename) ) {
 				throw new Filedrawers_Filesystem_Exception(sprintf(
@@ -90,8 +102,12 @@ class Service_Ifs extends Filedrawers_Filesystem_Mounted_Afs {
 		}
 	}
 
-	public function renameFavs( $oldPath, $newPath )
+	public function renameFavs( $oldName, $newName )
 	{
+		$favoritesPath = $this->getFavPath();
+		$newPath = $favoritesPath .$newName;
+		$oldPath = $favoritesPath .$oldName;
+
 		if ( !is_link( $oldPath ) ) {
 			// do nothing
 			throw new Filedrawers_Filesystem_Exception(sprintf(
