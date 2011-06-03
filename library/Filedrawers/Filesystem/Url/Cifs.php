@@ -24,7 +24,7 @@ class Filedrawers_Filesystem_Url_Cifs extends Filedrawers_Filesystem_Url {
 		stream_wrapper_register( "smb", "CifsStream" );
     }
 
-
+    
     public function setShareName( $shareName )
     {
         $this->_shareName = $shareName;

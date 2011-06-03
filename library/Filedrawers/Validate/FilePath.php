@@ -41,7 +41,7 @@ class Filedrawers_Validate_FilePath extends Zend_Validate_Abstract
         }
 
         $info = $filesystem->getInfo($value);
-
+        check($info);
         if (isset($this->_options['exists']) && $this->_options['exists'] === 'checkExisting') {
             if (is_array($info)) {
                 $this->_error(self::ALREADY_EXISTS);

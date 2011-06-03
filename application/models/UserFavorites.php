@@ -8,77 +8,77 @@
 class Model_UserFavorites extends Zend_Db_Table
 {
     protected $_name = 'filedrawers_favorites';
+    protected $_errorMsg;
 
+ 
     public function __construct()
     {
         parent::__construct();
     }
 
+ 
     public function insertFavs($favs)
     {
-        //check if favorite already exists, if not insert
+        try {     
+            $this->insert($favs);
+            } catch (Exception $ex) {
+                    echo $ex->getMessage();
+        }   
 
-        //check validity of filename
-        $name = trim( $name, $this->ILLEGAL_DIR_CHARS );
-  
-        //check validity of directory
-
-        //check validity of uniqname
-
-        //check validity of service
- 
-        //insert if valid and does not already exist
-        $insert = $this->insert($favs);
     }
 
 
     public function listFavs()
     {
-        $entries = array(); 
         $select = $this->select();
         $rows = $this->fetchAll($select);
-        $entries ['contents'][] = $rows;
-        return $entries;
-     }
+        $rowArray = $rows->toArray();
+        return $rowArray;
+    }
+
 
      public function renameFavs( $old, $new )
      {
-        if ($this->_fileExists($new)) {
-            // do nothing
-        }
-        if ( $old == $new ) {
-            // do nothing
-        }
-        rename( $oldPath, $newPath );
-      }
 
+        $row = NULL;
 
-    public function deleteFavs()
-    {
+        $select = $this->select()
+            ->from('filedrawers_favorites')
+            ->where("username = ?", $old['username'])
+            ->where("servicename = ?", $old['servicename'])
+            ->where("location = ?", $old['location'])
+            ->where("foldername = ?", $old['foldername'])
+            ->limit(1);
 
-
-
-
-
-    }
-
-    public function getMessages()
-    {
-        return $this->errorMsg;
+        $row = $this->fetchRow($select);
+   
+        $row->username = $new['username'];
+        $row->servicename = $new['servicename'];
+        $row->location = $new['location'];
+        $row->foldername = $new['foldername'];
+        $row->save(); 
+      
     }
 
 
+    public function deleteFavs($del)
+    {
 
-
-
-
-
-
-
-
-
-
-
+        $row = NULL;
+ 
+        $select = $this->select()
+            ->from('filedrawers_favorites')
+            ->where("username = ?", $del['username'])
+            ->where("servicename = ?", $del['servicename'])
+            ->where("location = ?", $del['location'])
+            ->where("foldername = ?", $del['foldername'])
+            ->limit(1);
+        
+        $row = $this->fetchRow($select);
+  
+        $row->delete();
+    
+    }
 
 
 }

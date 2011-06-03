@@ -1,0 +1,8 @@
+<?php echo $this->displayErrors($this->errorMsg); ?>
+<?php if ($this->message): ?>
+        <p><?php echo $this->escape($this->message); ?></p>
+<?php endif; ?>
+<div>
+    <?php echo $this->form; ?>
+</div>
+

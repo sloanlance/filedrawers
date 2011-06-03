@@ -15,17 +15,17 @@ class Form_AddForm extends Zend_Form
     public function init()
     {
         $this->setMethod('post');
-        $this->setName('mkdir');
+        $this->setName('add');
 
         $path = new Zend_Form_Element_Text('path');
         $path->addPrefixPath('Filedrawers_Validate', 'Filedrawers/Validate/', 'validate');
-        $path->setLabel('Path');
+        $path->setLabel('Path to existing directory');
         $path->setRequired(true)
             ->addValidator('NotEmpty', true, array('messages' => array('isEmpty' =>
-                'You must specifiy the parent path for the new folder.')
+                'You must specifiy the path to folder.')
             )
         );
-        $path->addValidator('FilePath', true, array(
+        $path->addValidator('FavoritesPath', true, array(
             'modifyable' => true,
             'type' => 'dir'
         ));
@@ -35,14 +35,14 @@ class Form_AddForm extends Zend_Form
 
         $folderName = new Zend_Form_Element_Text('folderName');
         $folderName->addPrefixPath('Filedrawers_Validate', 'Filedrawers/Validate/', 'validate');
-        $folderName->setLabel('Folder Name');
+        $folderName->setLabel('Add Fav Name');
         $folderName->addFilter('StringTrim');
         $folderName->setRequired(true)
             ->addValidator('NotEmpty', true, array('messages' => array('isEmpty' =>
-                'You must specifiy a name for the new folder.')
+                'You must specifiy a name for the favorite.')
             )
         );
-        $folderName->addValidator('FilePath', true, array(
+        $folderName->addValidator('FavoritesPath', true, array(
             'pathContext' => 'path',
             'exists' => 'checkExisting'
         ));

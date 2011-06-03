@@ -1,8 +1,9 @@
-<?php echo $this->displayErrors($this->errorMsg); ?>
-<?php if (is_array($this->contents)): ?>
+<p><?php echo $this->escape($this->message); ?></p>
+<pre>
 <?php var_dump($this->contents); ?>
+</pre>
+
 <table>
         <?php echo $this->partialLoop('index/_partial_list.phtml', $this->contents);?>
 </table>
-<?php endif; ?>
 

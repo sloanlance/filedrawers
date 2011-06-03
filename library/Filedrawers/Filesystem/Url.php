@@ -29,6 +29,10 @@ abstract class Filedrawers_Filesystem_Url extends Filedrawers_Filesystem {
         $this->_path = $path;
     }
 
+    public function getUser() {
+        return $this->_user;
+    }
+
     public function getUrl( $file = NULL ) {
         $url = $this->_scheme .'://';
         if ( ! empty( $this->_user )) {
@@ -54,7 +58,7 @@ abstract class Filedrawers_Filesystem_Url extends Filedrawers_Filesystem {
     {
         $this->setPath( $path );
 		$name = trim( $name, $this->ILLEGAL_DIR_CHARS );
-
+       
         if ( ! mkdir($this->getUrl( $name ), 0744, true)) {
             throw new Filedrawers_Filesystem_Exception(sprintf(
                 'Unable to create the directory "%s".', $name), 5);
@@ -381,7 +385,7 @@ abstract class Filedrawers_Filesystem_Url extends Filedrawers_Filesystem {
         try {
             $this->setPath( $path );
             $url = $this->getUrl();
-
+           
             if ( ! $this->_fileExists($url)) {
                 return false;
             }
@@ -389,7 +393,6 @@ abstract class Filedrawers_Filesystem_Url extends Filedrawers_Filesystem {
             $info = $this->_getInfo($url, false);
             $info['modifyable'] = @is_writable($url);
             $info['readable'] = @is_readable($url);
-
             return $info;
         }
         catch (Filedrawers_Filesystem_Exception $e) {
@@ -412,8 +415,5 @@ abstract class Filedrawers_Filesystem_Url extends Filedrawers_Filesystem {
     public function deleteFavs()
     {
     }
-
-
-
 
 }

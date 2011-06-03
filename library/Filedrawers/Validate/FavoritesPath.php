@@ -31,7 +31,8 @@ class Filedrawers_Validate_FavoritesPath extends Zend_Validate_Abstract
     {
         $this->_setValue($value);
         $filesystem = Zend_Registry::get('filesystem');
-
+        $input = $value;
+               
         if (isset($this->_options['pathContext'])) {
             if ( ! isset($context[$this->_options['pathContext']])) {
                 $this->_error(self::NO_CONTEXT);
@@ -39,19 +40,30 @@ class Filedrawers_Validate_FavoritesPath extends Zend_Validate_Abstract
             }
             $value = $filesystem->pathConcat($context[$this->_options['pathContext']], $value);
         }
-
+        check($value);        
         $info = $filesystem->getInfo($value);
-
+                       
         if (isset($this->_options['exists']) && $this->_options['exists'] === 'checkExisting') {
-            if (is_array($info)) {
+            $foldername = $filesystem->favsExists($value);
+            if ($foldername === true){
                 $this->_error(self::ALREADY_EXISTS);
                 return false;
-            }
+            } 
         }
-        else if ( ! is_array($info)) {
+         else if ( !is_array($info) &&  isset($this->_options['type']) && $this->_options['type'] === 'dir') {
             $this->_error(self::EXISTS);
             return false;
         }
+       
+
+        else if ( !is_array($info) ) {
+           $foldername = $filesystem->favsExists($value);
+            if ($foldername === false){
+                return true;
+            }
+
+        }
+ 
 
         if (isset($this->_options['type']) && $info['type'] !== $this->_options['type']) {
             $this->_error(self::WRONG_TYPE);

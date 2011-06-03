@@ -13,6 +13,12 @@ class Service_MainstreamStorage extends Filedrawers_Filesystem_Url_Cifs {
         return( $url = 'smb://'. $this->_shareName .'.m.storage.umich.edu'.$this->pathConcat( $this->_path, $filename ) );
     }
 
+    public function getUniqname()
+    {
+        $userInfo = posix_getpwnam(Zend_Auth::getInstance()->getIdentity());
+        return $uniqname = $userInfo['name'];
+    }
+
 
     public function setPath( $path )
     {
@@ -25,6 +31,33 @@ class Service_MainstreamStorage extends Filedrawers_Filesystem_Url_Cifs {
 
         $this->setShareName( $pathParts[ 1 ] );
         $this->_path = $path;
+    }
+
+    public function favsExists($favs){
+
+        $testArr = explode('/',$favs);
+        $foldername = array_pop($testArr);
+        $path = implode('/', $testArr); 
+        $uniqname = $this->getUniqname();
+        $favsTbl = new Model_UserFavorites;
+        $clause =  $favsTbl->getAdapter()->quoteInto("username =?", $uniqname) . $favsTbl->getAdapter()->quoteInto("AND location =?", $path);
+ 
+        $validator = new Zend_Validate_Db_NoRecordExists(
+          array(
+              'table' => 'filedrawers_favorites',
+              'field' => 'foldername',
+              'exclude' => $clause
+          )
+      );
+      
+        if ($validator->isValid($foldername)) {
+            //favs does not exist
+            return false;
+      } else {
+             //favs already exists.
+             return true;
+      }
+
     }
 
 
@@ -111,23 +144,56 @@ class Service_MainstreamStorage extends Filedrawers_Filesystem_Url_Cifs {
 
     public function addFavs($path,$foldername)
     {
-         $uniqname = $this->getUser();
-         $favsTbl = new Model_UserFavorites;
-         $action = 'add';
+        $uniqname = $this->getUniqname(); 
+        $favsTbl = new Model_UserFavorites;
+        
+        $favs = array(
+           'username'   => $uniqname,
+           'servicename' => 'mainstreamStorage',
+           'location' => $path,
+           'foldername' => $foldername
+        );
+         
+        $isValidInsert = $favsTbl->insertFavs($favs);
+    }
 
-         $favs = array(
-            'username'   => $uniqname,
-            'servicename' => 'mainstreamStorage',
-            'location' => $path,
-            'foldername' => $foldername
-         );
-      
-         $isValidInsert = $favsTbl->insertFavs($favs,$action);
-         if (! $isValidInsert ) {
-            throw new Filedrawers_Filesystem_Exception(sprintf(
-                'Unable to add foldername'), 2);
-         }
 
+     public function rename($oldFoldername,$newFoldername,$path)
+    {
+        $uniqname = $this->getUniqname();
+        $favsTbl = new Model_UserFavorites;
+ 
+        $favsOld = array(
+           'username'   => $uniqname,
+           'servicename' => 'mainstreamStorage',
+           'location' => $path,
+           'foldername' => $oldPath
+        );
+
+        $favsNew = array(
+           'username'   => $uniqname,
+           'servicename' => 'mainstreamStorage',
+           'location' => $path,
+           'foldername' => $newPath
+        );
+
+        $isValidRename = $favsTbl->renameFavs($favsOld, $favsNew);
+    }
+
+
+     public function deleteFavs($path,$foldername)
+    {
+        $uniqname = $this->getUniqname();
+        $favsTbl = new Model_UserFavorites;
+
+        $favs = array(
+           'username'   => $uniqname,
+           'servicename' => 'mainstreamStorage',
+           'location' => $path,
+           'foldername' => $foldername
+        );
+
+        $isValidDelete = $favsTbl->deleteFavs($favs);
     }
 
 }
