@@ -661,13 +661,12 @@ FD.InfoBar = function() {
             History.navigate(YAHOO.util.Dom.get('changeLocationNewPath').value, YAHOO.util.Dom.get('changeLocationNewService').value);
 			
 		} 
-            /*
+            
             else if (target.id == 'changeLocationCancel') {
             YAHOO.util.Dom.setStyle( currentLocation, 'display', 'inline' );
             YAHOO.util.Dom.setStyle( changeLocation, 'display', 'none' );
-                        // TODO abort the request
 		}
-            */
+            
 	};
 
 	var handleSubmit = function(e) {
@@ -698,7 +697,7 @@ FD.InfoBar = function() {
 	YAHOO.util.Event.on('infoBar', 'click', handleClick);
 	YAHOO.util.Event.on('location', 'submit', handleSubmit);
 	YAHOO.util.Event.on('notifyArea', 'click', locationClick);
-        YAHOO.util.Event.on('changeLocationNewService', 'change', serviceChange);
+    YAHOO.util.Event.on('changeLocationNewService', 'change', serviceChange);
 
 	var kl = new YAHOO.util.KeyListener(document, {keys:13}, {fn:function(){alert('enter');}});
 
@@ -990,7 +989,7 @@ FD.Favorites = function() {
 	
 		return callback = {
 			success: function (o) {
-                console.warn("getFavsCallback success");
+                //console.warn("getFavsCallback success");
                 
                 userFeedback.displayFeedback(o);
                 
@@ -1070,12 +1069,11 @@ FD.Favorites = function() {
     
     var handleEditFavChange = function(e) {
         YAHOO.util.Event.preventDefault(e);
-        console.warn("fav change submitted");
+        //console.warn("fav change submitted");
         klEsc.disable();
         
         oldName = thisCurrentFav.firstChild.innerHTML;
         newName = thisChangeFav.firstChild.value;
-        path = homeURL + "/Favorites";
         
         var callback = getFavsListCallback();			
 		api.post( api.getActionUrl( 'favorites/rename' ), callback, { 'oldName': oldName, 'newName': newName } );
@@ -1087,7 +1085,7 @@ FD.Favorites = function() {
     
     var handleEditFavCancel = function(e) {
         YAHOO.util.Event.preventDefault(e);
-        console.warn("fav change cancelled");
+        //console.warn("fav change cancelled");
         klEsc.disable();
         
         YAHOO.util.Dom.setStyle( thisCurrentFav, 'display', 'inline' );
