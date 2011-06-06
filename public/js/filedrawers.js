@@ -706,14 +706,15 @@ FD.InfoBar = function() {
 		init: function(crntDir) {
 			currentDir = crntDir;
 		},
-                setServiceOptions: function( services ) {
-                    var serviceOptionsHtml;
-                    for ( var id in services.contents ) {
-                        serviceOptionsHtml += '<option value="'+ id +'">'+ services.contents[ id ].label +'</option>';
-                    }
-                    YAHOO.util.Dom.get( 'changeLocationNewService' ).innerHTML = serviceOptionsHtml;
-                },
-                setService:setService,
+        setServiceOptions: function( services ) {
+            var serviceOptionsHtml = '<label for="changeLocationNewService">Service: </label><select name="changeLocationNewService" id="changeLocationNewService">';
+            for ( var id in services.contents ) {
+                serviceOptionsHtml += '<option value="'+ id +'">'+ services.contents[ id ].label +'</option>';
+            }
+            serviceOptionsHtml += '</select>';
+            YAHOO.util.Dom.get('setServicesWrapper').innerHTML = serviceOptionsHtml;
+        },
+        setService:setService,
 		update:update
 	}
 };	
