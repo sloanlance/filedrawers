@@ -31,7 +31,7 @@ class Service_MainstreamStorage extends Filedrawers_Filesystem_Url_Cifs {
         return $uniqname = $userInfo['name'];
     }
 
-    public function favoriteExists($favorite){
+    public function favExists($favorite){
         $inputArr = explode('/',$favorite);
         $foldername = array_pop($inputArr);
         $path = implode('/', $inputArr);
@@ -115,7 +115,7 @@ class Service_MainstreamStorage extends Filedrawers_Filesystem_Url_Cifs {
     }
 
 
-    public function listFavorites()
+    public function listFavs()
     {
         $favoritesTbl =  Model_UserFavorites::getDB(); 
         $listFavs =  $favoritesTbl->listFavorites();
@@ -145,20 +145,20 @@ class Service_MainstreamStorage extends Filedrawers_Filesystem_Url_Cifs {
     }
 
 
-    public function addFavorite($path,$favoriteName)
+    public function addFavs($path,$favoriteName)
     {
         $favoritesTbl =  Model_UserFavorites::getDB();
         $isValidInsert = $favoritesTbl->insertFavorite($path, $favoriteName);
     }
 
-    public function renameFavorite($oldFavorite,$newFavorite)
+    public function renameFavs($oldFavorite,$newFavorite)
     {
         $favoritesTbl =  Model_UserFavorites::getDB();
         $path = $favoritesTbl->getPath($oldFavorite);
         $isValidRename = $favoritesTbl->renameFavorite($oldFavorite, $newFavorite, $path);
     }
 
-    public function deleteFavorite($favorite)
+    public function deleteFavs($favorite)
     {
         $favoritesTbl =  Model_UserFavorites::getDB();
         $path = $favoritesTbl->getPath($favorite); 

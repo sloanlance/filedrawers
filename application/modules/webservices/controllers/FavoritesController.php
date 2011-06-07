@@ -55,7 +55,7 @@ class Webservices_FavoritesController extends Webservices_FiledrawersControllerA
 
     public function getFavs()
     {
-       $favs = $this->_filesystem->listFavorites();
+       $favs = $this->_filesystem->listFavs();
        $this->view->contents = $favs;
     }
 
@@ -79,7 +79,7 @@ class Webservices_FavoritesController extends Webservices_FiledrawersControllerA
         }
        
         $values = $this->_form->getValidValues($_POST);
-        $this->_filesystem->addFavorite($values['path'], $values['folderName']);
+        $this->_filesystem->addFavs($values['path'], $values['folderName']);
         $this->view->status = 'success';
         $this->view->message = 'Successfully added favorite.';
 
@@ -101,7 +101,7 @@ class Webservices_FavoritesController extends Webservices_FiledrawersControllerA
 
         $oldName = $values['oldName'];
         $newName = $values['newName'];
-        $this->_filesystem->renameFavorite($oldName, $newName);
+        $this->_filesystem->renameFavs($oldName, $newName);
 
         $this->view->status = 'success';
         $this->view->message = 'Successfully renamed favorite.';
@@ -122,7 +122,7 @@ class Webservices_FavoritesController extends Webservices_FiledrawersControllerA
         $values = $this->_form->getValidValues($_POST);
 
 	$name = $values['folderName'];
-	$this->_filesystem->deleteFavorite( $name );
+	$this->_filesystem->deleteFavs( $name );
             
         $this->view->status = 'success';
         $this->view->message = 'Successfully deleted favorite.';
