@@ -12,13 +12,6 @@ class Service_MainstreamStorage extends Filedrawers_Filesystem_Url_Cifs {
         return( $url = 'smb://'. $this->_shareName .'.m.storage.umich.edu'.$this->pathConcat( $this->_path, $filename ) );
     }
 
-    public function getUniqname()
-    {
-        $userInfo = posix_getpwnam(Zend_Auth::getInstance()->getIdentity());
-        return $uniqname = $userInfo['name'];
-    }
-
-
     public function setPath( $path )
     {
         if ( ! preg_match( '|^/|', $path )) {
@@ -32,14 +25,25 @@ class Service_MainstreamStorage extends Filedrawers_Filesystem_Url_Cifs {
         $this->_path = $path;
     }
 
-    public function favoriteExists($favorite){
+    public function getUniqname()
+    {
+        $userInfo = posix_getpwnam(Zend_Auth::getInstance()->getIdentity());
+        return $uniqname = $userInfo['name'];
+    }
 
-        $testArr = explode('/',$favorite);
-        $foldername = array_pop($testArr);
-        $path = implode('/', $testArr); 
+    public function favoriteExists($favorite){
+        $inputArr = explode('/',$favorite);
+        $foldername = array_pop($inputArr);
+        $path = implode('/', $inputArr);
         $uniqname = $this->getUniqname();
-        $favsTbl = new Model_UserFavorites;
-        $clause =  $favsTbl->getAdapter()->quoteInto("username =?", $uniqname) . $favsTbl->getAdapter()->quoteInto("AND location =?", $path);
+        $favoritesTbl =  Model_UserFavorites::getDB();
+        
+        if ($path === ''){
+            $path = $favoritesTbl->getPath($foldername);
+        } 
+        
+        if ($path !== ''){ 
+        $clause =  $favoritesTbl->getAdapter()->quoteInto("username =?", $uniqname) . $favoritesTbl->getAdapter()->quoteInto("AND location =?", $path);
  
         $validator = new Zend_Validate_Db_NoRecordExists(
           array(
@@ -47,16 +51,16 @@ class Service_MainstreamStorage extends Filedrawers_Filesystem_Url_Cifs {
               'field' => 'foldername',
               'exclude' => $clause
           )
-      );
-      
+        );
+         
         if ($validator->isValid($foldername)) {
             //favs does not exist
-            return false;
-      } else {
-             //favs already exists.
-             return true;
-      }
-
+           return false;
+        } else {
+                //favs already exists.
+                return true;
+        }
+      } 
     }
 
 
@@ -111,10 +115,10 @@ class Service_MainstreamStorage extends Filedrawers_Filesystem_Url_Cifs {
     }
 
 
-    public function listFavorite()
+    public function listFavorites()
     {
-        $favsTbl =  new Model_UserFavorites;
-        $listFavs =  $favsTbl->listFavs();
+        $favoritesTbl =  Model_UserFavorites::getDB(); 
+        $listFavs =  $favoritesTbl->listFavorites();
         $myFavs = array( 'count' => 0 );
         $c = 0;
 
@@ -125,7 +129,7 @@ class Service_MainstreamStorage extends Filedrawers_Filesystem_Url_Cifs {
                    $myFavs['contents'][$c]['service'] = $value;
                }    
  
-               if ($column == 'favorite'){
+               if ($column == 'foldername'){
 	           $myFavs['contents'][$c]['name'] = $value;
                }
 
@@ -141,53 +145,24 @@ class Service_MainstreamStorage extends Filedrawers_Filesystem_Url_Cifs {
     }
 
 
-    public function addFavorite($path,$favorite)
+    public function addFavorite($path,$favoriteName)
     {
-        $uniqname = $this->getUniqname(); 
-        $favsTbl = new Model_UserFavorites;
-        
-        $favs = array(
-           'username'   => $uniqname,
-           'servicename' => 'mainstreamStorage',
-           'location' => $path,
-           'favoritename' => $favoriteName
-        );
-         
-        $isValidInsert = $favsTbl->insertFavorite($path, $favoriteName);
+        $favoritesTbl =  Model_UserFavorites::getDB();
+        $isValidInsert = $favoritesTbl->insertFavorite($path, $favoriteName);
     }
 
-
-     public function renameFavorite($oldFavorite,$newFavorite,$path)
+    public function renameFavorite($oldFavorite,$newFavorite)
     {
-        $uniqname = $this->getUniqname();
-        $favsTbl = new Model_UserFavorites;
- 
-           'foldername' => $oldPath
-
-        $favsNew = array(
-           'username'   => $uniqname,
-           'servicename' => 'mainstreamStorage',
-           'location' => $path,
-           'foldername' => $newPath
-        );
-
-        $isValidRename = $favsTbl->renameFavs($favsOld, $favsNew);
+        $favoritesTbl =  Model_UserFavorites::getDB();
+        $path = $favoritesTbl->getPath($oldFavorite);
+        $isValidRename = $favoritesTbl->renameFavorite($oldFavorite, $newFavorite, $path);
     }
 
-
-     public function deleteFavorite($path,$foldername)
+    public function deleteFavorite($favorite)
     {
-        $uniqname = $this->getUniqname();
-        $favsTbl = new Model_UserFavorites;
-
-        $favs = array(
-           'username'   => $uniqname,
-           'servicename' => 'mainstreamStorage',
-           'location' => $path,
-           'foldername' => $foldername
-        );
-
-        $isValidDelete = $favsTbl->deleteFavs($favs);
+        $favoritesTbl =  Model_UserFavorites::getDB();
+        $path = $favoritesTbl->getPath($favorite); 
+        $isValidDelete = $favoritesTbl->deleteFavorite($path,$favorite);
     }
 
 }

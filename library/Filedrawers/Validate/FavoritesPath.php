@@ -45,17 +45,17 @@ class Filedrawers_Validate_FavoritesPath extends Zend_Validate_Abstract
         $info = $filesystem->getInfo($value);
          
         if (isset($this->_options['oldexists']) ) {
-			$foldername = $filesystem->favExists($value);
+            $foldername = $filesystem->favoriteExists($value);
             if ($foldername === false){
                 $this->_error(self::EXISTS);
                 return false;
             } else {
-				return true;
-			}
-		}
+                    return true;
+	    }
+        }
 
         if (isset($this->_options['exists']) ) {
-            $foldername = $filesystem->favExists($value);
+            $foldername = $filesystem->favoriteExists($value);
             if ($foldername === true){
                 $this->_error(self::ALREADY_EXISTS);
                 return false;

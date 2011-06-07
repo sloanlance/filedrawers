@@ -9,25 +9,67 @@ class Model_UserFavorites extends Zend_Db_Table
 {
     protected $_name = 'filedrawers_favorites';
     protected $_errorMsg;
+    protected static $_dbTbl = NULL;
+    protected $_username;
+    protected $_servicename;
 
- 
     public function __construct()
     {
-    
         parent::__construct();
-        $username = 
-        $servicename =  
-
+        $this->_username = $this->getUniqname();
+        $this->_servicename = $this->getService();
     }
 
- 
-    public function insertFavorite($favorite)
+    static public function getDB()
     {
-   
-        $this->insert($favorite);
+        if ( self::$_dbTbl === NULL ) {
+            self::$_dbTbl = new self();
+        }
 
+        return self::$_dbTbl;   
     }
 
+    public function getUniqname()
+    {
+        $userInfo = posix_getpwnam(Zend_Auth::getInstance()->getIdentity());
+        return $uniqname = $userInfo['name'];
+    }
+
+    public function getService()
+    {
+        $service = Zend_Registry::get('filesystem');
+        return $service = get_class($service);
+    }
+
+    public function getPath($old)
+    {
+        $row = NULL;
+        
+        $select = $this->select()
+           ->from('filedrawers_favorites')
+           ->where("username = ?", $this->_username)
+            ->where("servicename = ?", $this->_servicename)
+            ->where("foldername = ?", $old)
+            ->limit(1);
+
+        $row = $this->fetchRow($select);
+        if ($row !== NULL){      
+            $rowArray = $row->toArray();
+            return $row['location'];
+        } 
+    }
+ 
+    public function insertFavorite($path, $favorite)
+    {
+       $fav = array(
+           'username'   => $this->_username,
+           'servicename' => $this->_servicename,
+           'location' => $path,
+           'foldername' => $favorite
+        );
+
+        $this->insert($fav);
+    }
 
     public function listFavorites()
     {
@@ -37,50 +79,40 @@ class Model_UserFavorites extends Zend_Db_Table
         return $rowArray;
     }
 
-
-     public function renameFavorite( $old, $new )
-     {
-
+    public function renameFavorite($old, $new, $path)
+    {
         $row = NULL;
-
+ 
         $select = $this->select()
-            ->from('filedrawers_favorites')
-            ->where("username = ?", $old['username'])
-            ->where("servicename = ?", $old['servicename'])
-            ->where("location = ?", $old['location'])
-            ->where("foldername = ?", $old['foldername'])
+           ->from('filedrawers_favorites')
+           ->where("username = ?", $this->_username)
+            ->where("servicename = ?", $this->_servicename)
+            ->where("location = ?", $path)
+            ->where("foldername = ?", $old)
             ->limit(1);
 
         $row = $this->fetchRow($select);
    
-        $row->username = $new['username'];
-        $row->servicename = $new['servicename'];
-        $row->location = $new['location'];
-        $row->foldername = $new['foldername'];
+        $row->username = $this->_username;
+        $row->servicename = $this->_servicename;
+        $row->location = $path;
+        $row->foldername = $new;
         $row->save(); 
-      
     }
 
-
-    public function deleteFavorite($del)
+    public function deleteFavorite($path, $favorite)
     {
-
         $row = NULL;
- 
         $select = $this->select()
             ->from('filedrawers_favorites')
-            ->where("username = ?", $del['username'])
-            ->where("servicename = ?", $del['servicename'])
-            ->where("location = ?", $del['location'])
-            ->where("foldername = ?", $del['foldername'])
+            ->where("username = ?", $this->_username)
+            ->where("servicename = ?", $this->_servicename)
+            ->where("location = ?", $path)
+            ->where("foldername = ?", $favorite)
             ->limit(1);
         
         $row = $this->fetchRow($select);
-  
         $row->delete();
-    
     }
 
-
 }
-
