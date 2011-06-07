@@ -129,5 +129,17 @@ class Filedrawers_Filesystem_Mounted_Afs extends Filedrawers_Filesystem_Mounted
             return strtolower( $matches[1] );
         }
     }
+
+    public function getQuota($path)
+    {
+        $utilsPath = Zend_Registry::get('config')->afs->utilitiesPath;
+
+        $cmd = "$utilsPath/fs listquota " . escapeshellarg($path);
+        $result = shell_exec( $cmd . " 2>&1" );
+        $resultLines = explode("\n", $result);
+        $quotaParts = preg_split('/ +/', trim($resultLines[1]));
+
+        return array('total' => $quotaParts[1], 'used' => $quotaParts[2]);
+    }
 }
 

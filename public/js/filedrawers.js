@@ -661,13 +661,12 @@ FD.InfoBar = function() {
             History.navigate(YAHOO.util.Dom.get('changeLocationNewPath').value, YAHOO.util.Dom.get('changeLocationNewService').value);
 			
 		} 
-            /*
+            
             else if (target.id == 'changeLocationCancel') {
             YAHOO.util.Dom.setStyle( currentLocation, 'display', 'inline' );
             YAHOO.util.Dom.setStyle( changeLocation, 'display', 'none' );
-                        // TODO abort the request
 		}
-            */
+            
 	};
 
 	var handleSubmit = function(e) {
@@ -698,7 +697,7 @@ FD.InfoBar = function() {
 	YAHOO.util.Event.on('infoBar', 'click', handleClick);
 	YAHOO.util.Event.on('location', 'submit', handleSubmit);
 	YAHOO.util.Event.on('notifyArea', 'click', locationClick);
-        YAHOO.util.Event.on('changeLocationNewService', 'change', serviceChange);
+    YAHOO.util.Event.on('changeLocationNewService', 'change', serviceChange);
 
 	var kl = new YAHOO.util.KeyListener(document, {keys:13}, {fn:function(){alert('enter');}});
 
@@ -706,14 +705,15 @@ FD.InfoBar = function() {
 		init: function(crntDir) {
 			currentDir = crntDir;
 		},
-                setServiceOptions: function( services ) {
-                    var serviceOptionsHtml;
-                    for ( var id in services.contents ) {
-                        serviceOptionsHtml += '<option value="'+ id +'">'+ services.contents[ id ].label +'</option>';
-                    }
-                    YAHOO.util.Dom.get( 'changeLocationNewService' ).innerHTML = serviceOptionsHtml;
-                },
-                setService:setService,
+        setServiceOptions: function( services ) {
+            var serviceOptionsHtml = '<label for="changeLocationNewService">Service: </label><select name="changeLocationNewService" id="changeLocationNewService">';
+            for ( var id in services.contents ) {
+                serviceOptionsHtml += '<option value="'+ id +'">'+ services.contents[ id ].label +'</option>';
+            }
+            serviceOptionsHtml += '</select>';
+            YAHOO.util.Dom.get('setServicesWrapper').innerHTML = serviceOptionsHtml;
+        },
+        setService:setService,
 		update:update
 	}
 };	
@@ -954,7 +954,8 @@ FD.FileInspector = function() {
 FD.Favorites = function() {
 
     var thisCurrentFav,
-    thisChangeFav;
+    thisChangeFav,
+    alreadyAdding = false;
 	
 	myFavsSource = new YAHOO.util.DataSource("webservices/favorites/");
 	
@@ -988,7 +989,7 @@ FD.Favorites = function() {
 	
 		return callback = {
 			success: function (o) {
-                console.warn("getFavsCallback success");
+                //console.warn("getFavsCallback success");
                 
                 userFeedback.displayFeedback(o);
                 
@@ -1029,58 +1030,95 @@ FD.Favorites = function() {
             YAHOO.util.Dom.setStyle( thisCurrentFav, 'display', 'none' );
             YAHOO.util.Dom.setStyle( thisChangeFav, 'display', 'inline' );
             
-            YAHOO.util.Event.on(thisChangeFav, 'submit', handleFavChange);
-            YAHOO.util.Event.on(thisChangeFav, 'cancel', handleFavCancel);
+            YAHOO.util.Event.on(thisChangeFav, 'submit', handleEditFavChange);
+            YAHOO.util.Event.on(thisChangeFav, 'cancel', handleEditFavCancel);
             
         } else if (target.id == "deleBtn") {
-            console.warn("delete this favorite");
+            
+            var favName = target.parentNode.parentNode.parentNode.firstChild.innerHTML;
+            
+            var callback = getFavsListCallback();			
+            api.post( api.getActionUrl( 'favorites/delete' ), callback, { 'folderName': favName } );
+            
         } else if (target.id == "addBtn") {
+        
+            if (!alreadyAdding) {
+            
+                alreadyAdding = true;
 
-            var linksListHTML = YAHOO.util.Dom.get('favsLinks').innerHTML;
-            // trims off the last </ul> of the favs list
-            linksListHTML = linksListHTML.substr(0, linksListHTML.length - 5);
-            // grabs the highest folder from the current path
-            lastFolder = currentURL.substr(currentURL.lastIndexOf("/")+1);
-            linksListHTML += '<li><form><input type="text" name="newFav" id="newFav" size="10" value="' + lastFolder + '"/></form></li></ul>';
-            YAHOO.util.Dom.get('favsLinks').innerHTML = linksListHTML;
-            document.getElementById("newFav").focus();
+                var linksListHTML = YAHOO.util.Dom.get('favsLinks').innerHTML;
+                
+                // trims off the last </ul> of the favs list
+                linksListHTML = linksListHTML.substr(0, linksListHTML.length - 5);
+                
+                // grabs the highest folder from the current path
+                lastFolder = currentURL.substr(currentURL.lastIndexOf("/")+1);
+                
+                linksListHTML += '<li><form id="newFavForm"><input type="text" name="newFav" id="newFav" size="10" value="' + lastFolder + '"/></form></li></ul>';
+                YAHOO.util.Dom.get('favsLinks').innerHTML = linksListHTML;
+                
+                document.getElementById("newFav").focus();
+                
+                YAHOO.util.Event.on("newFavForm", 'submit', handleAddFav);
+                YAHOO.util.Event.on("newFavForm", 'focusout', handleAddFavCancel);
+                klEscAdd.enable();
+                
+            }
         }
     }
     
-    var handleFavChange = function(e) {
+    var handleEditFavChange = function(e) {
         YAHOO.util.Event.preventDefault(e);
-        console.warn("fav change submitted");
+        //console.warn("fav change submitted");
         klEsc.disable();
         
         oldName = thisCurrentFav.firstChild.innerHTML;
         newName = thisChangeFav.firstChild.value;
-        //path = thisCurrentFav.firstChild.getAttribute("href"); <--- this returns the path the Fav links to.
-        path = homeURL + "/Favorites";
-        
-        //myFavsSource.sendRequest( "rename?format=json&path=" + path + "&oldName=" + oldName + "&newName=" + newName );
         
         var callback = getFavsListCallback();			
-		api.post( api.getActionUrl( 'favorites/rename' ), callback, { 'oldName': oldName, 'newName': newName, 'path': path } );
-        
-        //console.warn( thisChangeFav.firstChild.value );
+		api.post( api.getActionUrl( 'favorites/rename' ), callback, { 'oldName': oldName, 'newName': newName } );
         
         YAHOO.util.Dom.setStyle( thisCurrentFav, 'display', 'inline' );
         YAHOO.util.Dom.setStyle( thisChangeFav, 'display', 'none' );
         
     }
     
-    var handleFavCancel = function(e) {
+    var handleEditFavCancel = function(e) {
         YAHOO.util.Event.preventDefault(e);
-        console.warn("fav change cancelled");
+        //console.warn("fav change cancelled");
         klEsc.disable();
         
         YAHOO.util.Dom.setStyle( thisCurrentFav, 'display', 'inline' );
         YAHOO.util.Dom.setStyle( thisChangeFav, 'display', 'none' );
     }
+    
+    var handleAddFav = function(e) {
+        YAHOO.util.Event.preventDefault(e);
+        var newFavName = document.getElementById("newFav").value;
+        var callback = getFavsListCallback();	
+        api.post( api.getActionUrl( 'favorites/add' ), callback, { 'folderName': newFavName, 'path': currentURL } );
+        klEscAdd.disable();
+        alreadyAdding = false;
+    };
+    
+    var handleAddFavCancel = function(e) {
+        
+        YAHOO.util.Event.preventDefault(e);
+        klEscAdd.disable();
+        
+        var linksListHTML = YAHOO.util.Dom.get('favsLinks').innerHTML;
+                
+        // trims off the last <li> to the end of the favs list
+        linksListHTML = linksListHTML.substr(0, linksListHTML.lastIndexOf("<li>"));
+        linksListHTML += '</ul>';
+        YAHOO.util.Dom.get('favsLinks').innerHTML = linksListHTML;
+        alreadyAdding = false;
+    };
 
 	myFavsSource.sendRequest( "list?format=json" );
     
-    var klEsc = new YAHOO.util.KeyListener(document, { keys:27 }, { fn:handleFavCancel } );
+    var klEsc = new YAHOO.util.KeyListener(document, { keys:27 }, { fn:handleEditFavCancel } );
+    var klEscAdd = new YAHOO.util.KeyListener(document, { keys:27 }, { fn:handleAddFavCancel } );
     
     return {
         editFav:editFav
