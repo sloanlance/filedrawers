@@ -308,11 +308,11 @@ abstract class Filedrawers_Filesystem_Mounted extends Filedrawers_Filesystem {
     }
 
 
-    public function getFileHandle($path)
+    public function getFileHandle($path, $mode = 'rb' )
     {
         clearstatcache();
 
-        if ( $handle = @fopen($path, "rb")) {
+        if ( $handle = @fopen($path, $mode)) {
             $stat = @fstat($handle);
             if ( is_array($stat) && $stat['dev'] == $this->fsStat['dev'] ) {
                 return $handle;
