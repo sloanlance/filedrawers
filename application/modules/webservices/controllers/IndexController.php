@@ -19,6 +19,7 @@ class Webservices_IndexController extends Webservices_FiledrawersControllerAbstr
         $this->contexts['copy'] = array('xml', 'json', 'html');
         $this->contexts['mkdir'] = array('xml', 'json', 'html');
         $this->contexts['gettoken'] = array('xml', 'json', 'html');
+        $this->contexts['upload'] = array('xml', 'json', 'html');  
         $this->contexts['uploadstatus'] = array('xml', 'json', 'html');  
         $this->contexts['uploadfinish'] = array('xml', 'json', 'html');
         parent::init(); 
@@ -336,6 +337,27 @@ class Webservices_IndexController extends Webservices_FiledrawersControllerAbstr
         $this->_filesystem->createDirectory($values['path'], $values['folderName']);
         $this->view->status = 'success';
         $this->view->message = 'Successfully created the directory.';
+    }
+
+
+    public function uploadAction()
+    {
+        // TODO handle methods other than stream uploads
+        // TODO validate input
+        $out = $this->_filesystem->getFileHandle(FileDrawers_Filesystem::pathConcat($_GET['path'], $_GET['name']), 'wb');
+        if ($out) {
+            // Read binary input stream and append it to temp file
+            $in = fopen("php://input", "rb");
+            if ($in) {
+                while ($buff = fread($in, 4096))
+                    fwrite($out, $buff);
+            } else
+                die('{"jsonrpc" : "2.0", "error" : {"code": 101, "message": "Failed to open input stream."}, "id" : "id"}');
+
+            fclose($in);
+            fclose($out);
+        } else
+            die('{"jsonrpc" : "2.0", "error" : {"code": 102, "message": "Failed to open output stream."}, "id" : "id"}');
     }
 
 

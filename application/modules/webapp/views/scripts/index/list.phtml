@@ -10,6 +10,11 @@ $this->headScript()->appendFile('yui/build/datatable/datatable-min.js');
 $this->headScript()->appendFile('yui/build/connection/connection-min.js');
 $this->headScript()->appendFile('yui/build/history/history-min.js');
 $this->headScript()->appendFile('yui/build/json/json-min.js');
+
+$this->headScript()->appendFile('plupload/javascript/plupload.js');
+$this->headScript()->appendFile('plupload/javascript/plupload.html5.js');
+$this->headScript()->appendFile('plupload/javascript/plupload.html4.js');
+
 $this->headScript()->appendFile('js/filedrawers.js');
 ?>
 
@@ -56,7 +61,7 @@ $this->headScript()->appendFile('js/filedrawers.js');
 			<div id="selectedItem" style="background-image: url('/images/folder.gif');"></div>
 			<h4>Actions</h4>
 			<ul id="actionList">
-				<li><a href="#upload">Upload File(s)</a></li>
+				<li><a href="#upload" class="expandable">Upload File(s)</a></li>
 				<li><a href="#cut">Cut Selected Item(s)</a></li>
 				<li><a href="#copy">Copy Selected Item(s)</a></li>
 				<li><a href="#paste">Paste to This Folder</a></li>
@@ -222,34 +227,16 @@ $this->headScript()->appendFile('js/filedrawers.js');
 			<input type="submit" name="save" value="Create" />
 		</div>
 	</form>
-	<form name="upload2" id="upload" class="expandItem" style="display: none;" enctype="multipart/form-data" action="/mfile-bin/upload.cgi" method="post">
-		<div class="titlebar"> <a href="javascript:closeItem('uploadCtrl','upload');document.getElementById('upload').reset();">[X]</a>
-			<h2>Upload Files to AFS</h2>
-		</div>
-		<input type="hidden" name="sessionid" id="sessionid" value="" />
-		<input type="hidden" name="path" id="uploadpath" value="" />
-		<input type="hidden" name="returnToURI" id="returnToURI" value="" />
-		<input type="hidden" name="overwrite_file" id="overwrite_file" value="" />
-		<ul>
-			<li id="file1">
-				<input type="file" name="file" />
-				<p><a href="javascript:toggleDisplay('file2');">Add Another File</a></p>
-			</li>
-		</ul>
-		<div class="uploadctrl" id="uploadctrl"> Overwrite files during upload?
-			<input type="checkbox" name="overwrite_box" id="overwrite_box" onclick="processClobberCheckbox();" />
-			<input type="button" name="upload" value="Upload File(s)" onclick="uploadloopcnt=0; ajaxupload();" />
-			&nbsp;&nbsp; </div>
-		<div id="lbtop">
-			<div id="lbinner"></div>
-			<table width="100%">
-				<tr>
-					<td id="fileinfo"></td>
-					<td align="right" id="lbpercent"></td>
-				</tr>
-			</table>
-		</div>
-	</form>
+	<div id="upload" class="expandItem" style="display: none;">
+            <form id="upload-form" method="post" action="dump.php">
+                <div>
+                    <div id="filelist">No runtime found.</div>
+                    <br />
+                    <a id="pickfiles" href="javascript:;">[Select files]</a> 
+                    <a id="uploadfiles" href="javascript:;">Upload files</a>
+                </div>
+            </form>
+	</div>
 
 	<iframe id="yui-history-iframe" src="images/mime/small/0000000dir.gif"></iframe>
 	<input id="yui-history-field" type="hidden">

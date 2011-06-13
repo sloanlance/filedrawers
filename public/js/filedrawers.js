@@ -764,14 +764,52 @@ FD.NewFolderDialog = function() {
 
 	return {
 		show: function(e, action) {
-			if (action != 'createFolder') {
-				hide();
-				return;
-			}
+                          switch (action[0]) {
+                              case 'createFolder':
+                                  YAHOO.util.Dom.setStyle('newFolder', 'display', 'block');
+                                  document.getElementById('newFold').focus(); 
+                                  break;
+                              case 'upload':
+                                  var uploader = new plupload.Uploader({
+                                            runtimes : 'html5',
+                                            browse_button : 'pickfiles',
+                                            multipart: false,
+                                            url : api.getActionUrl('upload'),
+                                            container: 'upload-form',
+                                            });
 
-			YAHOO.util.Dom.setStyle('newFolder', 'display', 'block');
-			document.getElementById('newFold').focus(); 
-		},
+                                  uploader.bind('Init', function(up, params) {
+                                          YAHOO.util.Dom.get('filelist').innerHTML = "<div>Current runtime: " + params.runtime + "</div>";
+                                          });
+
+                                  uploader.bind('FilesAdded', function(up, files) {
+                                          for (var i in files) {
+                                          YAHOO.util.Dom.get('filelist').innerHTML += '<div id="' + files[i].id + '">' + files[i].name + ' (' + plupload.formatSize(files[i].size) + ') <b></b></div>';
+                                          }
+                                          });
+
+                                  uploader.bind('UploadFile', function(up, file) {
+                                          YAHOO.util.Dom.get('upload-form').innerHTML += '<input type="hidden" name="file-' + file.id + '" value="' + file.name + '" />';
+                                          });
+
+                                  uploader.bind('UploadProgress', function(up, file) {
+                                          YAHOO.util.Dom.get(file.id).getElementsByTagName('b')[0].innerHTML = '<span>' + file.percent + "%</span>";
+                                          });
+
+                                  //YAHOO.util.Dom.get('pickfiles').onclick = function() { console.log('hi'); return false; };
+                                  YAHOO.util.Dom.get('uploadfiles').onclick = function() {
+                                      uploader.start();
+                                      return false;
+                                  };
+
+                                  uploader.init();
+                                  YAHOO.util.Dom.setStyle('upload', 'display', 'block');
+                                  break;
+                              default:
+                                  hide();
+                                  return;
+                          }
+        },
 
 		evnt:evnt
 	}
@@ -925,7 +963,6 @@ FD.FileInspector = function() {
 			}
 
                         switch (action[1]) {
-                            case 'upload':
                             case 'permissions':
                                 alert('"' + action[1] + '" not implemented');
                                 break;
