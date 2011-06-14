@@ -770,22 +770,23 @@ FD.NewFolderDialog = function() {
                                   document.getElementById('newFold').focus(); 
                                   break;
                               case 'upload':
+
                                   var settings = {
-                                            runtimes : 'html5,html4',
-                                            url: api.getActionUrl('upload'),
-                                            multipart: false,
-                                  };
+                                    runtimes : 'html5,html4',
+                                    multipart: false,
+                                    url : api.getActionUrl('upload')
+                                    };
                                   var uploader = new plupload.Uploader(settings);
+                                  // initialize to get features object
                                   uploader.init();
-                                  // uploader.features isn't populated until init, so we do a init() here to get those values
 
                                   if (!uploader.features.html5) {
                                       settings.multipart = true;
-                                      settings.chunk_size = '1mb';
+                                      settings.runtimes = 'html5,html4';
                                   }
-                                  settings.browse_button = 'pickfiles';
-                                  settings.container = 'upload-form';
 
+                                  // now create the real instance with all settings
+                                  settings.browse_button = 'pickfiles';
                                   uploader = new plupload.Uploader(settings);
 
                                   uploader.bind('Init', function(up, params) {
@@ -799,7 +800,7 @@ FD.NewFolderDialog = function() {
                                           });
 
                                   uploader.bind('UploadFile', function(up, file) {
-                                          YAHOO.util.Dom.get('upload-form').innerHTML += '<input type="hidden" name="file-' + file.id + '" value="' + file.name + '" />';
+                                          YAHOO.util.Dom.get('upload').innerHTML += '<input type="hidden" name="file-' + file.id + '" value="' + file.name + '" />';
                                           });
 
                                   uploader.bind('UploadProgress', function(up, file) {
@@ -807,20 +808,19 @@ FD.NewFolderDialog = function() {
                                           });
 
                                   uploader.bind('UploadComplete', function(up, files) {
-                                          YAHOO.util.Dom.setStyle('upload', 'display', 'none');
                                           userFeedback.hideFeedback();
                                           myDataSource.sendRequest( api.getActionUrl( 'list' ), dirTable.onDataReturnInitializeTable, dirTable);
                                           userFeedback.startTimer("list");
+                                          YAHOO.util.Dom.setStyle('upload', 'visibility', 'hidden');
                                           });
 
-                                  //YAHOO.util.Dom.get('pickfiles').onclick = function() { console.log('hi'); return false; };
                                   YAHOO.util.Dom.get('uploadfiles').onclick = function() {
                                       uploader.start();
                                       return false;
                                   };
 
                                   uploader.init();
-                                  YAHOO.util.Dom.setStyle('upload', 'display', 'block');
+                                  YAHOO.util.Dom.setStyle('upload', 'visibility', 'visible');
                                   break;
                               default:
                                   hide();

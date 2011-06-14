@@ -227,16 +227,14 @@ $this->headScript()->appendFile('js/filedrawers.js');
 			<input type="submit" name="save" value="Create" />
 		</div>
 	</form>
-	<div id="upload" class="expandItem" style="display: none;">
-            <form id="upload-form" method="post" action="dump.php">
-                <div>
-                    <div id="filelist">No runtime found.</div>
-                    <br />
-                    <a id="pickfiles" href="javascript:;">[Select files]</a> 
-                    <a id="uploadfiles" href="javascript:;">Upload files</a>
-                </div>
+            <form id="upload" class="expandItem" style="display: block; visibility: hidden;" method="post" action="dump.php">
+                    <div>
+                            <div id="filelist">No runtime found.</div>
+                            <br />
+                            <a id="pickfiles" style="z-index: 11;" href="javascript:;">[Select files]</a> 
+                            <a id="uploadfiles" href="javascript:;">[Upload files]</a>
+                    </div>
             </form>
-	</div>
 
 	<iframe id="yui-history-iframe" src="images/mime/small/0000000dir.gif"></iframe>
 	<input id="yui-history-field" type="hidden">
