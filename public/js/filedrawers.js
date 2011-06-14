@@ -796,6 +796,13 @@ FD.NewFolderDialog = function() {
                                           YAHOO.util.Dom.get(file.id).getElementsByTagName('b')[0].innerHTML = '<span>' + file.percent + "%</span>";
                                           });
 
+                                  uploader.bind('UploadComplete', function(up, files) {
+                                          YAHOO.util.Dom.setStyle('upload', 'display', 'none');
+                                          userFeedback.hideFeedback();
+                                          myDataSource.sendRequest( api.getActionUrl( 'list' ), dirTable.onDataReturnInitializeTable, dirTable);
+                                          userFeedback.startTimer("list");
+                                          });
+
                                   //YAHOO.util.Dom.get('pickfiles').onclick = function() { console.log('hi'); return false; };
                                   YAHOO.util.Dom.get('uploadfiles').onclick = function() {
                                       uploader.start();
