@@ -770,13 +770,23 @@ FD.NewFolderDialog = function() {
                                   document.getElementById('newFold').focus(); 
                                   break;
                               case 'upload':
-                                  var uploader = new plupload.Uploader({
-                                            runtimes : 'html5',
-                                            browse_button : 'pickfiles',
+                                  var settings = {
+                                            runtimes : 'html5,html4',
+                                            url: api.getActionUrl('upload'),
                                             multipart: false,
-                                            url : api.getActionUrl('upload'),
-                                            container: 'upload-form',
-                                            });
+                                  };
+                                  var uploader = new plupload.Uploader(settings);
+                                  uploader.init();
+                                  // uploader.features isn't populated until init, so we do a init() here to get those values
+
+                                  if (!uploader.features.html5) {
+                                      settings.multipart = true;
+                                      settings.chunk_size = '1mb';
+                                  }
+                                  settings.browse_button = 'pickfiles';
+                                  settings.container = 'upload-form';
+
+                                  uploader = new plupload.Uploader(settings);
 
                                   uploader.bind('Init', function(up, params) {
                                           YAHOO.util.Dom.get('filelist').innerHTML = "<div>Current runtime: " + params.runtime + "</div>";
