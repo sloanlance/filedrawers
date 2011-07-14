@@ -3,6 +3,7 @@ myJSONdata,
 myPerms,
 homeURL,
 currentURL,
+currentService,
 cutCopyURL,
 cutCopyFiles = [],
 clipboardState,
@@ -913,55 +914,81 @@ FD.FileInspector = function() {
 		
 		filesSelected = (numSelected > 0) ? true : false;
 
-		// Set actions
-		if (permissions.i) {
-			YAHOO.util.Dom.addClass(actions.upload.ref, 'enabled');
-			YAHOO.util.Dom.addClass(actions.createFolder.ref, 'enabled');
-		} else {
-			YAHOO.util.Dom.removeClass(actions.upload.ref, 'enabled');
-			YAHOO.util.Dom.removeClass(actions.createFolder.ref, 'enabled');
-		}
+                switch (currentService) {
+                    // these service specific tests are a work around until the API can normalize permissions for the interface
+                    case 'ifs':
+                        // Set actions
+                        if (permissions.i) {
+                            YAHOO.util.Dom.addClass(actions.upload.ref, 'enabled');
+                            YAHOO.util.Dom.addClass(actions.createFolder.ref, 'enabled');
+                        } else {
+                            YAHOO.util.Dom.removeClass(actions.upload.ref, 'enabled');
+                            YAHOO.util.Dom.removeClass(actions.createFolder.ref, 'enabled');
+                        }
 
-		if (filesSelected && permissions.r && permissions.d) {
-			YAHOO.util.Dom.addClass(actions.cut.ref, 'enabled');
-		} else {
-			YAHOO.util.Dom.removeClass(actions.cut.ref, 'enabled');
-		}
+                        if (filesSelected && permissions.r && permissions.d) {
+                            YAHOO.util.Dom.addClass(actions.cut.ref, 'enabled');
+                        } else {
+                            YAHOO.util.Dom.removeClass(actions.cut.ref, 'enabled');
+                        }
 
-		if (filesSelected && permissions.r) {
-			YAHOO.util.Dom.addClass(actions.copy.ref, 'enabled');
-		} else {
-			YAHOO.util.Dom.removeClass(actions.copy.ref, 'enabled');
-		}
+                        if (filesSelected && permissions.r) {
+                            YAHOO.util.Dom.addClass(actions.copy.ref, 'enabled');
+                        } else {
+                            YAHOO.util.Dom.removeClass(actions.copy.ref, 'enabled');
+                        }
 
-		// delete is weird... you need ldw and either r or i
-		if (filesSelected && permissions.d && (permissions.r || permissions.i) && permissions.w) {
-			YAHOO.util.Dom.addClass(actions.del.ref, 'enabled');
-		} else {
-			YAHOO.util.Dom.removeClass(actions.del.ref, 'enabled');
-		}
+                        // delete is weird... you need ldw and either r or i
+                        if (filesSelected && permissions.d && (permissions.r || permissions.i) && permissions.w) {
+                            YAHOO.util.Dom.addClass(actions.del.ref, 'enabled');
+                        } else {
+                            YAHOO.util.Dom.removeClass(actions.del.ref, 'enabled');
+                        }
 
-		if (filesSelected && numSelected < 2 && permissions.r && permissions.i && permissions.d) {
-			YAHOO.util.Dom.addClass(actions.rename.ref, 'enabled');
-		} else {
-			YAHOO.util.Dom.removeClass(actions.rename.ref, 'enabled');
-		}
-		
-		// paste condition
-		if (permissions.i && !filesSelected && cutCopyURL) {
-			YAHOO.util.Dom.addClass(actions.paste.ref, 'enabled');
-		} else {
-			YAHOO.util.Dom.removeClass(actions.paste.ref, 'enabled');
-		}
+                        if (filesSelected && numSelected < 2 && permissions.r && permissions.i && permissions.d) {
+                            YAHOO.util.Dom.addClass(actions.rename.ref, 'enabled');
+                        } else {
+                            YAHOO.util.Dom.removeClass(actions.rename.ref, 'enabled');
+                        }
 
-		// set permissions for folder
-		/*if ( itemInfo.numSel == 1 && files[ itemInfo.lastId ].type == folderMime ) {
-		setInspControl( 'permsCtrl', 'permsCtrl_cmd()',
-		'Set Permissions for Folder' );
-		} else {
-		setInspControl( 'permsCtrl', '', 'Set Permissions for Folder' );
-		}*/
-	};
+                        // paste condition
+                        if (permissions.i && !filesSelected && cutCopyURL) {
+                            YAHOO.util.Dom.addClass(actions.paste.ref, 'enabled');
+                        } else {
+                            YAHOO.util.Dom.removeClass(actions.paste.ref, 'enabled');
+                        }
+
+                        // set permissions for folder
+                        /*if ( itemInfo.numSel == 1 && files[ itemInfo.lastId ].type == folderMime ) {
+                          setInspControl( 'permsCtrl', 'permsCtrl_cmd()',
+                          'Set Permissions for Folder' );
+                          } else {
+                          setInspControl( 'permsCtrl', '', 'Set Permissions for Folder' );
+                          }*/
+                        break;
+                    case 'mainstreamStorage':
+                        YAHOO.util.Dom.addClass(actions.createFolder.ref, 'enabled');
+
+                        YAHOO.util.Dom.removeClass(actions.upload.ref, 'enabled');
+                        YAHOO.util.Dom.removeClass(actions.copy.ref, 'enabled');
+
+                        if (filesSelected) {
+                            YAHOO.util.Dom.addClass(actions.cut.ref, 'enabled');
+                            YAHOO.util.Dom.addClass(actions.del.ref, 'enabled');
+                            YAHOO.util.Dom.addClass(actions.rename.ref, 'enabled');
+                        } else {
+                            YAHOO.util.Dom.removeClass(actions.cut.ref, 'enabled');
+                            YAHOO.util.Dom.removeClass(actions.del.ref, 'enabled');
+                            YAHOO.util.Dom.removeClass(actions.rename.ref, 'enabled');
+                        }
+                        if (!filesSelected && cutCopyURL) {
+                            YAHOO.util.Dom.addClass(actions.paste.ref, 'enabled');
+                        } else {
+                            YAHOO.util.Dom.removeClass(actions.paste.ref, 'enabled');
+                        }
+                        break;
+                }
+        };
 	
 	clearSelection = function(e) {
 		YAHOO.util.Dom.removeClass(links, 'inspSelected');
