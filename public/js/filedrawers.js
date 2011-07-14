@@ -998,7 +998,9 @@ FD.FileInspector = function() {
 
 		var target = YAHOO.util.Event.getTarget(e);
 
-		if (target.href) {
+                if (!YAHOO.util.Dom.hasClass(target, 'enabled')) {
+                    YAHOO.util.Event.preventDefault(e);
+                } else if (target.href) {
 			YAHOO.util.Event.preventDefault(e);
 			var action = target.hash.match(/#(.*)$/);
 
@@ -1006,14 +1008,7 @@ FD.FileInspector = function() {
 				YAHOO.util.Dom.addClass(target, 'inspSelected');
 			}
 
-                        switch (action[1]) {
-                            case 'permissions':
-                                alert('"' + action[1] + '" not implemented');
-                                break;
-                            default:
-                                evnt.fire(action[1]);
-                                break;
-                        }
+                        evnt.fire(action[1]);
 		}
 	};
 	
