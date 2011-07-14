@@ -145,14 +145,28 @@ FD.UserFeedback = function() {
 			}
 						
 			//console.warn("errorMsg = " + myJSONdata.errorMsg + "  |  message = " + myJSONdata.message);
-			
+		        var msg = "";
+	
 			if (myJSONdata.errorMsg) {
-				YAHOO.util.Dom.get('feedback').innerHTML = YAHOO.lang.dump(myJSONdata.errorMsg);
-				YAHOO.util.Dom.setStyle('feedback', 'display', 'block');
-			} else if (myJSONdata.message) {
-				YAHOO.util.Dom.get('feedback').innerHTML = YAHOO.lang.dump(myJSONdata.message);
-				YAHOO.util.Dom.setStyle('feedback', 'display', 'block');
+                            switch (typeof myJSONdata.errorMsg) {
+                                case "string":
+                                    msg = YAHOO.lang.dump(myJSONdata.errorMsg);
+                                break;
+                                case "object":
+                                    // a hackish way to get the first error in the errorMsg object
+                                    for (var type in myJSONdata.errorMsg) break;
+                                    for (var code in myJSONdata.errorMsg[type]) break;
+                                    msg = myJSONdata.errorMsg[type][code];
+                                    break;
+                            }
+                        } else if (myJSONdata.message) {
+				msg = YAHOO.lang.dump(myJSONdata.message);
 			}
+
+                        if (msg != "") {
+                            YAHOO.util.Dom.get('feedback').innerHTML = msg;
+                            YAHOO.util.Dom.setStyle('feedback', 'display', 'block');
+                        }
 		},
 
 		hideFeedback: function() {
