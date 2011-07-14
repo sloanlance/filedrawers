@@ -315,25 +315,25 @@ FD.DirList = function() {
 	var getAjaxListCallback = function(oTable) {
 	
 		var tableState = oTable.getState();
-		
+	        var generalCallback =function (o) {
+
+                    userFeedback.displayFeedback(o);
+
+                    //myDataSource.responseSchema = responseSchema;
+                    myDataSource.doBeforeCallback = hiddenFileFilter;
+
+                    //tableState.sortedBy = tableInitialSort;
+
+                    myDataSource.sendRequest( api.getActionUrl( 'list' ), {
+                            success  : oTable.onDataReturnInitializeTable,
+                            failure  : oTable.onDataReturnInitializeTable,  // add errorHandling
+                            scope    : oTable,
+                            argument : tableState
+                    }); 	
+                };
 		return callback = {
-			success: function (o) {
-			
-				userFeedback.displayFeedback(o);
-								
-				//myDataSource.responseSchema = responseSchema;
-				myDataSource.doBeforeCallback = hiddenFileFilter;
-
-				//tableState.sortedBy = tableInitialSort;
-
-				myDataSource.sendRequest( api.getActionUrl( 'list' ), {
-					success  : oTable.onDataReturnInitializeTable,
-					failure  : oTable.onDataReturnInitializeTable,  // add errorHandling
-					scope    : oTable,
-					argument : tableState
-				});
-			},
-
+			success: generalCallback,
+                        failure: generalCallback,
 			timeout: 3000
 		};
 	};
