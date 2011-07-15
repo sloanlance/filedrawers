@@ -931,6 +931,9 @@ FD.FileInspector = function() {
                 switch (currentService) {
                     // these service specific tests are a work around until the API can normalize permissions for the interface
                     case 'ifs':
+                        YAHOO.util.Dom.setStyle(actions.upload.ref.parentNode, 'display', 'inline');
+                        YAHOO.util.Dom.setStyle(actions.copy.ref.parentNode, 'display', 'inline');
+
                         // Set actions
                         if (permissions.i) {
                             YAHOO.util.Dom.addClass(actions.upload.ref, 'enabled');
@@ -986,6 +989,9 @@ FD.FileInspector = function() {
                         YAHOO.util.Dom.removeClass(actions.upload.ref, 'enabled');
                         YAHOO.util.Dom.removeClass(actions.copy.ref, 'enabled');
 
+                        YAHOO.util.Dom.setStyle(actions.upload.ref.parentNode, 'display', 'none');
+                        YAHOO.util.Dom.setStyle(actions.copy.ref.parentNode, 'display', 'none');
+
                         if (filesSelected) {
                             YAHOO.util.Dom.addClass(actions.cut.ref, 'enabled');
                             YAHOO.util.Dom.addClass(actions.del.ref, 'enabled');
@@ -1002,6 +1008,10 @@ FD.FileInspector = function() {
                         }
                         break;
                 }
+
+                // removing permissions action until it is implemented
+                YAHOO.util.Dom.removeClass(actions.permissions.ref, 'enabled');
+                YAHOO.util.Dom.setStyle(actions.permissions.ref.parentNode, 'display', 'none');
         };
 	
 	clearSelection = function(e) {
