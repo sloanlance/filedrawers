@@ -419,6 +419,10 @@ FD.DirList = function() {
 							
 			myDataSource.doBeforeCallback = hiddenFileFilter;
 								
+			myDataSource.subscribe('dataErrorEvent', function(oDS){  // triggered by data return error
+                                FD.Utils.checkResponse(oDS.response);
+                        });
+
 			myDataSource.subscribe('responseEvent', function(oDS){  // triggered by data return
 			
 				userFeedback.stopTimer();
@@ -426,7 +430,6 @@ FD.DirList = function() {
 				userFeedback.displayFeedback(oDS.response);
 				
 				myJSONdata = YAHOO.lang.JSON.parse(oDS.response.responseText);
-				
 				currentURL = YAHOO.lang.dump(myJSONdata.path);
                                 api.setUrlParam( 'path', currentURL );
 				currentService = YAHOO.lang.dump(myJSONdata.service);
