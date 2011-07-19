@@ -270,7 +270,7 @@ FD.Utils = {
             case 302:
             case 0:
                 userFeedback.stopTimer()
-                userFeedback.showFeedback('A problem occurred, try <a href="' + baseUrl + '">reloading</a>.');
+                userFeedback.showFeedback('A problem occurred, try <a href="javascript: window.location.reload();">reloading</a>.');
                 break;
         }
         return true;
