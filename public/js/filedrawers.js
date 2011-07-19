@@ -89,7 +89,8 @@ FD.api = function() {
             };
 
             var getTokenFailureHandler = function(o) {
-                    alert(o.status + " : " + o.statusText);
+                FD.Utils.checkResponse(o);
+                //alert(o.status + " : " + o.statusText);
             };
 
             YAHOO.util.Connect.asyncRequest("GET", this.getActionUrl( 'gettoken' ), {
@@ -163,14 +164,19 @@ FD.UserFeedback = function() {
 				msg = YAHOO.lang.dump(myJSONdata.message);
 			}
 
-                        if (msg != "") {
-                            YAHOO.util.Dom.get('feedback').innerHTML = msg;
-                            YAHOO.util.Dom.setStyle('feedback', 'display', 'block');
-                        }
+                        this.showFeedback(msg);
 		},
 
+                showFeedback: function(msg) {
+                    if (msg != "") {
+                        YAHOO.util.Dom.get('feedback').innerHTML = msg;
+                        YAHOO.util.Dom.setStyle('feedback', 'display', 'block');
+                    }
+                },
+
 		hideFeedback: function() {
-			YAHOO.util.Dom.setStyle('feedback', 'display', 'none');
+                    YAHOO.util.Dom.get('feedback').innerHTML = "";
+                    YAHOO.util.Dom.setStyle('feedback', 'display', 'none');
 		}
 	}
 }
@@ -255,8 +261,20 @@ FD.Utils = {
         }
 
         return path.concat( pathParts.join( '/' ));
-    }
+    },
 
+    checkResponse: function(resp)
+    {
+        console.log(resp);
+        switch (resp.status) {
+            case 302:
+            case 0:
+                userFeedback.stopTimer()
+                userFeedback.showFeedback('A problem occurred, try <a href="' + baseUrl + '">reloading</a>.');
+                break;
+        }
+        return true;
+    }
 };
 
 FD.cutCopyEvent = new YAHOO.util.CustomEvent('cutCopyEvent');
@@ -311,7 +329,7 @@ FD.DirList = function() {
 			var newDir = FD.Utils.pathConcat( currentURL, oArgs.target.innerHTML );
 			userFeedback.hideFeedback();
 			History.navigate(newDir);
-		}		
+                }		
 		
 	};
 	
@@ -330,6 +348,11 @@ FD.DirList = function() {
 	
 		var tableState = oTable.getState();
 	        var generalCallback =function (o) {
+
+                    console.log(o);
+                    if ( ! FD.Utils.checkResponse(o)) {
+                        return false;
+                    }
 
                     userFeedback.displayFeedback(o);
 
