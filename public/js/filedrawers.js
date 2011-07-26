@@ -760,6 +760,7 @@ FD.InfoBar = function() {
 };	
 
 FD.NewFolderDialog = function() {
+
 	var evnt = new YAHOO.util.CustomEvent("New Folder Event");
 
 	var hide = function() {
@@ -805,73 +806,108 @@ FD.NewFolderDialog = function() {
 
 	return {
 		show: function(e, action) {
-                          switch (action[0]) {
-                              case 'createFolder':
-                                  YAHOO.util.Dom.setStyle('newFolder', 'display', 'block');
-                                  document.getElementById('newFold').focus(); 
-                                  break;
-                              case 'upload':
-
-                                  var settings = {
-                                    runtimes : 'html5,html4',
-                                    multipart: false,
-                                    url : api.getActionUrl('upload')
-                                    };
-                                  var uploader = new plupload.Uploader(settings);
-                                  // initialize to get features object
-                                  uploader.init();
-
-                                  if (!uploader.features.html5) {
-                                      settings.multipart = true;
-                                      settings.runtimes = 'html5,html4';
-                                  }
-
-                                  // now create the real instance with all settings
-                                  settings.browse_button = 'pickfiles';
-                                  uploader = new plupload.Uploader(settings);
-
-                                  uploader.bind('Init', function(up, params) {
-                                          YAHOO.util.Dom.get('filelist').innerHTML = "<div>Current runtime: " + params.runtime + "</div>";
-                                          });
-
-                                  uploader.bind('FilesAdded', function(up, files) {
-                                          for (var i in files) {
-                                          YAHOO.util.Dom.get('filelist').innerHTML += '<div id="' + files[i].id + '">' + files[i].name + ' (' + plupload.formatSize(files[i].size) + ') <b></b></div>';
-                                          }
-                                          });
-
-                                  uploader.bind('UploadFile', function(up, file) {
-                                          YAHOO.util.Dom.get('upload').innerHTML += '<input type="hidden" name="file-' + file.id + '" value="' + file.name + '" />';
-                                          });
-
-                                  uploader.bind('UploadProgress', function(up, file) {
-                                          YAHOO.util.Dom.get(file.id).getElementsByTagName('b')[0].innerHTML = '<span>' + file.percent + "%</span>";
-                                          });
-
-                                  uploader.bind('UploadComplete', function(up, files) {
-                                          userFeedback.hideFeedback();
-                                          myDataSource.sendRequest( api.getActionUrl( 'list' ), dirTable.onDataReturnInitializeTable, dirTable);
-                                          userFeedback.startTimer("list");
-                                          YAHOO.util.Dom.setStyle('upload', 'visibility', 'hidden');
-                                          });
-
-                                  YAHOO.util.Dom.get('uploadfiles').onclick = function() {
-                                      uploader.start();
-                                      return false;
-                                  };
-
-                                  uploader.init();
-                                  YAHOO.util.Dom.setStyle('upload', 'visibility', 'visible');
-                                  break;
-                              default:
-                                  hide();
-                                  return;
-                          }
+        
+            if (action != 'createFolder') {
+                return;
+            }
+             
+          YAHOO.util.Dom.setStyle('newFolder', 'display', 'block');
+          document.getElementById('newFold').focus(); 
+                                  
         },
 
 		evnt:evnt
 	}
 }();   //END FD.NewFolderDialog
+
+FD.UploadDialog = function() {
+
+    var evnt = new YAHOO.util.CustomEvent("Upload Event");
+    
+    var hide = function() {
+		var newUploadForm = YAHOO.util.Dom.get('upload');
+		YAHOO.util.Dom.setStyle(newUploadForm, 'display', 'none');
+		newUploadForm.reset();
+	};
+    
+    var handleClick = function(e) {
+		var target = YAHOO.util.Event.getTarget(e);
+
+		if ( ! target.href) {
+			return;
+		}
+
+		YAHOO.util.Event.preventDefault(e);
+		hide();
+		FD.InspDialogCloseEvent.fire();
+	};
+    
+    YAHOO.util.Event.on('upload', 'click', handleClick);
+
+    return {
+		show: function(e, action) {
+        
+            if (action != 'upload') {
+                return;
+            }
+        
+          var settings = {
+            runtimes : 'html5,html4',
+            multipart: false,
+            url : api.getActionUrl('upload')
+            };
+          var uploader = new plupload.Uploader(settings);
+          // initialize to get features object
+          uploader.init();
+
+          if (!uploader.features.html5) {
+              settings.multipart = true;
+              settings.runtimes = 'html5,html4';
+          }
+
+          // now create the real instance with all settings
+          settings.browse_button = 'pickfiles';
+          uploader = new plupload.Uploader(settings);
+
+          uploader.bind('Init', function(up, params) {
+                  YAHOO.util.Dom.get('filelist').innerHTML = "<div>Current runtime: " + params.runtime + "</div>";
+                  });
+
+          uploader.bind('FilesAdded', function(up, files) {
+                  for (var i in files) {
+                  YAHOO.util.Dom.get('filelist').innerHTML += '<div id="' + files[i].id + '">' + files[i].name + ' (' + plupload.formatSize(files[i].size) + ') <b></b></div>';
+                  }
+                  });
+
+          uploader.bind('UploadFile', function(up, file) {
+                  YAHOO.util.Dom.get('upload').innerHTML += '<input type="hidden" name="file-' + file.id + '" value="' + file.name + '" />';
+                  });
+
+          uploader.bind('UploadProgress', function(up, file) {
+                  YAHOO.util.Dom.get(file.id).getElementsByTagName('b')[0].innerHTML = '<span>' + file.percent + "%</span>";
+                  });
+
+          uploader.bind('UploadComplete', function(up, files) {
+                  userFeedback.hideFeedback();
+                  myDataSource.sendRequest( api.getActionUrl( 'list' ), dirTable.onDataReturnInitializeTable, dirTable);
+                  userFeedback.startTimer("list");
+                  YAHOO.util.Dom.setStyle('upload', 'visibility', 'hidden');
+                  });
+
+          YAHOO.util.Dom.get('uploadfiles').onclick = function() {
+              uploader.start();
+              return false;
+          };
+
+          uploader.init();
+          YAHOO.util.Dom.setStyle('upload', 'visibility', 'visible');
+   
+        },
+
+		evnt:evnt
+	}
+
+}();
 
 FD.InspDialogCloseEvent = new YAHOO.util.CustomEvent('InspDialogCloseEvent');
 
@@ -1047,10 +1083,10 @@ FD.FileInspector = function() {
 	var handleClick = function(e) {
 
 		var target = YAHOO.util.Event.getTarget(e);
-
-                if (!YAHOO.util.Dom.hasClass(target, 'enabled')) {
-                    YAHOO.util.Event.preventDefault(e);
-                } else if (target.href) {
+            
+            if (!YAHOO.util.Dom.hasClass(target, 'enabled')) {
+                YAHOO.util.Event.preventDefault(e);
+            } else if (target.href) {
 			YAHOO.util.Event.preventDefault(e);
 			var action = target.hash.match(/#(.*)$/);
 
@@ -1058,7 +1094,7 @@ FD.FileInspector = function() {
 				YAHOO.util.Dom.addClass(target, 'inspSelected');
 			}
 
-                        evnt.fire(action[1]);
+               evnt.fire(action[1]);
 		}
 	};
 	
@@ -1318,6 +1354,7 @@ FD.init = function()
     inspector.evnt.subscribe(dirList.pasteItems);
     inspector.evnt.subscribe(dirList.renameItem);
     inspector.evnt.subscribe(FD.NewFolderDialog.show);
+    inspector.evnt.subscribe(FD.UploadDialog.show);
 
     var callback = {
         'success': function( o ) {
