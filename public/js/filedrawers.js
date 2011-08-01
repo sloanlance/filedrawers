@@ -810,7 +810,10 @@ FD.NewFolderDialog = function() {
             if (action != 'createFolder') {
                 return;
             }
-             
+            
+            FD.InspDialogCloseEvent.fire();
+            
+          YAHOO.util.Dom.setStyle('upload', 'display', 'none');
           YAHOO.util.Dom.setStyle('newFolder', 'display', 'block');
           document.getElementById('newFold').focus(); 
                                   
@@ -850,6 +853,9 @@ FD.UploadDialog = function() {
             if (action != 'upload') {
                 return;
             }
+            
+            FD.InspDialogCloseEvent.fire();
+            YAHOO.util.Dom.setStyle('newFolder', 'display', 'none');
         
           var settings = {
             runtimes : 'html5,html4',
@@ -892,6 +898,7 @@ FD.UploadDialog = function() {
                   myDataSource.sendRequest( api.getActionUrl( 'list' ), dirTable.onDataReturnInitializeTable, dirTable);
                   userFeedback.startTimer("list");
                   YAHOO.util.Dom.setStyle('upload', 'visibility', 'hidden');
+                  FD.InspDialogCloseEvent.fire();
                   });
 
           YAHOO.util.Dom.get('uploadfiles').onclick = function() {
@@ -901,6 +908,8 @@ FD.UploadDialog = function() {
 
           uploader.init();
           YAHOO.util.Dom.setStyle('upload', 'visibility', 'visible');
+          YAHOO.util.Dom.setStyle('upload', 'display', 'block');
+
    
         },
 
