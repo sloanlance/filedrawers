@@ -92,6 +92,13 @@ class CifsStream {
 		return $data;
 	}
 
+        public function stream_write( $data )
+        {
+                $bytesWritten = smbclient_write( $this->_fileHandle, $data, 1024 );
+                $this->_filePos = $this->_filePos + $bytesWritten;
+                return $bytesWritten;
+        }
+
 	public function stream_eof()
 	{
 		return $this->_filePos > $this->_fileSize;
