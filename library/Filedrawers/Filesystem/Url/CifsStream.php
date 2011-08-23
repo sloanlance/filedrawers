@@ -72,7 +72,7 @@ class CifsStream {
 	public function stream_open( $path, $mode, $options, &$opened_path )
 	{
 		$path = rtrim( $path, "/" );
-		$this->_fileHandle= smbclient_open( $path );  
+		$this->_fileHandle= smbclient_open( $path, $mode );
 		return $this->_fileHandle !== false;
 	}
 
