@@ -104,7 +104,7 @@ class CifsStream {
 		return $this->_filePos > $this->_fileSize;
 	}
 
-	public function close()
+	public function stream_close()
 	{
 		smbclient_close( $this->_fileHandle );
 	}
