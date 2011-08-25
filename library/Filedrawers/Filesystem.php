@@ -29,8 +29,7 @@ abstract class Filedrawers_Filesystem {
         }
     }
 	
-	abstract function getFileHandle( $path );
-
+    abstract function getFileHandle( $path, $mode = 'rb' );
 
     public static function pathConcat()
     {

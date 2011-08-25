@@ -273,14 +273,14 @@ abstract class Filedrawers_Filesystem_Url extends Filedrawers_Filesystem {
     }
 
 
-    public function getFileHandle($path)
+    public function getFileHandle($path, $mode = 'rb')
     {
         $this->setPath( $path );
         $url = $this->getUrl();
 
         clearstatcache();
 
-        if ( $handle = @fopen($url, "rb")) {
+        if ( $handle = fopen($url, $mode)) {
             return $handle;
         }
         else {
