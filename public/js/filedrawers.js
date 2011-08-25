@@ -1058,13 +1058,12 @@ FD.FileInspector = function() {
                         YAHOO.util.Dom.addClass(actions.createFolder.ref, 'enabled');
 
                         YAHOO.util.Dom.removeClass(actions.upload.ref, 'enabled');
-                        YAHOO.util.Dom.removeClass(actions.copy.ref, 'enabled');
 
                         YAHOO.util.Dom.setStyle(actions.upload.ref.parentNode, 'display', 'none');
-                        YAHOO.util.Dom.setStyle(actions.copy.ref.parentNode, 'display', 'none');
 
                         if (filesSelected) {
                             YAHOO.util.Dom.addClass(actions.cut.ref, 'enabled');
+                            YAHOO.util.Dom.addClass(actions.copy.ref, 'enabled');
                             YAHOO.util.Dom.addClass(actions.del.ref, 'enabled');
                             YAHOO.util.Dom.addClass(actions.rename.ref, 'enabled');
                         } else {
