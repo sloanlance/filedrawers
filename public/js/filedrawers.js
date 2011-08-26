@@ -862,18 +862,18 @@ FD.UploadDialog = function() {
             multipart: false,
             url : api.getActionUrl('upload')
             };
-          var uploader = new plupload.Uploader(settings);
+          var uploadertmp = new plupload.Uploader(settings);
           // initialize to get features object
-          uploader.init();
+          uploadertmp.init();
 
-          if (!uploader.features.html5) {
+          if (!uploadertmp.features.html5) {
               settings.multipart = true;
               settings.runtimes = 'html5,html4';
           }
-
+            uploadertmp.destroy();
           // now create the real instance with all settings
           settings.browse_button = 'pickfiles';
-          uploader = new plupload.Uploader(settings);
+          var uploader = new plupload.Uploader(settings);
 
           uploader.bind('Init', function(up, params) {
                   YAHOO.util.Dom.get('filelist').innerHTML = "<div>Current runtime: " + params.runtime + "</div>";
