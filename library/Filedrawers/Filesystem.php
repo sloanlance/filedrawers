@@ -72,4 +72,15 @@ abstract class Filedrawers_Filesystem {
     public function deleteFavs()
     {
     }
+
+    protected static function getDefaultPermissions()
+    {
+        return array(
+            'read' => FALSE,
+            'write' => FALSE,
+            'delete' => FALSE,
+            'lock' => FALSE,
+            'admin' => FALSE
+        );
+    }
 }

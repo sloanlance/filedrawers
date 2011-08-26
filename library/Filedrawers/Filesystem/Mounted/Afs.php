@@ -6,6 +6,8 @@
  */
 class Filedrawers_Filesystem_Mounted_Afs extends Filedrawers_Filesystem_Mounted
 {
+    private $fsUtil = 'fs';
+
     public function init()
     {
         if ( ! $rc = parent::init()) {
@@ -16,7 +18,37 @@ class Filedrawers_Filesystem_Mounted_Afs extends Filedrawers_Filesystem_Mounted
         return TRUE;
     }
 
+    public static function getPermissions($path)
+    {
 
+        $permissions = self::getDefaultPermissions();
+        $rights = array( 'l', 'r', 'w', 'i', 'd', 'k', 'a' );
+        $access = self::getCallerAccess($path);
+        if (is_dir($path)) {
+            $map = array(
+                'l' => 'read',
+                'i' => 'write',
+                'd' => 'delete',
+                'k' => 'lock',
+                'a' => 'admin'
+            );
+        } else {
+            $map = array(
+                'r' => 'read',
+                'w' => 'write',
+                'd' => 'delete',
+                'k' => 'lock'
+            );
+        }
+
+        foreach ($rights as $right) {
+            if (strpos($access, $right) !== FALSE and array_key_exists($right, $map)) {
+                $permissions[$map[$right]] = TRUE;
+            }
+        }
+            
+        return $permissions;
+    }
 
     // Change the ACL for a given path
     public function changeAcl($entity,
@@ -29,10 +61,10 @@ class Filedrawers_Filesystem_Mounted_Afs extends Filedrawers_Filesystem_Mounted
         $rights   = escapeshellarg( trim( $rights ));
         $path    = ( $path ) ? $path : $this->path;
         $neg      = ( $negative ) ? ' -negative' : '';
-        $cmd      = "$this->afsUtils/fs sa $neg " . escapeshellarg( $path ) .
+        $cmd      = "$this->fsUtil sa $neg " . escapeshellarg( $path ) .
         " $entity $rights";
         $cmdRecur = "find " . escapeshellarg( $path ) . " -type d -exec " .
-            "$this->afsUtils/fs sa $neg {} $entity $rights \\;";
+            "$this->fsUtil sa $neg {} $entity $rights \\;";
         $cmd      = ( $recursive ) ? $cmdRecur : $cmd;
 
         if ( !$path ) {
@@ -51,7 +83,7 @@ class Filedrawers_Filesystem_Mounted_Afs extends Filedrawers_Filesystem_Mounted
     // Return an array of ACL rights for the current path
     public function readAcl($path)
     {
-        $cmd = "$this->afsUtils/fs listacl " . escapeshellarg( $path );
+        $cmd = "$this->fsUtil listacl " . escapeshellarg( $path );
         $result = shell_exec( $cmd . " 2>&1" );
         $rights = array( 'l', 'r', 'w', 'i', 'd', 'k', 'a' );
 
@@ -109,7 +141,8 @@ class Filedrawers_Filesystem_Mounted_Afs extends Filedrawers_Filesystem_Mounted
     public static function setPermissions(&$row)
     {
         if ($row['filename'] == '.') {
-            $row['perms'] = Filedrawers_Filesystem_Mounted_Afs::getCallerAccess($row['filename']);
+            //$row['perms'] = Filedrawers_Filesystem_Mounted_Afs::getCallerAccess($row['filename']);
+            $row['perms'] = self::getPermissions($row['filename']);
         } else {
             return;
         }
@@ -118,9 +151,8 @@ class Filedrawers_Filesystem_Mounted_Afs extends Filedrawers_Filesystem_Mounted
 
     protected static function getCallerAccess($path)
     {
-        $utilsPath = Zend_Registry::get('config')->afs->utilitiesPath;
 
-        $cmd = "$utilsPath/fs getcalleraccess " . escapeshellarg($path);
+        $cmd = "fs getcalleraccess " . escapeshellarg($path);
         $result = shell_exec( $cmd . " 2>&1" );
 
         $acls = '';

@@ -22,6 +22,7 @@ class Webservices_IndexController extends Webservices_FiledrawersControllerAbstr
         $this->contexts['upload'] = array('xml', 'json', 'html');  
         $this->contexts['uploadstatus'] = array('xml', 'json', 'html');  
         $this->contexts['uploadfinish'] = array('xml', 'json', 'html');
+        $this->contexts['permissions'] = array('xml', 'json', 'html');
         parent::init(); 
     }
     
@@ -424,6 +425,30 @@ class Webservices_IndexController extends Webservices_FiledrawersControllerAbstr
     {
         $row = $row['filename'];
         return true;
+    }
+
+    public function permissionsAction()
+    {
+        $validators = array(
+            'path'     => array(
+                array(
+                    'FilePath', array(
+                        'exists' => true
+                     )
+                 )
+             )
+        );
+        $options = array('inputNamespace' => 'Filedrawers_Validate');
+        $input = new Zend_Filter_Input($this->_baseFilter, $validators, $_GET, $options);
+
+        if ( ! $input->isValid()) {
+            $this->view->errorMsg = $input->getMessages();
+            return;
+        }
+
+        $path = (empty($input->path)) ? $this->_filesystem->getHomeDir() : $input->path;
+        $this->view->contents = $this->_filesystem->getPermissions($path);
+        check($this->_filesystem->getPermissions($path));
     }
  }
 
