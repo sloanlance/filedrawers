@@ -201,17 +201,21 @@ body {
 	padding-top: 8em;
 }
 
-#favsList {
+#navbar {
     position: absolute;
     right: 0px;
 	width: 220px;
 	margin-left: 15px;
 	margin-right: 15px;
-	border: 1px solid #336699;
     position: fixed;
 }
 
-#favsList h3 {
+.navList {
+    margin-bottom: 10px;
+    border: 1px solid #336699;
+}
+
+.navList h3 {
     background-color: #336699;
     color: #FFFFFF;
     font-size: 12px;
@@ -219,14 +223,14 @@ body {
     padding: 3px 0 3px 5px;
 }
 
-#favsList ul {
+.navList ul {
 	padding: 0 0.6em 0 0.5em;
 	margin-bottom: 0.8em;
 	margin-top: 0.5em;
     vertical-align: middle;
 }
 
-#favsList li {
+.navList li {
     /*margin: 0.15em 0;*/
     padding: 0.3em;
     white-space: nowrap;
@@ -246,11 +250,11 @@ body {
     vertical-align: middle;
 }
 
-#favsList li #editFavBtns{
+.navList li #editFavBtns{
     display: none;
 }
 
-#favsList li:hover #editFavBtns{
+.navList li:hover #editFavBtns{
     display: inline;
 }
 

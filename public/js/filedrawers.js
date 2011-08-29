@@ -748,11 +748,17 @@ FD.InfoBar = function() {
 		},
         setServiceOptions: function( services ) {
             var serviceOptionsHtml = '<label for="changeLocationNewService">Service: </label><select name="changeLocationNewService" id="changeLocationNewService">';
+            var servicesLinksListHTML = '<ul>';
             for ( var id in services.contents ) {
                 serviceOptionsHtml += '<option value="'+ id +'">'+ services.contents[ id ].label +'</option>';
+                // servicesLinksListHTML += '<li><span><a href="' + services.contents[id].home + '">' + services.contents[id].label + '</a></span></li>';
+                servicesLinksListHTML += '<li><span><a id="folderLink" href="' + services.contents[id].home + '">' + services.contents[id].label + '</a></span></li>';
             }
             serviceOptionsHtml += '</select>';
+            servicesLinksListHTML += '</ul>';
             YAHOO.util.Dom.get('setServicesWrapper').innerHTML = serviceOptionsHtml;
+            YAHOO.util.Dom.get('serviceLinks').innerHTML = servicesLinksListHTML;
+
         },
         setService:setService,
 		update:update
@@ -862,18 +868,18 @@ FD.UploadDialog = function() {
             multipart: false,
             url : api.getActionUrl('upload')
             };
-          var uploader = new plupload.Uploader(settings);
+          var uploadertmp = new plupload.Uploader(settings);
           // initialize to get features object
-          uploader.init();
+          uploadertmp.init();
 
-          if (!uploader.features.html5) {
+          if (!uploadertmp.features.html5) {
               settings.multipart = true;
               settings.runtimes = 'html5,html4';
           }
-
+            uploadertmp.destroy();
           // now create the real instance with all settings
           settings.browse_button = 'pickfiles';
-          uploader = new plupload.Uploader(settings);
+          var uploader = new plupload.Uploader(settings);
 
           uploader.bind('Init', function(up, params) {
                   YAHOO.util.Dom.get('filelist').innerHTML = "<div>Current runtime: " + params.runtime + "</div>";
@@ -1144,7 +1150,7 @@ FD.Favorites = function() {
 		var linksListHTML = '<ul>';	
 		for ( i=0; i < myFavs.contents.count; i++ ) {
 			linksListHTML += '<li><form id="changeFav"><input type="text" name="editFav" id="editFav" size="10" value="' + myFavs.contents.contents[i].name + '"/></form>';
-            linksListHTML += '<span id="currentFav"><a id="folderLink" href="' + myFavs.contents.contents[i].path + '">' + myFavs.contents.contents[i].name + '</a>';
+                        linksListHTML += '<span id="currentFav"><a id="folderLink" href="' + myFavs.contents.contents[i].path + '">' + myFavs.contents.contents[i].name + '</a>';
 			linksListHTML += '<span id="editFavBtns">&nbsp;&nbsp;<a href="#edit"><img src="images/pencil.png" id="editBtn" /></a>&nbsp;<a href="#delete"><img src="images/delete.png" id="deleBtn"/></a></span></span></li>';
 		}		
 		linksListHTML += '</ul>';
@@ -1391,7 +1397,7 @@ YAHOO.util.Event.addListener(window, "load", function() {
 		History.navigate(homeURL);
 	});	
 	
-	YAHOO.util.Event.on('favsList', 'click', function(e) {
+	YAHOO.util.Event.on('navbar', 'click', function(e) {
         YAHOO.util.Event.preventDefault(e);
         if (e.target.id == "folderLink") {
                 userFeedback.hideFeedback();
