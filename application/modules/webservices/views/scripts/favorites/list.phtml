@@ -1,9 +1,9 @@
 <p><?php echo $this->escape($this->message); ?></p>
 <pre>
-<?php var_dump($this->contents); ?>
+<?php var_dump($this->services); ?>
 </pre>
 
 <table>
-        <?php echo $this->partialLoop('index/_partial_list.phtml', $this->contents);?>
+        <?php echo $this->partialLoop('index/_partial_list.phtml', $this->services);?>
 </table>
 

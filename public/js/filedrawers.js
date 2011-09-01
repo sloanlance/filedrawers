@@ -748,17 +748,11 @@ FD.InfoBar = function() {
 		},
         setServiceOptions: function( services ) {
             var serviceOptionsHtml = '<label for="changeLocationNewService">Service: </label><select name="changeLocationNewService" id="changeLocationNewService">';
-            var servicesLinksListHTML = '<ul>';
             for ( var id in services.contents ) {
                 serviceOptionsHtml += '<option value="'+ id +'">'+ services.contents[ id ].label +'</option>';
-                // servicesLinksListHTML += '<li><span><a href="' + services.contents[id].home + '">' + services.contents[id].label + '</a></span></li>';
-                servicesLinksListHTML += '<li><span><a id="folderLink" href="' + services.contents[id].home + '">' + services.contents[id].label + '</a></span></li>';
             }
             serviceOptionsHtml += '</select>';
-            servicesLinksListHTML += '</ul>';
             YAHOO.util.Dom.get('setServicesWrapper').innerHTML = serviceOptionsHtml;
-            YAHOO.util.Dom.get('serviceLinks').innerHTML = servicesLinksListHTML;
-
         },
         setService:setService,
 		update:update
@@ -868,18 +862,18 @@ FD.UploadDialog = function() {
             multipart: false,
             url : api.getActionUrl('upload')
             };
-          var uploadertmp = new plupload.Uploader(settings);
+          var uploader = new plupload.Uploader(settings);
           // initialize to get features object
-          uploadertmp.init();
+          uploader.init();
 
-          if (!uploadertmp.features.html5) {
+          if (!uploader.features.html5) {
               settings.multipart = true;
               settings.runtimes = 'html5,html4';
           }
-            uploadertmp.destroy();
+
           // now create the real instance with all settings
           settings.browse_button = 'pickfiles';
-          var uploader = new plupload.Uploader(settings);
+          uploader = new plupload.Uploader(settings);
 
           uploader.bind('Init', function(up, params) {
                   YAHOO.util.Dom.get('filelist').innerHTML = "<div>Current runtime: " + params.runtime + "</div>";
@@ -1061,12 +1055,16 @@ FD.FileInspector = function() {
                           }*/
                         break;
                     case 'mainstreamStorage':
-                        YAHOO.util.Dom.addClass(actions.upload.ref, 'enabled');
                         YAHOO.util.Dom.addClass(actions.createFolder.ref, 'enabled');
+
+                        YAHOO.util.Dom.removeClass(actions.upload.ref, 'enabled');
+                        YAHOO.util.Dom.removeClass(actions.copy.ref, 'enabled');
+
+                        YAHOO.util.Dom.setStyle(actions.upload.ref.parentNode, 'display', 'none');
+                        YAHOO.util.Dom.setStyle(actions.copy.ref.parentNode, 'display', 'none');
 
                         if (filesSelected) {
                             YAHOO.util.Dom.addClass(actions.cut.ref, 'enabled');
-                            YAHOO.util.Dom.addClass(actions.copy.ref, 'enabled');
                             YAHOO.util.Dom.addClass(actions.del.ref, 'enabled');
                             YAHOO.util.Dom.addClass(actions.rename.ref, 'enabled');
                         } else {
@@ -1148,12 +1146,23 @@ FD.Favorites = function() {
 		myFavs = YAHOO.lang.JSON.parse(oDS.response.responseText);        
 				
 		var linksListHTML = '<ul>';	
-		for ( i=0; i < myFavs.contents.count; i++ ) {
-			linksListHTML += '<li><form id="changeFav"><input type="text" name="editFav" id="editFav" size="10" value="' + myFavs.contents.contents[i].name + '"/></form>';
-                        linksListHTML += '<span id="currentFav"><a id="folderLink" href="' + myFavs.contents.contents[i].path + '">' + myFavs.contents.contents[i].name + '</a>';
-			linksListHTML += '<span id="editFavBtns">&nbsp;&nbsp;<a href="#edit"><img src="images/pencil.png" id="editBtn" /></a>&nbsp;<a href="#delete"><img src="images/delete.png" id="deleBtn"/></a></span></span></li>';
-		}		
-		linksListHTML += '</ul>';
+                for ( var key in myFavs.services) {
+                    var obj = myFavs.services[key];
+                    if ( obj != null){
+                        
+                        linksListHTML += '<li> ' + key + ' </li>';
+                        
+                        for ( i=0; i < obj.count; i++ ) {
+                            linksListHTML += '<li><form id="changeFav"><input type="text" name="editFav" id="editFav" size="10" value="' + obj.contents[i].name + '"/></form>';
+                            linksListHTML += '<span id="currentFav"><a id="folderLink" href="' + obj.contents[i].path + '">' + obj.contents[i].name + '</a>';
+                            linksListHTML += '<span id="editFavBtns">&nbsp;&nbsp;<a href="#edit"><img src="images/pencil.png" id="editBtn" /></a>&nbsp;<a href="#delete"><img src="images/delete.png" id="deleBtn"/></a></span></span></li>';
+                        }
+                     
+                    } 
+                 
+                 }
+
+                linksListHTML += '</ul>';
 		
 		YAHOO.util.Dom.get('favsLinks').innerHTML = linksListHTML;
 	});
@@ -1227,7 +1236,7 @@ FD.Favorites = function() {
                 // grabs the highest folder from the current path
                 lastFolder = currentURL.substr(currentURL.lastIndexOf("/")+1);
                 
-                linksListHTML += '<li><form id="newFavForm"><input type="text" name="newFav" id="newFav" size="10" value="' + lastFolder + '"/></form></li></ul>';
+                linksListHTML += '<li><form id="newFavForm"><input type="text" name="newFav" id="newFav" size="10" value="' + lastFolder + '"/></f rm></li></ul>';
                 YAHOO.util.Dom.get('favsLinks').innerHTML = linksListHTML;
                 
                 document.getElementById("newFav").focus();
@@ -1397,7 +1406,7 @@ YAHOO.util.Event.addListener(window, "load", function() {
 		History.navigate(homeURL);
 	});	
 	
-	YAHOO.util.Event.on('navbar', 'click', function(e) {
+	YAHOO.util.Event.on('favsList', 'click', function(e) {
         YAHOO.util.Event.preventDefault(e);
         if (e.target.id == "folderLink") {
                 userFeedback.hideFeedback();
