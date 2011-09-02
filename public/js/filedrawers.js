@@ -79,6 +79,9 @@ FD.api = function() {
         },
 
         post: function( actionUrl, callback, postData ) {
+        
+            console.warn("post function entered");
+        
             var data = this.getData( postData );
 			
 			userFeedback.startTimer("post");
@@ -216,7 +219,7 @@ FD.Utils = {
         var query_parts = [];
         for ( var key in data ) {
             value = data[ key ];
-            if ( typeof value == 'string' ) {
+            if ( typeof value == 'string' || typeof value == 'boolean' ) {
                 query_parts.push( escape( key ) +'='+ escape( value ));
             } else if ( typeof value == 'object' ) {
                 if ( value instanceof Array ) {
