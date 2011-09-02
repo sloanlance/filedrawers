@@ -18,9 +18,60 @@ class Webservices_FavoritesController extends Webservices_FiledrawersControllerA
       parent::init();
     }
 
+     public function preDispatch()
+    {
+         if ( in_array( $this->_request->action, array( 'services' ))) {
+            return;
+         }
+
+        $serviceValidator = new Zend_Validate_InArray( array_keys( $this->_availableServices ));
+        $serviceValidator->setStrict( TRUE );
+        $wappverValidator = new Zend_Validate_Int();
+        $validators = array(
+            'service' => array(
+                $serviceValidator,
+                'presence' => 'optional',
+                'default' => Zend_Registry::get('config')->filesystem->default
+            ),
+            'wappver' => array(
+                $wappverValidator,
+                'presence' => 'optional',
+                'default' => 0
+            )
+        );
+        $options = array('inputNamespace' => 'Filedrawers_Validate');
+        $input = new Zend_Filter_Input($this->_baseFilter, $validators, $_GET, $options);
+
+        if ( ! $input->isValid( 'service' )) {
+            $this->view->errorMsg = array( 'service' => array( 'invalid' => 'invalid service specified' ));
+            throw( new Zend_Exception( 'service parameter must be one of: '. implode( ', ', array_keys( $this->_availableServices ))));
+        }
+//        $this->view->service = $input->service;
+
+        if ( ! $input->isValid( 'wappver' )) {
+            $this->view->errorMsg = array( 'wappver' => array( 'invalid' => 'invalid wappver flag' ));
+            throw( new Zend_Exception( 'wappver (Web App Version) parameter must be an integer.' ));
+        }
+        if ( (int) $input->wappver > 0 ) {
+            if ( $input->wappver != Zend_Registry::get( 'webAppVersion' )) {
+                // TODO there are better ways to do this:
+                $this->view->errorMsg = '<a href="" >Refresh</a> to get an updated version of the interface.';
+            }
+
+            $this->view->webAppVersion = Zend_Registry::get( 'webAppVersion' );
+        }
+
+        if ($input->service !== NULL){
+            $this->_filesystem = new $this->_availableServices[ $input->service ]();
+            $this->_filesystem->init();
+            Zend_Registry::set('filesystem', $this->_filesystem);
+        }
+    }
+
+
     public function listAction()
     {
-	$validators = array(
+ 	$validators = array(
         'path'     => array(
              array(
                 'FilePath', array(
@@ -40,30 +91,13 @@ class Webservices_FavoritesController extends Webservices_FiledrawersControllerA
             $this->view->errorMsg = $filterInput->getMessages();
             return;
         }
-        
-	//if filesystem set check favorites if not loop through avalaible services and return all favorites.
-        if (! $this->_filesystem){
-            foreach($this->_availableServices as $allServices){
-                    setFilesystem();
-	            getFavs();
-            } 
-        }
-        else{    
-	    $this->getFavs();   
-	} 
-    }
-
-    public function getFavs()
-    {
-       $favs = $this->_filesystem->listFavs();
-       $this->view->contents = $favs;
-    }
-
-    public function setFilesystem()
-    {
-        $this->_filesystem = new $allServices;
-        $this->_filesystem->init();
-        Zend_Registry::set('filesystem', $this->_filesystem);
+         
+        $this->view->services = array();
+        foreach( $this->_availableServices as $id => $serviceClass ) {
+                 $fs = new $serviceClass;	
+                 $fs->init();
+                 $this->view->services[$id] = $fs->listFavs(); 
+        } 
     }
 
     public function addAction()
@@ -79,16 +113,17 @@ class Webservices_FavoritesController extends Webservices_FiledrawersControllerA
         }
        
         $values = $this->_form->getValidValues($_POST);
+      
         $this->_filesystem->addFavs($values['path'], $values['folderName']);
         $this->view->status = 'success';
         $this->view->message = 'Successfully added favorite.';
-
+        
     }
     
     public function renameAction()
     {
         $this->_form = new Form_Favorites_RenameForm($this->_csrfToken, $this->_request->getParam('path'));
-    
+ 
         if ( ! $this->getRequest()->isPost()) {
             return;
         }
