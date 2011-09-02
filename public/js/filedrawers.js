@@ -839,7 +839,9 @@ FD.UploadDialog = function() {
     var handleClick = function(e) {
 		var target = YAHOO.util.Event.getTarget(e);
 
-		if ( ! target.href) {
+		console.warn(document.getElementById( 'overwrite' ).checked);
+        
+        if ( ! target.href) {
 			return;
 		}
 
