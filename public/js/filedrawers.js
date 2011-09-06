@@ -1155,13 +1155,18 @@ FD.Favorites = function() {
                     var obj = myFavs.services[key];
                     if ( obj != null){
                         
-                        linksListHTML += '<li> ' + key + ' </li>';
+                        linksListHTML += '<li>' + key + '</li><div id="' + key + '">';
                         
                         for ( i=0; i < obj.count; i++ ) {
+                        
+                            //console.warn(obj.contents[i]);
+                        
                             linksListHTML += '<li><form id="changeFav"><input type="text" name="editFav" id="editFav" size="10" value="' + obj.contents[i].name + '"/></form>';
                             linksListHTML += '<span id="currentFav"><a id="folderLink" href="' + obj.contents[i].path + '">' + obj.contents[i].name + '</a>';
                             linksListHTML += '<span id="editFavBtns">&nbsp;&nbsp;<a href="#edit"><img src="images/pencil.png" id="editBtn" /></a>&nbsp;<a href="#delete"><img src="images/delete.png" id="deleBtn"/></a></span></span></li>';
                         }
+                        
+                        linksListHTML += '</div>';
                      
                     } 
                  
@@ -1415,7 +1420,9 @@ YAHOO.util.Event.addListener(window, "load", function() {
         YAHOO.util.Event.preventDefault(e);
         if (e.target.id == "folderLink") {
                 userFeedback.hideFeedback();
-                History.navigate(e.target.getAttribute("href"));
+                thisService = e.target.parentNode.parentNode.parentNode.id;
+                thisPath = e.target.getAttribute("href");
+                History.navigate(thisPath, thisService);
         } else if (e.target.parentNode.href) {
             //console.warn(e.target.parentNode.href)
             favorites.editFav(e.target);
