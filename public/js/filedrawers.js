@@ -80,8 +80,6 @@ FD.api = function() {
 
         post: function( actionUrl, callback, postData ) {
         
-            console.warn("post function entered");
-        
             var data = this.getData( postData );
 			
 			userFeedback.startTimer("post");
@@ -1153,13 +1151,14 @@ FD.Favorites = function() {
 		var linksListHTML = '<ul>';	
                 for ( var key in myFavs.services) {
                     var obj = myFavs.services[key];
+                    
+                    var keyValue = services.contents[key].label;
+                    
                     if ( obj != null){
                         
-                        linksListHTML += '<li>' + key + '</li><div id="' + key + '">';
+                        linksListHTML += '<li><a id="homeLink" href="' + services.contents[key].home + '">' + keyValue + '</li><div id="' + key + '">';
                         
                         for ( i=0; i < obj.count; i++ ) {
-                        
-                            //console.warn(obj.contents[i]);
                         
                             linksListHTML += '<li><form id="changeFav"><input type="text" name="editFav" id="editFav" size="10" value="' + obj.contents[i].name + '"/></form>';
                             linksListHTML += '<span id="currentFav"><a id="folderLink" href="' + obj.contents[i].path + '">' + obj.contents[i].name + '</a>';
@@ -1246,7 +1245,7 @@ FD.Favorites = function() {
                 // grabs the highest folder from the current path
                 lastFolder = currentURL.substr(currentURL.lastIndexOf("/")+1);
                 
-                linksListHTML += '<li><form id="newFavForm"><input type="text" name="newFav" id="newFav" size="10" value="' + lastFolder + '"/></f rm></li></ul>';
+                linksListHTML += '<li><form id="newFavForm"><input type="text" name="newFav" id="newFav" size="10" value="' + lastFolder + '"/></form></li></ul>';
                 YAHOO.util.Dom.get('favsLinks').innerHTML = linksListHTML;
                 
                 document.getElementById("newFav").focus();
@@ -1373,7 +1372,6 @@ FD.init = function()
     api = new FD.api();
     dirList = new FD.DirList();
     userFeedback = new FD.UserFeedback();
-    favorites = new FD.Favorites();	
     History = new FD.History();
 
     inspector = new FD.FileInspector();
@@ -1390,6 +1388,8 @@ FD.init = function()
         'success': function( o ) {
             services = YAHOO.lang.JSON.parse(o.responseText).services;
             infoBar.setServiceOptions( services );
+            //favorites is now dependent on services data return
+            favorites = new FD.Favorites();	
             History.init();
         }
     };
@@ -1413,7 +1413,7 @@ YAHOO.util.Event.addListener(window, "load", function() {
 	YAHOO.util.Event.on('homeBtn', 'click', function(e) {
 		YAHOO.util.Event.preventDefault(e);
 		userFeedback.hideFeedback();
-		History.navigate(homeURL);
+		History.navigate(homeURL, 'ifs');
 	});	
 	
 	YAHOO.util.Event.on('favsList', 'click', function(e) {
@@ -1421,6 +1421,11 @@ YAHOO.util.Event.addListener(window, "load", function() {
         if (e.target.id == "folderLink") {
                 userFeedback.hideFeedback();
                 thisService = e.target.parentNode.parentNode.parentNode.id;
+                thisPath = e.target.getAttribute("href");
+                History.navigate(thisPath, thisService);
+        } else if (e.target.id == "homeLink") {
+                userFeedback.hideFeedback();
+                thisService = e.target.parentNode.nextSibling.id;
                 thisPath = e.target.getAttribute("href");
                 History.navigate(thisPath, thisService);
         } else if (e.target.parentNode.href) {
