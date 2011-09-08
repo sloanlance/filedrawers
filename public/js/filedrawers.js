@@ -1236,7 +1236,7 @@ FD.Favorites = function() {
             if (!alreadyAdding) {
             
                 alreadyAdding = true;
-
+                
                 var linksListHTML = YAHOO.util.Dom.get('favsLinks').innerHTML;
                 
                 // trims off the last </ul> of the favs list

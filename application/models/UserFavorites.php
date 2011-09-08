@@ -75,7 +75,8 @@ class Model_UserFavorites extends Zend_Db_Table
     {
         $select = $this->select()
            ->from('filedrawers_favorites')
-           ->where("username = ?", $this->_username);
+           ->where("username = ?", $this->_username)
+           ->order("foldername");
 
         $rows = $this->fetchAll($select);
         $rowArray = $rows->toArray();
