@@ -73,7 +73,10 @@ class Model_UserFavorites extends Zend_Db_Table
 
     public function listFavorites()
     {
-        $select = $this->select();
+        $select = $this->select()
+           ->from('filedrawers_favorites')
+           ->where("username = ?", $this->_username);
+
         $rows = $this->fetchAll($select);
         $rowArray = $rows->toArray();
         return $rowArray;
