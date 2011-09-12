@@ -32,7 +32,7 @@ abstract class Webservices_FiledrawersControllerAbstract extends Zend_Controller
         $this->_context->initContext();
     }
 
-
+/*
     public function preDispatch()
     {
 	 if ( in_array( $this->_request->action, array( 'services' ))) {
@@ -82,7 +82,7 @@ abstract class Webservices_FiledrawersControllerAbstract extends Zend_Controller
             Zend_Registry::set('filesystem', $this->_filesystem); 
         }
     }
-
+*/
 
      public function postDispatch()
     {

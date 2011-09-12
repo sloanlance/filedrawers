@@ -85,12 +85,7 @@ $this->headScript()->appendFile('js/filedrawers.js');
 		<div id="content">		
 			<div id="fileList"></div>
 		</div>
-		<div id="navbar">
-                    <div id="servicesList" class="navList">
-			<h3>Services</h3>
-			<div id="serviceLinks">
-                        </div>
-                    </div>
+		<div id="navbar">                    
                     <div id="favsList" class="navList">
                         <a href="#add"><img id="addBtn" src="images/add.png" /></a>
 			<h3>Favorites</h3>
@@ -243,6 +238,7 @@ $this->headScript()->appendFile('js/filedrawers.js');
                 <div id="filelist">No runtime found.</div><br />
                 <input type="submit" id="pickfiles" name="pickfiles" value="Select files"/>
                 <input type="submit" id="uploadfiles" name="uploadfiles" value="Upload files"/>
+				<br><br>Overwrite files during upload? <input type="checkbox" id="overwrite" name="overwrite"> <br>
             </div>
     </form>
 

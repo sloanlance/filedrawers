@@ -250,6 +250,14 @@ body {
     vertical-align: middle;
 }
 
+li #folderLink {
+    padding-left: 8px;
+}
+
+li #homeLink {
+    font-weight: bold;
+}
+
 .navList li #editFavBtns{
     display: none;
 }

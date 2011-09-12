@@ -79,6 +79,7 @@ FD.api = function() {
         },
 
         post: function( actionUrl, callback, postData ) {
+        
             var data = this.getData( postData );
 			
 			userFeedback.startTimer("post");
@@ -216,7 +217,7 @@ FD.Utils = {
         var query_parts = [];
         for ( var key in data ) {
             value = data[ key ];
-            if ( typeof value == 'string' ) {
+            if ( typeof value == 'string' || typeof value == 'boolean' ) {
                 query_parts.push( escape( key ) +'='+ escape( value ));
             } else if ( typeof value == 'object' ) {
                 if ( value instanceof Array ) {
@@ -748,17 +749,11 @@ FD.InfoBar = function() {
 		},
         setServiceOptions: function( services ) {
             var serviceOptionsHtml = '<label for="changeLocationNewService">Service: </label><select name="changeLocationNewService" id="changeLocationNewService">';
-            var servicesLinksListHTML = '<ul>';
             for ( var id in services.contents ) {
                 serviceOptionsHtml += '<option value="'+ id +'">'+ services.contents[ id ].label +'</option>';
-                // servicesLinksListHTML += '<li><span><a href="' + services.contents[id].home + '">' + services.contents[id].label + '</a></span></li>';
-                servicesLinksListHTML += '<li><span><a id="folderLink" href="' + services.contents[id].home + '">' + services.contents[id].label + '</a></span></li>';
             }
             serviceOptionsHtml += '</select>';
-            servicesLinksListHTML += '</ul>';
             YAHOO.util.Dom.get('setServicesWrapper').innerHTML = serviceOptionsHtml;
-            YAHOO.util.Dom.get('serviceLinks').innerHTML = servicesLinksListHTML;
-
         },
         setService:setService,
 		update:update
@@ -842,7 +837,9 @@ FD.UploadDialog = function() {
     var handleClick = function(e) {
 		var target = YAHOO.util.Event.getTarget(e);
 
-		if ( ! target.href) {
+		console.warn(document.getElementById( 'overwrite' ).checked);
+        
+        if ( ! target.href) {
 			return;
 		}
 
@@ -868,18 +865,18 @@ FD.UploadDialog = function() {
             multipart: false,
             url : api.getActionUrl('upload')
             };
-          var uploadertmp = new plupload.Uploader(settings);
+          var uploader = new plupload.Uploader(settings);
           // initialize to get features object
-          uploadertmp.init();
+          uploader.init();
 
-          if (!uploadertmp.features.html5) {
+          if (!uploader.features.html5) {
               settings.multipart = true;
               settings.runtimes = 'html5,html4';
           }
-            uploadertmp.destroy();
+
           // now create the real instance with all settings
           settings.browse_button = 'pickfiles';
-          var uploader = new plupload.Uploader(settings);
+          uploader = new plupload.Uploader(settings);
 
           uploader.bind('Init', function(up, params) {
                   YAHOO.util.Dom.get('filelist').innerHTML = "<div>Current runtime: " + params.runtime + "</div>";
@@ -1061,12 +1058,16 @@ FD.FileInspector = function() {
                           }*/
                         break;
                     case 'mainstreamStorage':
-                        YAHOO.util.Dom.addClass(actions.upload.ref, 'enabled');
                         YAHOO.util.Dom.addClass(actions.createFolder.ref, 'enabled');
+
+                        YAHOO.util.Dom.removeClass(actions.upload.ref, 'enabled');
+                        YAHOO.util.Dom.removeClass(actions.copy.ref, 'enabled');
+
+                        YAHOO.util.Dom.setStyle(actions.upload.ref.parentNode, 'display', 'none');
+                        YAHOO.util.Dom.setStyle(actions.copy.ref.parentNode, 'display', 'none');
 
                         if (filesSelected) {
                             YAHOO.util.Dom.addClass(actions.cut.ref, 'enabled');
-                            YAHOO.util.Dom.addClass(actions.copy.ref, 'enabled');
                             YAHOO.util.Dom.addClass(actions.del.ref, 'enabled');
                             YAHOO.util.Dom.addClass(actions.rename.ref, 'enabled');
                         } else {
@@ -1148,12 +1149,29 @@ FD.Favorites = function() {
 		myFavs = YAHOO.lang.JSON.parse(oDS.response.responseText);        
 				
 		var linksListHTML = '<ul>';	
-		for ( i=0; i < myFavs.contents.count; i++ ) {
-			linksListHTML += '<li><form id="changeFav"><input type="text" name="editFav" id="editFav" size="10" value="' + myFavs.contents.contents[i].name + '"/></form>';
-                        linksListHTML += '<span id="currentFav"><a id="folderLink" href="' + myFavs.contents.contents[i].path + '">' + myFavs.contents.contents[i].name + '</a>';
-			linksListHTML += '<span id="editFavBtns">&nbsp;&nbsp;<a href="#edit"><img src="images/pencil.png" id="editBtn" /></a>&nbsp;<a href="#delete"><img src="images/delete.png" id="deleBtn"/></a></span></span></li>';
-		}		
-		linksListHTML += '</ul>';
+                for ( var key in myFavs.services) {
+                    var obj = myFavs.services[key];
+                    
+                    var keyValue = services.contents[key].label;
+                    
+                    if ( obj != null){
+                        
+                        linksListHTML += '<li><a id="homeLink" href="' + services.contents[key].home + '">' + keyValue + '</li><div id="' + key + '">';
+                        
+                        for ( i=0; i < obj.count; i++ ) {
+                        
+                            linksListHTML += '<li><form id="changeFav"><input type="text" name="editFav" id="editFav" size="10" value="' + obj.contents[i].name + '"/></form>';
+                            linksListHTML += '<span id="currentFav"><a id="folderLink" href="' + obj.contents[i].path + '">' + obj.contents[i].name + '</a>';
+                            linksListHTML += '<span id="editFavBtns">&nbsp;&nbsp;<a href="#edit"><img src="images/pencil.png" id="editBtn" /></a>&nbsp;<a href="#delete"><img src="images/delete.png" id="deleBtn"/></a></span></span></li>';
+                        }
+                        
+                        linksListHTML += '</div>';
+                     
+                    } 
+                 
+                 }
+
+                linksListHTML += '</ul>';
 		
 		YAHOO.util.Dom.get('favsLinks').innerHTML = linksListHTML;
 	});
@@ -1218,7 +1236,7 @@ FD.Favorites = function() {
             if (!alreadyAdding) {
             
                 alreadyAdding = true;
-
+                
                 var linksListHTML = YAHOO.util.Dom.get('favsLinks').innerHTML;
                 
                 // trims off the last </ul> of the favs list
@@ -1354,7 +1372,6 @@ FD.init = function()
     api = new FD.api();
     dirList = new FD.DirList();
     userFeedback = new FD.UserFeedback();
-    favorites = new FD.Favorites();	
     History = new FD.History();
 
     inspector = new FD.FileInspector();
@@ -1371,6 +1388,8 @@ FD.init = function()
         'success': function( o ) {
             services = YAHOO.lang.JSON.parse(o.responseText).services;
             infoBar.setServiceOptions( services );
+            //favorites is now dependent on services data return
+            favorites = new FD.Favorites();	
             History.init();
         }
     };
@@ -1394,14 +1413,21 @@ YAHOO.util.Event.addListener(window, "load", function() {
 	YAHOO.util.Event.on('homeBtn', 'click', function(e) {
 		YAHOO.util.Event.preventDefault(e);
 		userFeedback.hideFeedback();
-		History.navigate(homeURL);
+		History.navigate(homeURL, 'ifs');
 	});	
 	
-	YAHOO.util.Event.on('navbar', 'click', function(e) {
+	YAHOO.util.Event.on('favsList', 'click', function(e) {
         YAHOO.util.Event.preventDefault(e);
         if (e.target.id == "folderLink") {
                 userFeedback.hideFeedback();
-                History.navigate(e.target.getAttribute("href"));
+                thisService = e.target.parentNode.parentNode.parentNode.id;
+                thisPath = e.target.getAttribute("href");
+                History.navigate(thisPath, thisService);
+        } else if (e.target.id == "homeLink") {
+                userFeedback.hideFeedback();
+                thisService = e.target.parentNode.nextSibling.id;
+                thisPath = e.target.getAttribute("href");
+                History.navigate(thisPath, thisService);
         } else if (e.target.parentNode.href) {
             //console.warn(e.target.parentNode.href)
             favorites.editFav(e.target);

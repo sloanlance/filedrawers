@@ -28,10 +28,15 @@ class Filedrawers_Validate_FavoritesPath extends Zend_Validate_Abstract
     }
 
 
-    public function isValid($value, $context=null)
+    public function isValid($value,$context=null)
     {
         $this->_setValue($value);
         $filesystem = Zend_Registry::get('filesystem');
+
+       /* if ($selectedFilesystem != $filesystem && $selectedFilesystem != null) {
+            $filesystem = $selectedFilesystem;
+       } */
+
         $input = $value;
          
         if (isset($this->_options['pathContext'])) {
@@ -63,7 +68,7 @@ class Filedrawers_Validate_FavoritesPath extends Zend_Validate_Abstract
         }
  
         else if ( !is_array($info)) {
-            $this->_error(self::EXISTS);
+            $this->_error( self::EXISTS );
             return false;
         }
 
