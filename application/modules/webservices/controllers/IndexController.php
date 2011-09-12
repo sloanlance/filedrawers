@@ -467,6 +467,20 @@ class Webservices_IndexController extends Webservices_FiledrawersControllerAbstr
             $row['modTime'] = date("m/d/Y h:i:s",$row['modTime']);
         }
 
+        if( is_array(@$row['perms'])){
+            $perm_parts = array();
+            foreach( $row['perms'] as $perm => $value ) {
+                if ($value) {
+                    $perm_parts[] = ucfirst($perm);
+                }
+            }
+            if (empty($perm_parts)) {
+                $row['perms'] = 'no permissions';
+            } else {
+                $row['perms'] = implode(', ', $perm_parts);
+            }
+        }
+
         return true;
     }
 

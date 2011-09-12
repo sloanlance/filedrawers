@@ -14,16 +14,15 @@ class Filedrawers_Filesystem_Mounted_Afs extends Filedrawers_Filesystem_Mounted
             return $rc;
         }
 
-        $this->addListHelper(array('Filedrawers_Filesystem_Mounted_Afs', 'setPermissions'));
+        //$this->addListHelper(array($this, 'setPermissions'));
         return TRUE;
     }
 
-    public static function getPermissions($path)
+    public function getPermissions($path)
     {
-
-        $permissions = self::getDefaultPermissions();
+        $permissions = $this->getDefaultPermissions();
         $rights = array( 'l', 'r', 'w', 'i', 'd', 'k', 'a' );
-        $access = self::getCallerAccess($path);
+        $access = $this->getCallerAccess($path);
         if (is_dir($path)) {
             $map = array(
                 'l' => 'read',
@@ -138,12 +137,13 @@ class Filedrawers_Filesystem_Mounted_Afs extends Filedrawers_Filesystem_Mounted
     }
 
 
-    public static function setPermissions(&$row)
+    public function setPermissions(&$row)
     {
         if ($row['filename'] == '.') {
             //$row['perms'] = Filedrawers_Filesystem_Mounted_Afs::getCallerAccess($row['filename']);
-            $row['perms'] = self::getPermissions($row['filename']);
+            $row['perms'] = $this->getPermissions($row['filename']);
         } else {
+            $row['perms'] = $this->getPermissions($row['filename']);
             return;
         }
     }

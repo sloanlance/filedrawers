@@ -344,6 +344,11 @@ abstract class Filedrawers_Filesystem_Url extends Filedrawers_Filesystem {
         return '/';
     }
 
+    //protected function getPermissions($file)
+    //{
+        //return parent::getPermsissions($file);
+    //}
+//
     protected function _fileExists($url)
     {
         clearstatcache();
@@ -367,7 +372,9 @@ abstract class Filedrawers_Filesystem_Url extends Filedrawers_Filesystem {
             'type' => filetype($url),
             'filename' => basename( $url ),
             'modTime' => $modTime,
-            'size' => $size);
+            'size' => $size,
+            'perms' => $this->getPermissions($url));
+            check($url, $this->getPermissions($url));
 
         if ($useListHelpers) {
             foreach($this->listHelpers as $helper) {
