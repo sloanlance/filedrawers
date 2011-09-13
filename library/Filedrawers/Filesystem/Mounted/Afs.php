@@ -20,7 +20,7 @@ class Filedrawers_Filesystem_Mounted_Afs extends Filedrawers_Filesystem_Mounted
 
     public function getPermissions($path)
     {
-        $permissions = parent::getPermissions();
+        $permissions = parent::getPermissions($path);
         $rights = array( 'l', 'r', 'w', 'i', 'd', 'k', 'a' );
         $access = $this->getCallerAccess($path);
         if (is_dir($path)) {

@@ -397,11 +397,6 @@ abstract class Filedrawers_Filesystem_Mounted extends Filedrawers_Filesystem {
         return $stat;
     }
 
-    protected function getPermissions($file)
-    {
-        return parent::getPermsissions($file);
-    }
-
     protected function _fileExists($path)
     {
         clearstatcache();
