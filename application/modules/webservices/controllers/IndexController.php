@@ -392,6 +392,46 @@ class Webservices_IndexController extends Webservices_FiledrawersControllerAbstr
 
     public function uploadAction()
     {
+        $validators = array(
+            'path'     => array(
+                array(
+                    'FilePath', array(
+                        'type' => 'dir',
+                        'readable' => 'true'
+                     )
+                ), 'presence' => 'required')
+        );
+         
+        $options = array(
+            'inputNamespace' => 'Filedrawers_Validate',
+            'missingMessage' => 'You must specify an origin path in the URL before uploading files.'
+        );
+        
+        $input = new Zend_Filter_Input($this->_baseFilter, $validators, $_GET, $options);
+        if ( ! $input->isValid('path')) {
+            $this->view->errorMsg = $input->getMessages();
+            return;
+        }
+// use form to do validation. All we can validate is the path.
+
+        $this->_filesystem->addListHelper(array($this, 'filterByFileName'));
+        $files = $this->_filesystem->listDirectory($input->path, true);
+        $this->_form = new Form_UploadForm(
+            $this->_csrfToken,
+            $input->path
+        );
+
+        $overwrite = $this->_request->getParam('overwrite');
+        $filename = $this->_request->getParam('name');
+
+        if ( $overwrite === "false") {
+            if (file_exists($input->path.'/'.$filename )) {
+                // error back to javascript for plupload
+                die('{"jsonrpc" : "2.0", "error" : {"code": 101, "message": "Failed upload, file exists."}, "id" : "id"}');
+            }
+        }
+
+
         // TODO handle methods other than stream uploads
         // TODO validate input
         $out = $this->_filesystem->getFileHandle(FileDrawers_Filesystem::pathConcat($_GET['path'], $_GET['name']), 'wb');
