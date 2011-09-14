@@ -1165,7 +1165,7 @@ FD.Favorites = function() {
 	*/
 	
 	myFavsSource.subscribe('responseEvent', function(oDS){
-    
+        
         var thisCurrentFav,
         thisChangeFav;
 		
@@ -1174,18 +1174,18 @@ FD.Favorites = function() {
 		var linksListHTML = '<ul>';	
                 for ( var key in myFavs.services) {
                     var obj = myFavs.services[key];
-                    
                     var keyValue = services.contents[key].label;
                     
                     if ( obj != null){
                         
-                        linksListHTML += '<li><a id="homeLink" href="' + services.contents[key].home + '">' + keyValue + '</li><div id="' + key + '">';
+                        linksListHTML += '<li><a id="homeLink" href="' + services.contents[key].home + '">' + keyValue + '</a></li><div id="' + key + '">';
                         
                         for ( i=0; i < obj.count; i++ ) {
                         
                             linksListHTML += '<li><form id="changeFav"><input type="text" name="editFav" id="editFav" size="10" value="' + obj.contents[i].name + '"/></form>';
                             linksListHTML += '<span id="currentFav"><a id="folderLink" href="' + obj.contents[i].path + '">' + obj.contents[i].name + '</a>';
-                            linksListHTML += '<span id="editFavBtns">&nbsp;&nbsp;<a href="#edit"><img src="images/pencil.png" id="editBtn" /></a>&nbsp;<a href="#delete"><img src="images/delete.png" id="deleBtn"/></a></span></span></li>';
+                            linksListHTML += '<span id="editFavBtns">&nbsp;&nbsp;<a href="#edit"><img src="images/pencil.png" id="editBtn" /></a>&nbsp;<a href="#delete"><img src="images/delete.png" id="deleBtn"/></a></span></span></li>'; 
+                            
                         }
                         
                         linksListHTML += '</div>';
