@@ -863,7 +863,6 @@ FD.UploadDialog = function() {
           var settings = {
             runtimes : 'html5,html4',
             multipart: false,
-            url : api.getActionUrl('upload')
             };
           var uploader = new plupload.Uploader(settings);
           // initialize to get features object
@@ -892,7 +891,31 @@ FD.UploadDialog = function() {
                   YAHOO.util.Dom.get('upload').innerHTML += '<input type="hidden" name="file-' + file.id + '" value="' + file.name + '" />';
                   });
 
-          uploader.bind('UploadProgress', function(up, file) {
+		//check status of overwrite before upload
+		uploader.bind('BeforeUpload', function(up, file){
+		var overwrite = document.getElementById( 'overwrite' ).checked;
+		uploader.settings.url = api.getActionUrl('upload') + "&overwrite="+overwrite;
+});
+
+/* After file has uploaded check server side response, if errorcode exists 
+print errormsg and set file.percent to 0 and status to 3,
+so that it shows in progress bar.
+*/
+
+		uploader.bind('FileUploaded', function(up, file, response) {
+			var myJSONdata = YAHOO.lang.JSON.parse(response.response);
+			if ( myJSONdata.error ) {
+				file.status = 3;
+				file.percent = 0;
+				alert("'" + file.name + "' : " + myJSONdata.error.message);
+			}
+		});
+
+		uploader.bind('error', function(up, err) {
+			alert("Upload error: " + err.message);
+		});
+
+		uploader.bind('UploadProgress', function(up, file, response) {
                   YAHOO.util.Dom.get(file.id).getElementsByTagName('b')[0].innerHTML = '<span>' + file.percent + "%</span>";
                   });
 
