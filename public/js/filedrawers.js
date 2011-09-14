@@ -1,6 +1,6 @@
 var api,
 myJSONdata,
-myPerms,
+folderPerms,
 homeURL,
 currentURL,
 currentService,
@@ -302,6 +302,28 @@ FD.DirList = function() {
 	formatType = function(elCell, oRecord, oColumn, sData) {					
 		elCell.innerHTML = '<img src="' + baseUrl + 'images/mime/small/' + sData + '.gif" />';
 	};
+    
+    formatPerms = function(elCell, oRecord, oColumn, sData) {					
+		//elCell.innerHTML = YAHOO.lang.dump(sData);
+        var tempPerms = "";
+        
+        if (sData.read == true) {
+            tempPerms += "R ";
+        }
+        if (sData.write == true) {
+            tempPerms += "W ";
+        }
+        if (sData.delete == true) {
+            tempPerms += "D ";
+        }
+        if (sData.lock == true) {
+            tempPerms += "L ";
+        }
+        if (sData.admin == true) {
+            tempPerms += "A";
+        }
+        elCell.innerHTML = tempPerms;
+	};
 	
 	formatURL = function(elCell, oRecord, oColumn, sData) {	
 		
@@ -341,7 +363,7 @@ FD.DirList = function() {
 		{key:"modTime", label:"Last Modified", formatter:formatDate, sortable:true, sortOptions:{defaultDir:YAHOO.widget.DataTable.CLASS_DESC}},
 		{key:"size", label:"Size", formatter:formatBytes, sortable:true, resizeable:true},
 		{key:"mimeImage", label:"Type", formatter:formatType, sortable:true, resizeable:true},
-		//{key:"perms", sortable:true, resizeable:true},
+		{key:"perms", label:"Permissions", sortable:true, resizeable:true, formatter:formatPerms},
 		//{key:"mimeType", sortable:true, resizeable:true}
 	];
 	
@@ -440,7 +462,9 @@ FD.DirList = function() {
 					homeURL = currentURL;
 				}
 				
-				myPerms = YAHOO.lang.dump(myJSONdata.contents[0].perms);
+				folderPerms = YAHOO.lang.dump(myJSONdata.contents[0].perms);
+                
+                console.warn("folderPerms = " + folderPerms);
 				
 				var currentLocationPath = YAHOO.util.Dom.get('currentLocationPath'),
 				changeLocationNewPath = YAHOO.util.Dom.get('changeLocationNewPath'),
@@ -1018,9 +1042,9 @@ FD.FileInspector = function() {
 			updateItemInfo();
 		}
 
-		for (i=0; i < myPerms.length; i++) {
-			permissions[myPerms.charAt(i)] = true;
-			//alert(myPerms.charAt(i) + " = " + permissions[myPerms.charAt(i)]);
+		for (i=0; i < folderPerms.length; i++) {
+			permissions[folderPerms.charAt(i)] = true;
+			//alert(folderPerms.charAt(i) + " = " + permissions[folderPerms.charAt(i)]);
 		}
 		
 		filesSelected = (numSelected > 0) ? true : false;
