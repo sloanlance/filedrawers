@@ -330,7 +330,7 @@ FD.DirList = function() {
 		if (oRecord.getData("type") == "dir") {
 			elCell.innerHTML = '<a id="folderLink">' + sData + '</a>';
 		} else {
-                        elCell.innerHTML = '<a href="' + api.getActionUrl('download', {'path':FD.Utils.pathConcat(currentURL, sData)}, true) + '">' + sData + '</a>';
+            elCell.innerHTML = '<a href="' + api.getActionUrl('download', {'path':FD.Utils.pathConcat(currentURL, sData)}, true) + '">' + sData + '</a>';
 		}
 	};
 	
@@ -362,8 +362,12 @@ FD.DirList = function() {
 		{key:"filename", label:"Name", formatter:formatURL, sortable:true, resizeable:true, editor: new YAHOO.widget.TextboxCellEditor({disableBtns:true})},
 		{key:"modTime", label:"Last Modified", formatter:formatDate, sortable:true, sortOptions:{defaultDir:YAHOO.widget.DataTable.CLASS_DESC}},
 		{key:"size", label:"Size", formatter:formatBytes, sortable:true, resizeable:true},
-		{key:"mimeImage", label:"Type", formatter:formatType, sortable:true, resizeable:true},
-		{key:"perms", label:"Permissions", sortable:true, resizeable:true, formatter:formatPerms},
+		{key:"mimeImage", label:"Type", sortable:true, resizeable:true, formatter:formatType},
+		{key:"perms.read", label:"R", sortable:true, resizeable:true, formatter:YAHOO.widget.DataTable.formatCheckbox},
+        {key:"perms.write", label:"W", sortable:true, resizeable:true, formatter:YAHOO.widget.DataTable.formatCheckbox},
+        {key:"perms.delete", label:"D", sortable:true, resizeable:true, formatter:YAHOO.widget.DataTable.formatCheckbox},
+        {key:"perms.lock", label:"L", sortable:true, resizeable:true, formatter:YAHOO.widget.DataTable.formatCheckbox},
+        {key:"perms.admin", label:"A", sortable:true, resizeable:true, formatter:YAHOO.widget.DataTable.formatCheckbox},
 		//{key:"mimeType", sortable:true, resizeable:true}
 	];
 	
@@ -436,7 +440,7 @@ FD.DirList = function() {
 			myDataSource.responseType = YAHOO.util.DataSource.TYPE_JSON; 
 			myDataSource.responseSchema = {
 				resultsList: "contents",
-				fields: ["type","filename","modTime","size","mimeImage","perms","mimeType"]
+				fields: ["type","filename","modTime","size","mimeImage","perms.read","perms.write","perms.delete","perms.lock","perms.admin","mimeType"]
 			};
 
 							
