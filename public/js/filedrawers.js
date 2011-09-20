@@ -146,7 +146,6 @@ FD.UserFeedback = function() {
 				return;
 			}
 						
-			//console.warn("errorMsg = " + myJSONdata.errorMsg + "  |  message = " + myJSONdata.message);
 		        var msg = "";
 	
 			if (myJSONdata.errorMsg) {
@@ -466,9 +465,9 @@ FD.DirList = function() {
 					homeURL = currentURL;
 				}
 				
-				folderPerms = YAHOO.lang.dump(myJSONdata.contents[0].perms);
-                
-                console.warn("folderPerms = " + folderPerms);
+				//folderPerms = YAHOO.lang.dump(myJSONdata.contents[0].perms);
+                //console.warn("folderPerms = " + folderPerms);
+                folderPerms = myJSONdata.contents[0].perms;               
 				
 				var currentLocationPath = YAHOO.util.Dom.get('currentLocationPath'),
 				changeLocationNewPath = YAHOO.util.Dom.get('changeLocationNewPath'),
@@ -1028,32 +1027,161 @@ FD.FileInspector = function() {
 		
 		var numSelected,
 		i,
-		permissions = {
+		selectionPerms = {
 			r: false,   // read
-			l: false,   // list
-			i: false,   // insert
-			d: false,   // delete
 			w: false,   // write
-			k: false,   // lock
-			a: false    // administrative
+			d: false,   // delete
+			l: false,   // lock
+			a: false    // admin
 		};
+        
+        console.warn(folderPerms);
 
 		if (oArgs) {
-			numSelected = dirTable.getSelectedRows().length;
+            numSelected = dirTable.getSelectedRows().length;
 			updateItemInfo.apply(dirTable, [dirTable.getSelectedRows()]);
+            
+            selectedRows = dirTable.getSelectedRows();
+            
+            // read
+            for (i=0; i < numSelected; i++) {
+                if (dirTable.getRecord(selectedRows[i])._oData["perms.read"] == true) {
+                    selectionPerms = true;
+                } else {
+                    selectionPerms.r = false;
+                    break;
+                }
+            }
+            
+            // write
+            for (i=0; i < numSelected; i++) {
+                if (dirTable.getRecord(selectedRows[i])._oData["perms.write"] == true) {
+                    selectionPerms.w = true;
+                } else {
+                    selectionPerms.w = false;
+                    break;
+                }
+            }
+            
+            // delete
+            for (i=0; i < numSelected; i++) {
+                if (dirTable.getRecord(selectedRows[i])._oData["perms.delete"] == true) {
+                    selectionPerms.d = true;
+                } else {
+                    selectionPerms.d = false;
+                    break;
+                }
+            }
+            
+            // lock
+            for (i=0; i < numSelected; i++) {
+                if (dirTable.getRecord(selectedRows[i])._oData["perms.lock"] == true) {
+                    selectionPerms.l = true;
+                } else {
+                    selectionPerms.l = false;
+                    break;
+                }
+            }
+            
+            // admin
+            for (i=0; i < numSelected; i++) {
+                if (dirTable.getRecord(selectedRows[i])._oData["perms.admin"] == true) {
+                    selectionPerms.a = true;
+                } else {
+                    selectionPerms.a = false;
+                    break;
+                }
+            }
+            
 		} else {
 			numSelected = 0;
 			updateItemInfo();
-		}
-
-		for (i=0; i < folderPerms.length; i++) {
-			permissions[folderPerms.charAt(i)] = true;
-			//alert(folderPerms.charAt(i) + " = " + permissions[folderPerms.charAt(i)]);
-		}
+		}    
 		
 		filesSelected = (numSelected > 0) ? true : false;
 
                 switch (currentService) {
+                    // these service specific tests are a work around until the API can normalize permissions for the interface
+                    case 'ifs':
+                        YAHOO.util.Dom.setStyle(actions.upload.ref.parentNode, 'display', 'inline');
+                        YAHOO.util.Dom.setStyle(actions.copy.ref.parentNode, 'display', 'inline');
+
+                        // Set actions
+                        if (folderPerms.write) {
+                            YAHOO.util.Dom.addClass(actions.upload.ref, 'enabled');
+                            YAHOO.util.Dom.addClass(actions.createFolder.ref, 'enabled');
+                        } else {
+                            YAHOO.util.Dom.removeClass(actions.upload.ref, 'enabled');
+                            YAHOO.util.Dom.removeClass(actions.createFolder.ref, 'enabled');
+                        }
+
+                        if (filesSelected && selectionPerms.r && selectionPerms.d) {
+                            YAHOO.util.Dom.addClass(actions.cut.ref, 'enabled');
+                        } else {
+                            YAHOO.util.Dom.removeClass(actions.cut.ref, 'enabled');
+                        }
+
+                        if (filesSelected && selectionPerms.r) {
+                            YAHOO.util.Dom.addClass(actions.copy.ref, 'enabled');
+                        } else {
+                            YAHOO.util.Dom.removeClass(actions.copy.ref, 'enabled');
+                        }
+
+                        if (filesSelected && selectionPerms.d) {
+                            YAHOO.util.Dom.addClass(actions.del.ref, 'enabled');
+                        } else {
+                            YAHOO.util.Dom.removeClass(actions.del.ref, 'enabled');
+                        }
+
+                        if (filesSelected && numSelected < 2 && selectionPerms.r && selectionPerms.w) {
+                            YAHOO.util.Dom.addClass(actions.rename.ref, 'enabled');
+                        } else {
+                            YAHOO.util.Dom.removeClass(actions.rename.ref, 'enabled');
+                        }
+
+                        // paste condition
+                        if (folderPerms.write && cutCopyURL) {
+                            YAHOO.util.Dom.addClass(actions.paste.ref, 'enabled');
+                        } else {
+                            YAHOO.util.Dom.removeClass(actions.paste.ref, 'enabled');
+                        }
+
+                        // set permissions for folder
+                        /*if ( itemInfo.numSel == 1 && files[ itemInfo.lastId ].type == folderMime ) {
+                          setInspControl( 'permsCtrl', 'permsCtrl_cmd()',
+                          'Set Permissions for Folder' );
+                          } else {
+                          setInspControl( 'permsCtrl', '', 'Set Permissions for Folder' );
+                          }*/
+                        break;
+                    case 'mainstreamStorage':
+                        YAHOO.util.Dom.addClass(actions.createFolder.ref, 'enabled');
+
+                        YAHOO.util.Dom.removeClass(actions.upload.ref, 'enabled');
+                        YAHOO.util.Dom.removeClass(actions.copy.ref, 'enabled');
+
+                        YAHOO.util.Dom.setStyle(actions.upload.ref.parentNode, 'display', 'none');
+                        YAHOO.util.Dom.setStyle(actions.copy.ref.parentNode, 'display', 'none');
+
+                        if (filesSelected) {
+                            YAHOO.util.Dom.addClass(actions.cut.ref, 'enabled');
+                            YAHOO.util.Dom.addClass(actions.del.ref, 'enabled');
+                            YAHOO.util.Dom.addClass(actions.rename.ref, 'enabled');
+                        } else {
+                            YAHOO.util.Dom.removeClass(actions.cut.ref, 'enabled');
+                            YAHOO.util.Dom.removeClass(actions.del.ref, 'enabled');
+                            YAHOO.util.Dom.removeClass(actions.rename.ref, 'enabled');
+                        }
+                        if (!filesSelected && cutCopyURL) {
+                            YAHOO.util.Dom.addClass(actions.paste.ref, 'enabled');
+                        } else {
+                            YAHOO.util.Dom.removeClass(actions.paste.ref, 'enabled');
+                        }
+                        break;
+                }
+                
+                // old IFS only switch
+                /*switch (currentService) {
                     // these service specific tests are a work around until the API can normalize permissions for the interface
                     case 'ifs':
                         YAHOO.util.Dom.setStyle(actions.upload.ref.parentNode, 'display', 'inline');
@@ -1101,12 +1229,12 @@ FD.FileInspector = function() {
                         }
 
                         // set permissions for folder
-                        /*if ( itemInfo.numSel == 1 && files[ itemInfo.lastId ].type == folderMime ) {
-                          setInspControl( 'permsCtrl', 'permsCtrl_cmd()',
-                          'Set Permissions for Folder' );
-                          } else {
-                          setInspControl( 'permsCtrl', '', 'Set Permissions for Folder' );
-                          }*/
+                        //if ( itemInfo.numSel == 1 && files[ itemInfo.lastId ].type == folderMime ) {
+                         // setInspControl( 'permsCtrl', 'permsCtrl_cmd()',
+                        //  'Set Permissions for Folder' );
+                        //  } else {
+                        //  setInspControl( 'permsCtrl', '', 'Set Permissions for Folder' );
+                        //  }
                         break;
                     case 'mainstreamStorage':
                         YAHOO.util.Dom.addClass(actions.createFolder.ref, 'enabled');
@@ -1132,7 +1260,7 @@ FD.FileInspector = function() {
                             YAHOO.util.Dom.removeClass(actions.paste.ref, 'enabled');
                         }
                         break;
-                }
+                }*/
 
                 // removing permissions action until it is implemented
                 YAHOO.util.Dom.removeClass(actions.permissions.ref, 'enabled');
@@ -1231,7 +1359,6 @@ FD.Favorites = function() {
 	
 		return callback = {
 			success: function (o) {
-                //console.warn("getFavsCallback success");
                 
                 userFeedback.displayFeedback(o);
                 
@@ -1311,7 +1438,6 @@ FD.Favorites = function() {
     
     var handleEditFavChange = function(e) {
         YAHOO.util.Event.preventDefault(e);
-        //console.warn("fav change submitted");
         klEsc.disable();
         
         oldName = thisCurrentFav.firstChild.innerHTML;
@@ -1327,7 +1453,6 @@ FD.Favorites = function() {
     
     var handleEditFavCancel = function(e) {
         YAHOO.util.Event.preventDefault(e);
-        //console.warn("fav change cancelled");
         klEsc.disable();
         
         YAHOO.util.Dom.setStyle( thisCurrentFav, 'display', 'inline' );
@@ -1396,7 +1521,6 @@ FD.History = function()
             dirTable.subscribe('editorSaveEvent', dirList.handleNameEditorSave);
             //stops dirTable "Data error." behavior when path does not exist
             dirTable.doBeforeLoadData = function(oRequest, oResponse, oPayload) {
-                //console.warn(oResponse);
                 if (!oResponse.error) {
                     return true;
                 }
@@ -1480,7 +1604,6 @@ YAHOO.util.Event.addListener(window, "load", function() {
                 thisPath = e.target.getAttribute("href");
                 History.navigate(thisPath, thisService);
         } else if (e.target.parentNode.href) {
-            //console.warn(e.target.parentNode.href)
             favorites.editFav(e.target);
         }
 		
