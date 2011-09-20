@@ -853,6 +853,7 @@ FD.NewFolderDialog = function() {
 
 FD.UploadDialog = function() {
 
+    var overwrite = false;
     var evnt = new YAHOO.util.CustomEvent("Upload Event");
     
     var hide = function() {
@@ -864,7 +865,9 @@ FD.UploadDialog = function() {
     var handleClick = function(e) {
 		var target = YAHOO.util.Event.getTarget(e);
 
-		console.warn(document.getElementById( 'overwrite' ).checked);
+                if (target.id == 'overwrite') {
+                    overwrite = target.checked;
+                }
         
         if ( ! target.href) {
 			return;
@@ -918,11 +921,10 @@ FD.UploadDialog = function() {
                   YAHOO.util.Dom.get('upload').innerHTML += '<input type="hidden" name="file-' + file.id + '" value="' + file.name + '" />';
                   });
 
+          uploader.bind('BeforeUpload', function(up, file){
 		//check status of overwrite before upload
-		uploader.bind('BeforeUpload', function(up, file){
-		var overwrite = document.getElementById( 'overwrite' ).checked;
 		uploader.settings.url = api.getActionUrl('upload') + "&overwrite="+overwrite;
-});
+          });
 
 /* After file has uploaded check server side response, if errorcode exists 
 print errormsg and set file.percent to 0 and status to 3,
