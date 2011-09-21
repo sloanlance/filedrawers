@@ -484,7 +484,6 @@ FD.DirList = function() {
 					for (j=0; j <= i; j++) {
 						linkTemp += "/" + locationParts[j];
 					}
-					//console.warn(linkPaths[i]);
 					locLinks += '/ <a href="#" id="' + linkTemp + '">' + locationParts[i] + '</a> ';
 				}
 				
@@ -516,6 +515,8 @@ FD.DirList = function() {
 		},
 		
 		toggleHiddenFilter: function(e, action) {
+        
+            console.warn("toggleHiddenFilter entered");
 	
 			if (action != 'showHidden') {
 				return;
@@ -1037,7 +1038,7 @@ FD.FileInspector = function() {
 			a: false    // admin
 		};
         
-        console.warn(folderPerms);
+        
 
 		if (oArgs) {
             numSelected = dirTable.getSelectedRows().length;
@@ -1048,7 +1049,7 @@ FD.FileInspector = function() {
             // read
             for (i=0; i < numSelected; i++) {
                 if (dirTable.getRecord(selectedRows[i])._oData["perms.read"] == true) {
-                    selectionPerms = true;
+                    selectionPerms.r = true;
                 } else {
                     selectionPerms.r = false;
                     break;
@@ -1276,6 +1277,8 @@ FD.FileInspector = function() {
 	var handleClick = function(e) {
 
 		var target = YAHOO.util.Event.getTarget(e);
+        
+            console.warn(target);
             
             if (!YAHOO.util.Dom.hasClass(target, 'enabled')) {
                 YAHOO.util.Event.preventDefault(e);
