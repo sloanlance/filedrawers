@@ -46,7 +46,6 @@ class Webservices_FavoritesController extends Webservices_FiledrawersControllerA
             $this->view->errorMsg = array( 'service' => array( 'invalid' => 'invalid service specified' ));
             throw( new Zend_Exception( 'service parameter must be one of: '. implode( ', ', array_keys( $this->_availableServices ))));
         }
-//        $this->view->service = $input->service;
 
         if ( ! $input->isValid( 'wappver' )) {
             $this->view->errorMsg = array( 'wappver' => array( 'invalid' => 'invalid wappver flag' ));

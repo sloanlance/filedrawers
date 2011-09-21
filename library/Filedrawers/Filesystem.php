@@ -76,11 +76,11 @@ abstract class Filedrawers_Filesystem {
     protected function getPermissions($path)
     {
         return array(
-            'read' => FALSE,
-            'write' => FALSE,
-            'delete' => FALSE,
-            'lock' => FALSE,
-            'admin' => FALSE
+            'read' => TRUE,
+            'write' => TRUE,
+            'delete' => TRUE,
+            'lock' => TRUE,
+            'admin' => TRUE
         );
     }
 }
