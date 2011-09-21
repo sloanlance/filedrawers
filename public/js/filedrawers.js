@@ -1250,11 +1250,11 @@ FD.Favorites = function() {
             YAHOO.util.Event.on(thisChangeFav, 'cancel', handleEditFavCancel);
             
         } else if (target.id == "deleBtn") {
-            
+            thisCurrentFav = target.parentNode.parentNode.parentNode;    
             var favName = target.parentNode.parentNode.parentNode.firstChild.innerHTML;
-            
+            var params = { 'format': 'json', 'path': thisCurrentFav.firstChild.href, 'service': thisCurrentFav.parentNode.parentNode.id, 'wappver': webAppVersion.toString() }; 
             var callback = getFavsListCallback();			
-            api.post( api.getActionUrl( 'favorites/delete' ), callback, { 'folderName': favName } );
+            api.post( api.getActionUrl( 'favorites/delete',params ), callback, { 'folderName': favName } );
             
         } else if (target.id == "addBtn") {
         
@@ -1290,9 +1290,11 @@ FD.Favorites = function() {
         
         oldName = thisCurrentFav.firstChild.innerHTML;
         newName = thisChangeFav.firstChild.value;
-        
+       
+        var params = { 'format': 'json', 'path': thisCurrentFav.firstChild.href, 'service': thisCurrentFav.parentNode.parentNode.id, 'wappver': webAppVersion.toString() };
+ 
         var callback = getFavsListCallback();			
-		api.post( api.getActionUrl( 'favorites/rename' ), callback, { 'oldName': oldName, 'newName': newName } );
+		api.post( api.getActionUrl( 'favorites/rename',params), callback, { 'oldName': oldName, 'newName': newName } );
         
         YAHOO.util.Dom.setStyle( thisCurrentFav, 'display', 'inline' );
         YAHOO.util.Dom.setStyle( thisChangeFav, 'display', 'none' );
