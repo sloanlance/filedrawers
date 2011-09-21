@@ -510,6 +510,13 @@ FD.DirList = function() {
 			
 			dirTable.subscribe('checkboxClickEvent', handleFileSelection);
 			dirTable.subscribe('click', handleTableClick);
+            
+            // hides permission columns
+            dirTable.hideColumn("perms.read");
+            dirTable.hideColumn("perms.write");
+            dirTable.hideColumn("perms.delete");
+            dirTable.hideColumn("perms.lock");
+            dirTable.hideColumn("perms.admin");
 			
 			return dirTable;
 		},
@@ -1037,8 +1044,6 @@ FD.FileInspector = function() {
 			l: false,   // lock
 			a: false    // admin
 		};
-        
-        
 
 		if (oArgs) {
             numSelected = dirTable.getSelectedRows().length;
@@ -1614,5 +1619,5 @@ YAHOO.util.Event.addListener(window, "load", function() {
             favorites.editFav(e.target);
         }
 		
-	});	
+	});    
 });
