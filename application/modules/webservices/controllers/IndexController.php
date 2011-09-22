@@ -417,7 +417,6 @@ class Webservices_IndexController extends Webservices_FiledrawersControllerAbstr
 
         $acl = $this->_filesystem->readAcl($path);
         $this->view->acl = $acl;
-        check($acl);
         $this->_form = new Form_AclForm($this->_csrfToken, $acl);
 
     }
