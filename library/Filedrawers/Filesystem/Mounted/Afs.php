@@ -82,51 +82,67 @@ class Filedrawers_Filesystem_Mounted_Afs extends Filedrawers_Filesystem_Mounted
     // Return an array of ACL rights for the current path
     public function readAcl($path)
     {
-        $cmd = "$this->fsUtil listacl " . escapeshellarg( $path );
-        $result = shell_exec( $cmd . " 2>&1" );
-        $rights = array( 'l', 'r', 'w', 'i', 'd', 'k', 'a' );
-
         if ( ! $path ) {
             return false;
         }
 
-    if ( preg_match( '/^fs:/', $result )) {
+        $cmd = "$this->fsUtil listacl " . escapeshellarg( $path );
+        $acl_raw = shell_exec( $cmd . " 2>&1" );
+
+    if ( preg_match( '/^fs:/', $acl_raw )) {
         $this->errorMsg =
             "Warning: Unable to read the access control list.";
             return false;
         }
 
-        $result   = preg_replace( "/(.*)is\n(.*)rights:\n/", "", $result );
-        $result   = explode( "\nNegative rights:\n", $result );
+        $rights = array(
+            'l' => 'lookup',
+            'r' => 'read',
+            'w' => 'write',
+            'i' => 'insert',
+            'd' => 'delete',
+            'k' => 'lock',
+            'a' => 'admin' );
 
-        if ( isset( $result[0] )) {
-            $normal = explode( "\n", trim( $result[0] ));
+        $result = array( 'rights' => array(
+            'normal' => array(
+                'label' => 'Normal Rights',
+                'options' => $rights ),
+            'negative' => array(
+                'label' => 'Negative Rights',
+                'options' => $rights )
+            ));
+
+        $acl_raw   = preg_replace( "/(.*)is\n(.*)rights:\n/", "", $acl_raw );
+        $acl_raw   = explode( "\nNegative rights:\n", $acl_raw );
+        if ( isset( $acl_raw[0] )) {
+            $normal = explode( "\n", trim( $acl_raw[0] ));
             if ( is_array( $normal )) {
                 foreach ( $normal as $item ) {
                     $perm = explode( ' ', trim( $item ));
                     $setRights = $perm[1];
-                    foreach ( $rights as $right ) {
+                    foreach ( $rights as $right => $right_desc ) {
                         if ( strpos( $setRights, $right ) !== false ) {
-                            $result['normal'][$perm[0]][$right] = true;
+                            $result['lists']['normal'][$perm[0]][$right] = true;
                         } else {
-                            $result['normal'][$perm[0]][$right] = false;
+                            $result['lists']['normal'][$perm[0]][$right] = false;
                         }
                     }
                 }
             }
         }
 
-        if ( isset( $result[1] )) {
-            $negative = explode( "\n", trim( $result[1] ));
+        if ( isset( $acl_raw[1] )) {
+            $negative = explode( "\n", trim( $acl_raw[1] ));
             if ( is_array( $negative )) {
                 foreach ( $negative as $item ) {
                     $perm = explode( ' ', trim( $item ));
                     $setRights = $perm[1];
-                    foreach ( $rights as $right ) {
+                    foreach ( $rights as $right => $right_desc ) {
                         if ( strpos( $setRights, $right ) !== false ) {
-                            $result['negative'][$perm[0]][$right] = true;
+                            $result['lists']['negative'][$perm[0]][$right] = true;
                         } else {
-                            $result['negative'][$perm[0]][$right] = false;
+                            $result['lists']['negative'][$perm[0]][$right] = false;
                         }
                     }
                 }

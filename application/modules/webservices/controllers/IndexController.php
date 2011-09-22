@@ -22,6 +22,7 @@ class Webservices_IndexController extends Webservices_FiledrawersControllerAbstr
         $this->contexts['upload'] = array('xml', 'json', 'html');  
         $this->contexts['uploadstatus'] = array('xml', 'json', 'html');  
         $this->contexts['uploadfinish'] = array('xml', 'json', 'html');
+        $this->contexts['acl'] = array('xml', 'json', 'html');
         parent::init(); 
     }
     
@@ -387,6 +388,38 @@ class Webservices_IndexController extends Webservices_FiledrawersControllerAbstr
         $this->_filesystem->createDirectory($values['path'], $values['folderName']);
         $this->view->status = 'success';
         $this->view->message = 'Successfully created the directory.';
+    }
+
+
+    public function aclAction()
+    {
+        $validators = array(
+            'path'     => array(
+                array(
+                    'FilePath', array(
+                        'type' => 'dir',
+                        'readable' => true
+                     )
+                ), 'allowEmpty' => true),
+            'friendly' => array('Alpha', 'allowEmpty' => true),
+            'limit'    => array('Digits', 'allowEmpty' => true),
+            'offset'   => array('Digits', 'allowEmpty' => true)
+        );
+        $options = array('inputNamespace' => 'Filedrawers_Validate');
+        $input = new Zend_Filter_Input($this->_baseFilter, $validators, $_GET, $options);
+       
+        if ( ! $input->isValid()) {
+            $this->view->errorMsg = $input->getMessages();
+            return;
+        }
+        $path = (empty($input->path)) ? $this->_filesystem->getHomeDir() : $input->path;
+        $this->view->path = $path;
+
+        $acl = $this->_filesystem->readAcl($path);
+        $this->view->acl = $acl;
+        check($acl);
+        $this->_form = new Form_AclForm($this->_csrfToken, $acl);
+
     }
 
 
