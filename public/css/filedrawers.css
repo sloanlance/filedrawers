@@ -617,3 +617,9 @@ div.expandItem h2, form.expandItem h2 {
 #cancelBtn {
 	display: none;
 }
+
+th.yui-dt-hidden,
+tr.yui-dt-odd .yui-dt-hidden,
+tr.yui-dt-even .yui-dt-hidden {
+display:none;
+}
