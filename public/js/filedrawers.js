@@ -1113,6 +1113,7 @@ FD.FileInspector = function() {
                     case 'ifs':
                         YAHOO.util.Dom.setStyle(actions.upload.ref.parentNode, 'display', 'inline');
                         YAHOO.util.Dom.setStyle(actions.copy.ref.parentNode, 'display', 'inline');
+                        YAHOO.util.Dom.setStyle(actions.permissions.ref.parentNode, 'display', 'inline');
 
                         // Set actions
                         if (folderPerms.write) {
@@ -1155,21 +1156,22 @@ FD.FileInspector = function() {
                         }
 
                         // set permissions for folder
-                        /*if ( itemInfo.numSel == 1 && files[ itemInfo.lastId ].type == folderMime ) {
-                          setInspControl( 'permsCtrl', 'permsCtrl_cmd()',
-                          'Set Permissions for Folder' );
-                          } else {
-                          setInspControl( 'permsCtrl', '', 'Set Permissions for Folder' );
-                          }*/
+                        if ( numSelected == 1 && dirTable.getRecord(selectedRows[0])._oData["type"] == "dir" ) {
+                            YAHOO.util.Dom.addClass(actions.permissions.ref, 'enabled');
+                        } else {
+                            YAHOO.util.Dom.removeClass(actions.permissions.ref, 'enabled');
+                        }
                         break;
                     case 'mainstreamStorage':
                         YAHOO.util.Dom.addClass(actions.createFolder.ref, 'enabled');
 
                         YAHOO.util.Dom.removeClass(actions.upload.ref, 'enabled');
                         YAHOO.util.Dom.removeClass(actions.copy.ref, 'enabled');
+                        YAHOO.util.Dom.removeClass(actions.permissions.ref, 'enabled');
 
                         YAHOO.util.Dom.setStyle(actions.upload.ref.parentNode, 'display', 'none');
-                        YAHOO.util.Dom.setStyle(actions.copy.ref.parentNode, 'display', 'none');
+                        YAHOO.util.Dom.setStyle(actions.copy.ref.parentNode, 'display', 'none');                      
+                        YAHOO.util.Dom.setStyle(actions.permissions.ref.parentNode, 'display', 'none');
 
                         if (filesSelected) {
                             YAHOO.util.Dom.addClass(actions.cut.ref, 'enabled');
@@ -1271,8 +1273,6 @@ FD.FileInspector = function() {
                 }*/
 
                 // removing permissions action until it is implemented
-                YAHOO.util.Dom.removeClass(actions.permissions.ref, 'enabled');
-                YAHOO.util.Dom.setStyle(actions.permissions.ref.parentNode, 'display', 'none');
         };
 	
 	clearSelection = function(e) {
