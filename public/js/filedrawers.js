@@ -795,6 +795,64 @@ FD.InfoBar = function() {
 	}
 };	
 
+FD.PermissionsDialog = function() {
+
+	var evnt = new YAHOO.util.CustomEvent("Permissions Event");
+
+	var hide = function() {
+		var newPermissionsDialog = YAHOO.util.Dom.get('permissions');
+		YAHOO.util.Dom.setStyle(newPermissionsDialog, 'display', 'none');
+		// reenable when dialog becomes a form
+        //newPermissionsDialog.reset();
+	};
+
+	var handleClick = function(e) {
+		var target = YAHOO.util.Event.getTarget(e);
+
+		if ( ! target.href) {
+			return;
+		}
+
+		YAHOO.util.Event.preventDefault(e);
+		hide();
+		FD.InspDialogCloseEvent.fire();
+	};
+
+	var handleSubmit = function(e) {
+		var target = YAHOO.util.Event.getTarget(e);
+		YAHOO.util.Event.preventDefault(e);
+		// TO DO update line below to gather and send new data
+        //evnt.fire(target.folderName.value);
+		hide();
+		FD.InspDialogCloseEvent.fire();
+	};
+
+	YAHOO.util.Event.on('permissions', 'click', handleClick);
+	YAHOO.util.Event.on('permissions', 'submit', handleSubmit);
+	
+
+	return {
+		show: function(e, action) {
+        
+            if (action != 'permissions') {
+                return;
+            }
+            
+            console.warn("permissionsDialog.show");
+            
+            FD.InspDialogCloseEvent.fire();
+            
+          YAHOO.util.Dom.setStyle('upload', 'display', 'none');
+          YAHOO.util.Dom.setStyle('newFolder', 'display', 'none');
+          YAHOO.util.Dom.setStyle('permissions', 'display', 'block');
+          //document.getElementById('newFold').focus(); 
+                                  
+        },
+
+		evnt:evnt
+	}
+}();   //END FD.PermissionsDialog
+
 FD.NewFolderDialog = function() {
 
 	var evnt = new YAHOO.util.CustomEvent("New Folder Event");
@@ -850,6 +908,7 @@ FD.NewFolderDialog = function() {
             FD.InspDialogCloseEvent.fire();
             
           YAHOO.util.Dom.setStyle('upload', 'display', 'none');
+          YAHOO.util.Dom.setStyle('permissions', 'display', 'none');
           YAHOO.util.Dom.setStyle('newFolder', 'display', 'block');
           document.getElementById('newFold').focus(); 
                                   
@@ -897,6 +956,7 @@ FD.UploadDialog = function() {
             
             FD.InspDialogCloseEvent.fire();
             YAHOO.util.Dom.setStyle('newFolder', 'display', 'none');
+            YAHOO.util.Dom.setStyle('permissions', 'display', 'none');
         
           var settings = {
             runtimes : 'html5,html4',
@@ -1156,6 +1216,7 @@ FD.FileInspector = function() {
                         }
 
                         // set permissions for folder
+                        // TO DO: add condition which checks if user has rights to modify permissions
                         if ( numSelected == 1 && dirTable.getRecord(selectedRows[0])._oData["type"] == "dir" ) {
                             YAHOO.util.Dom.addClass(actions.permissions.ref, 'enabled');
                         } else {
@@ -1189,90 +1250,6 @@ FD.FileInspector = function() {
                         }
                         break;
                 }
-                
-                // old IFS only switch
-                /*switch (currentService) {
-                    // these service specific tests are a work around until the API can normalize permissions for the interface
-                    case 'ifs':
-                        YAHOO.util.Dom.setStyle(actions.upload.ref.parentNode, 'display', 'inline');
-                        YAHOO.util.Dom.setStyle(actions.copy.ref.parentNode, 'display', 'inline');
-
-                        // Set actions
-                        if (permissions.i) {
-                            YAHOO.util.Dom.addClass(actions.upload.ref, 'enabled');
-                            YAHOO.util.Dom.addClass(actions.createFolder.ref, 'enabled');
-                        } else {
-                            YAHOO.util.Dom.removeClass(actions.upload.ref, 'enabled');
-                            YAHOO.util.Dom.removeClass(actions.createFolder.ref, 'enabled');
-                        }
-
-                        if (filesSelected && permissions.r && permissions.d) {
-                            YAHOO.util.Dom.addClass(actions.cut.ref, 'enabled');
-                        } else {
-                            YAHOO.util.Dom.removeClass(actions.cut.ref, 'enabled');
-                        }
-
-                        if (filesSelected && permissions.r) {
-                            YAHOO.util.Dom.addClass(actions.copy.ref, 'enabled');
-                        } else {
-                            YAHOO.util.Dom.removeClass(actions.copy.ref, 'enabled');
-                        }
-
-                        // delete is weird... you need ldw and either r or i
-                        if (filesSelected && permissions.d && (permissions.r || permissions.i) && permissions.w) {
-                            YAHOO.util.Dom.addClass(actions.del.ref, 'enabled');
-                        } else {
-                            YAHOO.util.Dom.removeClass(actions.del.ref, 'enabled');
-                        }
-
-                        if (filesSelected && numSelected < 2 && permissions.r && permissions.i && permissions.d) {
-                            YAHOO.util.Dom.addClass(actions.rename.ref, 'enabled');
-                        } else {
-                            YAHOO.util.Dom.removeClass(actions.rename.ref, 'enabled');
-                        }
-
-                        // paste condition
-                        if (permissions.i && !filesSelected && cutCopyURL) {
-                            YAHOO.util.Dom.addClass(actions.paste.ref, 'enabled');
-                        } else {
-                            YAHOO.util.Dom.removeClass(actions.paste.ref, 'enabled');
-                        }
-
-                        // set permissions for folder
-                        //if ( itemInfo.numSel == 1 && files[ itemInfo.lastId ].type == folderMime ) {
-                         // setInspControl( 'permsCtrl', 'permsCtrl_cmd()',
-                        //  'Set Permissions for Folder' );
-                        //  } else {
-                        //  setInspControl( 'permsCtrl', '', 'Set Permissions for Folder' );
-                        //  }
-                        break;
-                    case 'mainstreamStorage':
-                        YAHOO.util.Dom.addClass(actions.createFolder.ref, 'enabled');
-
-                        YAHOO.util.Dom.removeClass(actions.upload.ref, 'enabled');
-                        YAHOO.util.Dom.removeClass(actions.copy.ref, 'enabled');
-
-                        YAHOO.util.Dom.setStyle(actions.upload.ref.parentNode, 'display', 'none');
-                        YAHOO.util.Dom.setStyle(actions.copy.ref.parentNode, 'display', 'none');
-
-                        if (filesSelected) {
-                            YAHOO.util.Dom.addClass(actions.cut.ref, 'enabled');
-                            YAHOO.util.Dom.addClass(actions.del.ref, 'enabled');
-                            YAHOO.util.Dom.addClass(actions.rename.ref, 'enabled');
-                        } else {
-                            YAHOO.util.Dom.removeClass(actions.cut.ref, 'enabled');
-                            YAHOO.util.Dom.removeClass(actions.del.ref, 'enabled');
-                            YAHOO.util.Dom.removeClass(actions.rename.ref, 'enabled');
-                        }
-                        if (!filesSelected && cutCopyURL) {
-                            YAHOO.util.Dom.addClass(actions.paste.ref, 'enabled');
-                        } else {
-                            YAHOO.util.Dom.removeClass(actions.paste.ref, 'enabled');
-                        }
-                        break;
-                }*/
-
-                // removing permissions action until it is implemented
         };
 	
 	clearSelection = function(e) {
@@ -1282,8 +1259,6 @@ FD.FileInspector = function() {
 	var handleClick = function(e) {
 
 		var target = YAHOO.util.Event.getTarget(e);
-        
-            console.warn(target);
             
             if (!YAHOO.util.Dom.hasClass(target, 'enabled')) {
                 YAHOO.util.Event.preventDefault(e);
@@ -1295,7 +1270,8 @@ FD.FileInspector = function() {
 				YAHOO.util.Dom.addClass(target, 'inspSelected');
 			}
 
-               evnt.fire(action[1]);
+                console.warn(action[1]);
+                evnt.fire(action[1]);
 		}
 	};
 	
@@ -1570,6 +1546,7 @@ FD.init = function()
     inspector.evnt.subscribe(dirList.renameItem);
     inspector.evnt.subscribe(FD.NewFolderDialog.show);
     inspector.evnt.subscribe(FD.UploadDialog.show);
+    inspector.evnt.subscribe(FD.PermissionsDialog.show);
 
     var callback = {
         'success': function( o ) {

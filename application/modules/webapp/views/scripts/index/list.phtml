@@ -69,7 +69,6 @@ $this->headScript()->appendFile('js/filedrawers.js');
 				<li><a href="#createFolder" class="expandable">Create a New Folder</a></li>
 				<li><a href="#rename">Rename Selected Item</a></li>
 				<li><a href="#permissions">Set Permissions for Folder</a></li>
-				<? //<li><a href="#favorites" class="global expandable">Favorite Locations</a></li> ?>
 			</ul>
 			<div id="itemInfo"></div>
 			<h4>View Options</h4>
@@ -96,33 +95,6 @@ $this->headScript()->appendFile('js/filedrawers.js');
 		<div class="clear">&nbsp;</div>
 	</div>	
 	
-	<div id="favorites" class="expandItem">
-		<div class="hd"> <a href="#close">[X]</a>
-			<h2>My Favorite Locations</h2>
-		</div>
-		<div class="bd">
-			<div id="favMenu"><a href="#viewFav" class="sel">View</a> | <a href="#addFav">Add</a> | <a href="#editFav">Edit</a></div>
-			<div id="viewFav">
-				<p>Go to a favorite location:</p>
-				<div class="tabContent">&nbsp;</div>
-			</div>
-			<form action="#" method="post" name="addFav" id="addFav">
-				<p>Enter a name and click 'Add' to add the current location to your favorites.</p>
-				<input type="text" name="selectedItems" size="18" />
-				<p align="center">
-					<input type="hidden" name="formKey" value="c0c17487e741591fdcad1e95aa43d2ad" />
-					<input type="submit" name="command" value="Add" />
-				</p>
-			</form>
-			<form action="#" method="post" name="editFav" id="editFav">
-				<div class="tabContent">&nbsp;</div>
-				<p align="center">
-					<input type="hidden" name="formKey" value="c0c17487e741591fdcad1e95aa43d2ad" />
-					<input type="submit" name="command" value="Save" />
-				</p>
-			</form>
-		</div>
-	</div>
 	<div id="permissions" class="expandItem">
 		<div class="hd"> <a href="#close">[X]</a>
 			<h2>Permissions Manager</h2>
