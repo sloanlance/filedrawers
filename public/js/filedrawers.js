@@ -950,7 +950,7 @@ FD.UploadDialog = function() {
     return {
         init: function() {
             $("#uploader").pluploadQueue({
-                runtimes : 'hml5,gears,html4',
+                runtimes : 'html5,gears,html4',
                 url : api.getActionUrl('upload'),
             });
 
