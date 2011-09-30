@@ -26,7 +26,7 @@ class Form_Favorites_AddForm extends Zend_Form
             )
         );
         $path->addValidator('FavoritesPath', true, array(
-            'modifyable' => true,
+            'readable' => true,
             'type' => 'dir'
         ));
         $path->addFilter('StringTrim');
