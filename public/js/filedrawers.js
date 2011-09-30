@@ -951,7 +951,7 @@ FD.UploadDialog = function() {
         init: function() {
             $("#uploader").pluploadQueue({
                 runtimes : 'html5,gears,html4',
-                url : api.getActionUrl('upload'),
+                multipart: false,
             });
 
             // Client side form validation
@@ -973,6 +973,12 @@ FD.UploadDialog = function() {
                 }
 
                 return false;
+            });
+
+            var uploader = $('#uploader').pluploadQueue();
+            uploader.bind('BeforeUpload', function(up, file){
+		//check status of overwrite before upload
+		uploader.settings.url = api.getActionUrl('upload') + "&overwrite="+overwrite;
             });
         },
 
