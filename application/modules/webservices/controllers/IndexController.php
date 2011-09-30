@@ -458,8 +458,8 @@ class Webservices_IndexController extends Webservices_FiledrawersControllerAbstr
 
         if ( $overwrite === "false") {
             if (file_exists($input->path.'/'.$filename )) {
-                // error back to javascript for plupload
-                die('{"jsonrpc" : "2.0", "error" : {"code": 101, "message": "Failed upload, file exists."}, "id" : "id"}');
+                //error back to javascript for plupload
+                $this->view->errorMsg = "Failed upload, file exists.";
             }
         }
 
@@ -474,12 +474,12 @@ class Webservices_IndexController extends Webservices_FiledrawersControllerAbstr
                 while ($buff = fread($in, 4096))
                     fwrite($out, $buff);
             } else
-                die('{"jsonrpc" : "2.0", "error" : {"code": 101, "message": "Failed to open input stream."}, "id" : "id"}');
+                 $this->view->errorMsg = "Failed to open input stream.";
 
             fclose($in);
             fclose($out);
         } else
-            die('{"jsonrpc" : "2.0", "error" : {"code": 102, "message": "Failed to open output stream."}, "id" : "id"}');
+            $this->view->errorMsg = "Failed to open output stream.";
     }
 
 

@@ -980,6 +980,15 @@ FD.UploadDialog = function() {
 		//check status of overwrite before upload
 		uploader.settings.url = api.getActionUrl('upload') + "&overwrite="+overwrite;
             });
+
+            uploader.bind('FileUploaded', function(uploader, file, r) {
+                var resp = jQuery.parseJSON(r.response);
+                if (typeof resp.errorMsg !== 'undefined') {
+                    file.status = plupload.FAILED;
+                    $('#'+ file.id).addClass('plupload_failed');
+                    alert('Could not upload "'+ file.name +'":'+"\n"+ resp.errorMsg);
+                }
+            });
         },
 
         show: function(e, action) {
