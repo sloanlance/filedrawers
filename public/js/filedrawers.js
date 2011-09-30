@@ -930,34 +930,63 @@ FD.UploadDialog = function() {
 	};
     
     var handleClick = function(e) {
-		var target = YAHOO.util.Event.getTarget(e);
+        var target = YAHOO.util.Event.getTarget(e);
 
-                if (target.id == 'overwrite') {
-                    overwrite = target.checked;
-                }
-        
+        if (target.id == 'overwrite') {
+            overwrite = target.checked;
+        }
+
         if ( ! target.href) {
-			return;
-		}
+            return;
+        }
 
-		YAHOO.util.Event.preventDefault(e);
-		hide();
-		FD.InspDialogCloseEvent.fire();
-	};
+        //YAHOO.util.Event.preventDefault(e);
+        //hide();
+        //FD.InspDialogCloseEvent.fire();
+    };
     
     YAHOO.util.Event.on('upload', 'click', handleClick);
 
     return {
-		show: function(e, action) {
-        
+        init: function() {
+            $("#uploader").pluploadQueue({
+                runtimes : 'hml5,gears,html4',
+                url : api.getActionUrl('upload'),
+            });
+
+            // Client side form validation
+            $('#upload').submit(function(e) {
+                var uploader = $('#uploader').pluploadQueue();
+
+                // Files in queue upload them first
+                if (uploader.files.length > 0) {
+                    // When all files are uploaded submit form
+                    uploader.bind('StateChanged', function() {
+                        if (uploader.files.length === (uploader.total.uploaded + uploader.total.failed)) {
+                            $('form')[0].submit();
+                        }
+                    });
+
+                    uploader.start();
+                } else {
+                        alert('You must queue at least one file.');
+                }
+
+                return false;
+            });
+        },
+
+        show: function(e, action) {
+
             if (action != 'upload') {
                 return;
             }
-            
-            FD.InspDialogCloseEvent.fire();
-            YAHOO.util.Dom.setStyle('newFolder', 'display', 'none');
-            YAHOO.util.Dom.setStyle('permissions', 'display', 'none');
-        
+
+            YAHOO.util.Dom.setStyle('upload', 'visibility', 'visible');
+            YAHOO.util.Dom.setStyle('upload', 'display', 'block');
+
+            return;
+       //============== 
           var settings = {
             runtimes : 'html5,html4',
             multipart: false,
@@ -1536,6 +1565,8 @@ FD.init = function()
     dirList = new FD.DirList();
     userFeedback = new FD.UserFeedback();
     History = new FD.History();
+
+    FD.UploadDialog.init();
 
     inspector = new FD.FileInspector();
 

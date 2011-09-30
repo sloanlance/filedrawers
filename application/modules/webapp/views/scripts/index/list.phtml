@@ -1,6 +1,7 @@
 <?
 $this->headLink()->appendStylesheet($this->baseUrl('yui/build/fonts/fonts-min.css')); 
 $this->headLink()->appendStylesheet($this->baseUrl('yui/build/datatable/assets/skins/sam/datatable.css')); 
+$this->headLink()->appendStylesheet($this->baseUrl('plupload/javascript/jquery.plupload.queue/css/jquery.plupload.queue.css')); 
 
 $this->headScript()->appendFile('yui/build/yahoo-dom-event/yahoo-dom-event.js');
 $this->headScript()->appendFile('yui/build/dragdrop/dragdrop-min.js');
@@ -11,9 +12,11 @@ $this->headScript()->appendFile('yui/build/connection/connection-min.js');
 $this->headScript()->appendFile('yui/build/history/history-min.js');
 $this->headScript()->appendFile('yui/build/json/json-min.js');
 
+$this->headScript()->appendFile('js/jquery-1.6.4.min.js');
 $this->headScript()->appendFile('plupload/javascript/plupload.js');
 $this->headScript()->appendFile('plupload/javascript/plupload.html5.js');
 $this->headScript()->appendFile('plupload/javascript/plupload.html4.js');
+$this->headScript()->appendFile('plupload/javascript/jquery.plupload.queue/jquery.plupload.queue.js');
 
 $this->headScript()->appendFile('js/filedrawers.js');
 ?>
@@ -206,12 +209,9 @@ $this->headScript()->appendFile('js/filedrawers.js');
         <div class="hd"> <a href="#close">[X]</a>
             <h2>Upload Files</h2>
         </div>
-            <div>
-                <div id="filelist">No runtime found.</div><br />
-                <input type="submit" id="pickfiles" name="pickfiles" value="Select files"/>
-                <input type="submit" id="uploadfiles" name="uploadfiles" value="Upload files"/>
-				<br><br>Overwrite files during upload? <input type="checkbox" id="overwrite" name="overwrite"> <br>
+            <div id="uploader">
             </div>
+				<br><br>Overwrite files during upload? <input type="checkbox" id="overwrite" name="overwrite"> <br>
     </form>
 
 	<iframe id="yui-history-iframe" src="images/mime/small/0000000dir.gif"></iframe>

@@ -282,7 +282,7 @@ li #homeLink {
 	padding-bottom: 15px;
 	text-align: left;
 	z-index: 10;
-	width: 400px;
+	width: 600px;
 }
 
 #upload ul {
@@ -319,6 +319,11 @@ li #homeLink {
 	height: 65px;
 	margin: 0px auto 0px auto;
 	display: none;
+}
+
+.plupload_header_content {
+    background: none;
+    padding-left: 10px;
 }
 
 #permissions {
