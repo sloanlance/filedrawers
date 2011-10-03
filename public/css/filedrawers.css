@@ -308,6 +308,13 @@ li #homeLink {
 	white-space: nowrap;
 }
 
+#upload-close {
+	color: #0033CC;
+	text-align: right;
+	margin-left: auto;
+        width: 100%;
+        cursor: pointer;
+}
 #upload a {
 	color: #0033CC;
 	text-align: right;

@@ -920,14 +920,9 @@ FD.NewFolderDialog = function() {
 
 FD.UploadDialog = function() {
 
+    var uploadQueue;
     var overwrite = false;
     var evnt = new YAHOO.util.CustomEvent("Upload Event");
-    
-    var hide = function() {
-		var newUploadForm = YAHOO.util.Dom.get('upload');
-		YAHOO.util.Dom.setStyle(newUploadForm, 'display', 'none');
-		newUploadForm.reset();
-	};
     
     var handleClick = function(e) {
         var target = YAHOO.util.Event.getTarget(e);
@@ -936,38 +931,39 @@ FD.UploadDialog = function() {
             overwrite = target.checked;
         }
 
-        if ( ! target.href) {
-            return;
+        if (target.id == "upload-close") {
+            FD.UploadDialog.hide();
         }
-
-        //YAHOO.util.Event.preventDefault(e);
-        //hide();
-        //FD.InspDialogCloseEvent.fire();
     };
     
     YAHOO.util.Event.on('upload', 'click', handleClick);
 
     return {
-        init: function() {
+        show: function(e, action) {
+            if (action != 'upload') {
+                return;
+            }
+            overwrite = false;
             $("#uploader").pluploadQueue({
                 runtimes : 'html5,gears,html4',
                 multipart: false,
+                multiple_queues: true,
             });
 
+            uploadQueue = $('#uploader').pluploadQueue();
             // Client side form validation
             $('#upload').submit(function(e) {
-                var uploader = $('#uploader').pluploadQueue();
 
                 // Files in queue upload them first
-                if (uploader.files.length > 0) {
+                if (uploadQueue.files.length > 0) {
                     // When all files are uploaded submit form
-                    uploader.bind('StateChanged', function() {
-                        if (uploader.files.length === (uploader.total.uploaded + uploader.total.failed)) {
+                    uploadQueue.bind('StateChanged', function() {
+                        if (uploadQueue.files.length === (uploadQueue.total.uploaded + uploadQueue.total.failed)) {
                             $('form')[0].submit();
                         }
                     });
 
-                    uploader.start();
+                    uploadQueue.start();
                 } else {
                         alert('You must queue at least one file.');
                 }
@@ -975,13 +971,12 @@ FD.UploadDialog = function() {
                 return false;
             });
 
-            var uploader = $('#uploader').pluploadQueue();
-            uploader.bind('BeforeUpload', function(up, file){
+            uploadQueue.bind('BeforeUpload', function(up, file){
 		//check status of overwrite before upload
-		uploader.settings.url = api.getActionUrl('upload') + "&overwrite="+overwrite;
+		uploadQueue.settings.url = api.getActionUrl('upload') + "&overwrite="+overwrite;
             });
 
-            uploader.bind('FileUploaded', function(uploader, file, r) {
+            uploadQueue.bind('FileUploaded', function(uploader, file, r) {
                 var resp = jQuery.parseJSON(r.response);
                 if (typeof resp.errorMsg !== 'undefined') {
                     file.status = plupload.FAILED;
@@ -989,97 +984,42 @@ FD.UploadDialog = function() {
                     alert('Could not upload "'+ file.name +'":'+"\n"+ resp.errorMsg);
                 }
             });
-        },
 
-        show: function(e, action) {
+            uploadQueue.bind('UploadComplete', function(up, files) {
+                var error = false;
+                for (i in files) {
+                    if (files[i].status != plupload.DONE) {
+                        error = true;
+                        break;
+                    }
+                }    
 
-            if (action != 'upload') {
-                return;
-            }
+                if ( ! error) {
+                    userFeedback.hideFeedback();
+                    myDataSource.sendRequest( api.getActionUrl( 'list' ), dirTable.onDataReturnInitializeTable, dirTable);
+                    userFeedback.startTimer("list");
+                    YAHOO.util.Dom.setStyle('upload', 'visibility', 'hidden');
+                    FD.InspDialogCloseEvent.fire();
+                    FD.UploadDialog.hide();
+                }
+            });
+
+            uploadQueue.bind('error', function(up, err) {
+                alert("Upload error: " + err.message);
+            });
+
 
             YAHOO.util.Dom.setStyle('upload', 'visibility', 'visible');
             YAHOO.util.Dom.setStyle('upload', 'display', 'block');
 
             return;
-       //============== 
-          var settings = {
-            runtimes : 'html5,html4',
-            multipart: false,
-            };
-          var uploader = new plupload.Uploader(settings);
-          // initialize to get features object
-          uploader.init();
-
-          if (!uploader.features.html5) {
-              settings.multipart = true;
-              settings.runtimes = 'html5,html4';
-          }
-
-          // now create the real instance with all settings
-          settings.browse_button = 'pickfiles';
-          uploader = new plupload.Uploader(settings);
-
-          uploader.bind('Init', function(up, params) {
-                  YAHOO.util.Dom.get('filelist').innerHTML = "<div>Current runtime: " + params.runtime + "</div>";
-                  });
-
-          uploader.bind('FilesAdded', function(up, files) {
-                  for (var i in files) {
-                  YAHOO.util.Dom.get('filelist').innerHTML += '<div id="' + files[i].id + '">' + files[i].name + ' (' + plupload.formatSize(files[i].size) + ') <b></b></div>';
-                  }
-                  });
-
-          uploader.bind('UploadFile', function(up, file) {
-                  YAHOO.util.Dom.get('upload').innerHTML += '<input type="hidden" name="file-' + file.id + '" value="' + file.name + '" />';
-                  });
-
-          uploader.bind('BeforeUpload', function(up, file){
-		//check status of overwrite before upload
-		uploader.settings.url = api.getActionUrl('upload') + "&overwrite="+overwrite;
-          });
-
-/* After file has uploaded check server side response, if errorcode exists 
-print errormsg and set file.percent to 0 and status to 3,
-so that it shows in progress bar.
-*/
-
-		uploader.bind('FileUploaded', function(up, file, response) {
-			var myJSONdata = YAHOO.lang.JSON.parse(response.response);
-			if ( myJSONdata.error ) {
-				file.status = 3;
-				file.percent = 0;
-				alert("'" + file.name + "' : " + myJSONdata.error.message);
-			}
-		});
-
-		uploader.bind('error', function(up, err) {
-			alert("Upload error: " + err.message);
-		});
-
-		uploader.bind('UploadProgress', function(up, file, response) {
-                  YAHOO.util.Dom.get(file.id).getElementsByTagName('b')[0].innerHTML = '<span>' + file.percent + "%</span>";
-                  });
-
-          uploader.bind('UploadComplete', function(up, files) {
-                  userFeedback.hideFeedback();
-                  myDataSource.sendRequest( api.getActionUrl( 'list' ), dirTable.onDataReturnInitializeTable, dirTable);
-                  userFeedback.startTimer("list");
-                  YAHOO.util.Dom.setStyle('upload', 'visibility', 'hidden');
-                  FD.InspDialogCloseEvent.fire();
-                  });
-
-          YAHOO.util.Dom.get('uploadfiles').onclick = function() {
-              uploader.start();
-              return false;
-          };
-
-          uploader.init();
-          YAHOO.util.Dom.setStyle('upload', 'visibility', 'visible');
-          YAHOO.util.Dom.setStyle('upload', 'display', 'block');
-
-   
         },
 
+        hide: function() {
+            YAHOO.util.Dom.setStyle('upload', 'display', 'none');
+            uploadQueue.destroy();
+	},
+    
 		evnt:evnt
 	}
 
@@ -1314,7 +1254,6 @@ FD.FileInspector = function() {
 				YAHOO.util.Dom.addClass(target, 'inspSelected');
 			}
 
-                console.warn(action[1]);
                 evnt.fire(action[1]);
 		}
 	};
@@ -1581,7 +1520,7 @@ FD.init = function()
     userFeedback = new FD.UserFeedback();
     History = new FD.History();
 
-    FD.UploadDialog.init();
+    //FD.UploadDialog.init();
 
     inspector = new FD.FileInspector();
 
