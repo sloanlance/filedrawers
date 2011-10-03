@@ -995,11 +995,6 @@ FD.UploadDialog = function() {
                 }    
 
                 if ( ! error) {
-                    userFeedback.hideFeedback();
-                    myDataSource.sendRequest( api.getActionUrl( 'list' ), dirTable.onDataReturnInitializeTable, dirTable);
-                    userFeedback.startTimer("list");
-                    YAHOO.util.Dom.setStyle('upload', 'visibility', 'hidden');
-                    FD.InspDialogCloseEvent.fire();
                     FD.UploadDialog.hide();
                 }
             });
@@ -1016,6 +1011,10 @@ FD.UploadDialog = function() {
         },
 
         hide: function() {
+            userFeedback.hideFeedback();
+            myDataSource.sendRequest( api.getActionUrl( 'list' ), dirTable.onDataReturnInitializeTable, dirTable);
+            userFeedback.startTimer("list");
+            FD.InspDialogCloseEvent.fire();
             YAHOO.util.Dom.setStyle('upload', 'display', 'none');
             uploadQueue.destroy();
 	},
