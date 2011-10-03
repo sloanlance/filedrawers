@@ -51,6 +51,14 @@ class Bootstrap extends Zend_Application_Bootstrap_Bootstrap
                 'action' => 'list'
             )
         );
+        $uaNotSupported = new Zend_Controller_Router_Route_Static(
+            'notSupported',
+            array(
+                'module' => 'webapp',
+                'controller' => 'index',
+                'action' => 'notSupported'
+            )
+        );
 
 
         $list = new Zend_Controller_Router_Route_Regex(
@@ -126,6 +134,7 @@ class Bootstrap extends Zend_Application_Bootstrap_Bootstrap
         $router->addRoute('webservice', $webservice);
         $router->addRoute('v1', $v1);
         $router->addRoute('favorites', $favorites);
+        $router->addRoute('uaNotSupported', $uaNotSupported);
     }
 }
 

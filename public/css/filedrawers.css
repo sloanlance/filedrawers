@@ -12,6 +12,10 @@ body,div,dl,dt,dd,ul,ol,li,h1,h2,h3,h4,h5,h6,pre,form,fieldset,input,textarea,p,
 	padding:0;
 }
 
+#main-content {
+    padding: 80px 10px 10px 10px;
+}
+
 fieldset,img { 
 	border:0;
 }

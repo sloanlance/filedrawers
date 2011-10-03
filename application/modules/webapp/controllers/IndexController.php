@@ -24,6 +24,11 @@ class IndexController extends Zend_Controller_Action
         $this->view->messages = $this->_flashMessenger->getMessages();
     }
 
+    public function notsupportedAction()
+    {
+
+    }
+
     public function listAction()
     {
         $path = $this->_request->getParam('path');
