@@ -26,7 +26,6 @@ class Webservices_FavoritesController extends Webservices_FiledrawersControllerA
 
         $serviceValidator = new Zend_Validate_InArray( array_keys( $this->_availableServices ));
         $serviceValidator->setStrict( TRUE );
-        $wappverValidator = new Zend_Validate_Int();
         $validators = array(
             'service' => array(
                 $serviceValidator,
@@ -34,7 +33,6 @@ class Webservices_FavoritesController extends Webservices_FiledrawersControllerA
                 'default' => Zend_Registry::get('config')->filesystem->default
             ),
             'wappver' => array(
-                $wappverValidator,
                 'presence' => 'optional',
                 'default' => 0
             )
@@ -51,7 +49,7 @@ class Webservices_FavoritesController extends Webservices_FiledrawersControllerA
             $this->view->errorMsg = array( 'wappver' => array( 'invalid' => 'invalid wappver flag' ));
             throw( new Zend_Exception( 'wappver (Web App Version) parameter must be an integer.' ));
         }
-        if ( (int) $input->wappver > 0 ) {
+        if ( $input->wappver > 0 ) {
             if ( $input->wappver != Zend_Registry::get( 'webAppVersion' )) {
                 // TODO there are better ways to do this:
                 $this->view->errorMsg = '<a href="" >Refresh</a> to get an updated version of the interface.';
